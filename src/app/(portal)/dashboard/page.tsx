@@ -1,30 +1,42 @@
-import { auth } from "@/auth";
-import { redirect } from "next/navigation";
-
-export default async function DashboardPage() {
-  const session = await auth();
-  if (!session?.user) redirect("/login");
-
+export default function DashboardPage() {
   return (
-    <main className="min-h-screen bg-zinc-50 p-8">
-      <h1 className="text-2xl font-semibold text-zinc-900">
-        Dashboard
-      </h1>
-      <p className="mt-1 text-sm text-zinc-500">
-        Selamat datang, {session.user.name}
-      </p>
-      <pre className="mt-6 rounded-lg bg-zinc-900 p-4 text-xs text-zinc-100">
-        {JSON.stringify(
-          {
-            role: session.user.role,
-            organizationId: session.user.organizationId,
-            branchId: session.user.branchId,
-            email: session.user.email,
-          },
-          null,
-          2
-        )}
-      </pre>
-    </main>
+    <div className="space-y-6">
+      <div>
+        <h1 className="text-3xl font-bold tracking-tight text-slate-900">Dashboard</h1>
+        <p className="text-sm text-slate-500">Ringkasan aktivitas klinik hari ini.</p>
+      </div>
+      
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+        {/* Mock KPI Cards */}
+        <div className="rounded-xl border bg-white p-6 shadow-sm">
+          <div className="flex flex-row items-center justify-between pb-2">
+            <h3 className="text-sm font-medium text-slate-500">Total Janji Hari Ini</h3>
+          </div>
+          <div className="text-2xl font-bold text-slate-900">24</div>
+          <p className="text-xs text-slate-500">+2 dari kemarin</p>
+        </div>
+        <div className="rounded-xl border bg-white p-6 shadow-sm">
+          <div className="flex flex-row items-center justify-between pb-2">
+            <h3 className="text-sm font-medium text-slate-500">Pasien Hadir</h3>
+          </div>
+          <div className="text-2xl font-bold text-emerald-600">18</div>
+          <p className="text-xs text-slate-500">75% tingkat kehadiran</p>
+        </div>
+        <div className="rounded-xl border bg-white p-6 shadow-sm">
+          <div className="flex flex-row items-center justify-between pb-2">
+            <h3 className="text-sm font-medium text-slate-500">Pasien Baru</h3>
+          </div>
+          <div className="text-2xl font-bold text-slate-900">5</div>
+          <p className="text-xs text-slate-500">Bulan ini: 42</p>
+        </div>
+         <div className="rounded-xl border bg-white p-6 shadow-sm">
+          <div className="flex flex-row items-center justify-between pb-2">
+            <h3 className="text-sm font-medium text-slate-500">Pendapatan Estimasi</h3>
+          </div>
+          <div className="text-2xl font-bold text-slate-900">Rp 4.2M</div>
+          <p className="text-xs text-slate-500">Berdasarkan janji selesai</p>
+        </div>
+      </div>
+    </div>
   );
 }
