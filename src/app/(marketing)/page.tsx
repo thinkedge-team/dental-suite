@@ -137,13 +137,13 @@ export default function HomePage() {
             {/* Right Visual Column: Genuine Treatment Environment */}
             <div className="lg:col-span-5 relative">
               <div className="relative rounded-3xl overflow-hidden bg-card border border-border/80 shadow-2xl p-2 group">
-                <div className="relative w-full h-[400px] sm:h-[460px] rounded-2xl overflow-hidden">
+                <div className="relative w-full h-[420px] sm:h-[480px] rounded-2xl overflow-hidden">
                   <Image
                     src="/images/clinic-room.jpg"
                     alt="Ruang Tindakan Klinik Gigi Senyum Sehat"
                     fill
                     priority
-                    sizes="(max-width: 1024px) 100vw, 500px"
+                    sizes="(max-width: 1024px) 100vw, 550px"
                     className="object-cover group-hover:scale-105 transition-transform duration-700"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-transparent" />
@@ -188,9 +188,6 @@ export default function HomePage() {
       <section className="max-w-[1440px] mx-auto px-6 sm:px-8 lg:px-12">
         <div className="grid lg:grid-cols-12 gap-10 items-center">
           <div className="lg:col-span-5 space-y-5">
-            <span className="text-xs uppercase font-bold text-primary tracking-widest block">
-              Bukti Hasil Klinis
-            </span>
             <h2 className="text-3xl sm:text-4xl font-bold text-foreground tracking-tight leading-tight">
               Transformasi senyum nyata dengan teknik minimal invasif.
             </h2>
@@ -239,10 +236,7 @@ export default function HomePage() {
 
       {/* 3. CLINICAL STANDARDS PROTOCOL: Replaces AI Slop 3-Equal Cards with Professional Checklist */}
       <section className="max-w-[1440px] mx-auto px-6 sm:px-8 lg:px-12">
-        <div className="space-y-4 max-w-2xl mb-12">
-          <span className="text-xs uppercase font-bold text-primary tracking-widest block">
-            Protokol Klinis
-          </span>
+        <div className="space-y-3 max-w-2xl mb-12">
           <h2 className="text-3xl sm:text-4xl font-bold text-foreground tracking-tight">
             Empat Pilar Keamanan Perawatan Pasien
           </h2>
@@ -280,9 +274,6 @@ export default function HomePage() {
       <section className="max-w-[1440px] mx-auto px-6 sm:px-8 lg:px-12">
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-10">
           <div className="space-y-2">
-            <span className="text-xs uppercase font-bold text-primary tracking-widest block">
-              Pilihan Tindakan
-            </span>
             <h2 className="text-3xl sm:text-4xl font-bold text-foreground tracking-tight">
               Layanan Perawatan Unggulan
             </h2>
@@ -300,8 +291,8 @@ export default function HomePage() {
           </Link>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {mockServices.slice(0, 3).map((service) => (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {mockServices.map((service) => (
             <ServiceCard key={service.id} service={service} />
           ))}
         </div>
@@ -311,9 +302,6 @@ export default function HomePage() {
       <section className="max-w-[1440px] mx-auto px-6 sm:px-8 lg:px-12">
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-10">
           <div className="space-y-2">
-            <span className="text-xs uppercase font-bold text-primary tracking-widest block">
-              Tim Medis
-            </span>
             <h2 className="text-3xl sm:text-4xl font-bold text-foreground tracking-tight">
               Dokter Gigi Spesialis Kami
             </h2>
@@ -341,9 +329,6 @@ export default function HomePage() {
       {/* 6. DUAL-BRANCH LOCATIONS */}
       <section className="max-w-[1440px] mx-auto px-6 sm:px-8 lg:px-12">
         <div className="space-y-3 mb-10 max-w-xl">
-          <span className="text-xs uppercase font-bold text-primary tracking-widest block">
-            Jaringan Cabang
-          </span>
           <h2 className="text-3xl sm:text-4xl font-bold text-foreground tracking-tight">
             Kunjungi Cabang Terdekat di Jakarta
           </h2>
@@ -363,10 +348,6 @@ export default function HomePage() {
       <section className="max-w-[1440px] mx-auto px-6 sm:px-8 lg:px-12">
         <div className="rounded-3xl bg-card border border-border/80 p-8 sm:p-12 shadow-sm relative overflow-hidden">
           <div className="max-w-3xl space-y-5">
-            <span className="inline-flex items-center gap-1.5 text-xs font-bold text-primary uppercase tracking-widest">
-              <ShieldCheck className="w-4 h-4" />
-              Kemudahan Pembayaran
-            </span>
             <h2 className="text-2xl sm:text-3xl font-bold text-foreground tracking-tight">
               Dukungan Klaim Asuransi dan BPJS Kesehatan
             </h2>
@@ -406,9 +387,6 @@ export default function HomePage() {
       {/* 8. FAQ ACCORDION SECTION */}
       <section className="max-w-4xl mx-auto px-6 sm:px-8">
         <div className="text-center space-y-3 mb-10">
-          <span className="text-xs uppercase font-bold text-primary tracking-widest block">
-            Tanya Jawab
-          </span>
           <h2 className="text-3xl font-bold text-foreground tracking-tight">
             Pertanyaan yang Sering Diajukan
           </h2>
