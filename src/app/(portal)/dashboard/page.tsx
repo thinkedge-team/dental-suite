@@ -1,6 +1,22 @@
 import { Calendar, Users, TrendingUp, Clock, ArrowRight, UserPlus, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
+interface MetricCardProps {
+  title: string;
+  value: string;
+  trend: string;
+  icon: React.ReactNode;
+  accent?: boolean;
+  positive?: boolean;
+}
+
+const UPCOMING_APPOINTMENTS = [
+  { id: "apt-1", time: "09:00", name: "Sarah Wijaya", type: "Pembersihan Gigi", status: "Menunggu", color: "bg-amber-100 text-amber-800" },
+  { id: "apt-2", time: "09:45", name: "Budi Santoso", type: "Konsultasi Implant", status: "Diperiksa", color: "bg-orange-100 text-orange-800" },
+  { id: "apt-3", time: "10:30", name: "Rina Kartika", type: "Penambalan", status: "Terkonfirmasi", color: "bg-emerald-100 text-emerald-800" },
+  { id: "apt-4", time: "11:15", name: "Anton Prabowo", type: "Cabut Gigi", status: "Terkonfirmasi", color: "bg-emerald-100 text-emerald-800" },
+];
+
 export default function DashboardPage() {
   return (
     <div className="space-y-8 pb-10">
@@ -9,7 +25,7 @@ export default function DashboardPage() {
         <div 
           className="absolute inset-0 z-0 opacity-40 mix-blend-luminosity"
           style={{
-            backgroundImage: 'url("https://image.pollinations.ai/prompt/soft%20abstract%20medical%20background,%20clean%20warm%20orange%20and%20ink%20waves,%20minimalist%20dental%20theme,%20light%20and%20airy,%20high%20quality?width=1200&height=400&nologo=true&seed=99")',
+            backgroundImage: 'url("/images/dashboard-hero.jpg")',
             backgroundSize: 'cover',
             backgroundPosition: 'center',
             filter: 'contrast(1.1) brightness(0.85)'
@@ -18,7 +34,7 @@ export default function DashboardPage() {
         <div className="absolute inset-0 bg-gradient-to-r from-foreground via-foreground/90 to-transparent z-0" />
         
         <div className="relative z-10 max-w-2xl text-background">
-          <p className="text-sm font-semibold tracking-widest uppercase opacity-80 mb-2 text-primary">Selasa, 4 September 2026</p>
+          <p className="text-sm font-semibold tracking-widest uppercase opacity-80 mb-2 text-primary">Aktivitas Hari Ini</p>
           <h1 className="text-4xl md:text-5xl font-light mb-4 leading-tight tracking-tight">
             Selamat pagi, <span className="font-semibold text-white">Dr. Budi</span>.
           </h1>
@@ -80,13 +96,8 @@ export default function DashboardPage() {
           
           <div className="rounded-xl border border-border bg-card shadow-sm overflow-hidden">
             <div className="divide-y divide-border">
-              {[
-                { time: "09:00", name: "Sarah Wijaya", type: "Pembersihan Gigi", status: "Menunggu", color: "bg-amber-100 text-amber-800" },
-                { time: "09:45", name: "Budi Santoso", type: "Konsultasi Implant", status: "Diperiksa", color: "bg-orange-100 text-orange-800" },
-                { time: "10:30", name: "Rina Kartika", type: "Penambalan", status: "Terkonfirmasi", color: "bg-emerald-100 text-emerald-800" },
-                { time: "11:15", name: "Anton Prabowo", type: "Cabut Gigi", status: "Terkonfirmasi", color: "bg-emerald-100 text-emerald-800" },
-              ].map((apt, i) => (
-                <div key={i} className="flex items-center p-4 hover:bg-muted/30 transition-colors">
+              {UPCOMING_APPOINTMENTS.map((apt) => (
+                <div key={apt.id} className="flex items-center p-4 hover:bg-muted/30 transition-colors">
                   <div className="w-16 shrink-0 text-sm font-semibold text-foreground flex items-center gap-1.5">
                     <Clock className="h-3.5 w-3.5 text-muted-foreground" /> {apt.time}
                   </div>
@@ -145,7 +156,7 @@ export default function DashboardPage() {
   );
 }
 
-function MetricCard({ title, value, trend, icon, accent, positive }: any) {
+function MetricCard({ title, value, trend, icon, accent, positive }: MetricCardProps) {
   return (
     <div className="relative overflow-hidden rounded-xl border border-border bg-card p-5 shadow-sm group hover:shadow-md transition-shadow">
       <div className="flex justify-between items-start mb-4">
@@ -172,6 +183,7 @@ function MetricCard({ title, value, trend, icon, accent, positive }: any) {
     </div>
   );
 }
+
 
 
 
