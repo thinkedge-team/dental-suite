@@ -65,7 +65,7 @@ export default function ServicesPage() {
           {searchQuery && (
             <button
               onClick={() => setSearchQuery("")}
-              className="absolute right-3.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground p-1"
+              className="absolute right-3.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground p-1 cursor-pointer"
               aria-label="Bersihkan pencarian"
             >
               <X className="w-4 h-4" />
