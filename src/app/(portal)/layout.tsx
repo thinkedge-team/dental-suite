@@ -1,27 +1,51 @@
+import { redirect } from "next/navigation";
+import { auth } from "@/auth";
+import { prisma } from "@/lib/prisma";
 import { Sidebar } from "@/components/portal/sidebar";
+import { PortalHeader } from "@/components/portal/header";
 
-export default function PortalLayout({
+export default async function PortalLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const session = await auth();
+
+  if (!session?.user) {
+    redirect("/login");
+  }
+
+  const branches = await prisma.branch.findMany({
+    where: {
+      organizationId: session.user.organizationId,
+      isActive: true,
+    },
+    select: {
+      id: true,
+      name: true,
+    },
+    orderBy: {
+      name: "asc",
+    },
+  });
+
   return (
-    <div className="flex min-h-screen bg-background flex-col md:flex-row">
-      <Sidebar />
+    <div className="flex min-h-screen bg-background flex-col md:flex-row font-sans">
+      <Sidebar 
+        user={{
+          name: session.user.name,
+          role: session.user.role,
+          branchName: session.user.branchName,
+        }}
+        modules={session.user.modules}
+      />
       <main className="flex-1 flex flex-col min-w-0 overflow-hidden">
-        <header className="hidden md:flex h-14 items-center justify-between border-b bg-card px-8 shadow-none">
-          <div className="font-semibold text-foreground text-sm">
-            Klinik Gigi Senyum Sehat
-          </div>
-          <div className="flex items-center gap-4">
-            <span className="text-sm text-muted-foreground">
-              Cabang:{" "}
-              <strong className="text-foreground font-semibold">
-                Semua Cabang
-              </strong>
-            </span>
-          </div>
-        </header>
+        <PortalHeader
+          organizationName={session.user.organizationName}
+          branchName={session.user.branchName}
+          role={session.user.role}
+          branches={branches}
+        />
         <div className="flex-1 overflow-auto p-4 md:p-8">
           <div className="mx-auto max-w-6xl">{children}</div>
         </div>
@@ -29,4 +53,5 @@ export default function PortalLayout({
     </div>
   );
 }
+
 

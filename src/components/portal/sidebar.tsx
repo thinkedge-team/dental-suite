@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { signOut } from "next-auth/react";
 import { cn } from "@/lib/utils";
 import {
   LayoutDashboard,
@@ -12,17 +13,23 @@ import {
   X,
   Stethoscope,
   Building2,
+  LogOut,
 } from "lucide-react";
 import { useState } from "react";
 
-const navigation = [
-  { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
-  { name: "Jadwal Janji", href: "/appointments", icon: CalendarDays },
-  { name: "Pasien", href: "/patients", icon: Users },
-  { name: "Dokter", href: "/doctors", icon: Stethoscope },
-  { name: "Cabang", href: "/branches", icon: Building2 },
-  { name: "Pengaturan", href: "/settings/organization", icon: Settings },
-];
+interface SidebarProps {
+  user?: {
+    name?: string | null;
+    role?: string;
+    branchName?: string | null;
+  };
+  modules?: {
+    grow: boolean;
+    connect: boolean;
+    operate: boolean;
+    intelligence: boolean;
+  };
+}
 
 function ToothMark() {
   return (
@@ -36,16 +43,64 @@ function ToothMark() {
   );
 }
 
-export function Sidebar() {
+export function Sidebar({ user, modules }: SidebarProps) {
   const pathname = usePathname();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  const role = user?.role ?? "DIRECTOR";
+  const userModules = modules ?? { grow: true, connect: true, operate: false, intelligence: false };
+
+  const navigation = [
+    { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard, show: true },
+    { 
+      name: "Jadwal Janji", 
+      href: "/appointments", 
+      icon: CalendarDays, 
+      show: userModules.connect 
+    },
+    { 
+      name: "Pasien", 
+      href: "/patients", 
+      icon: Users, 
+      show: userModules.connect || userModules.operate 
+    },
+    { 
+      name: "Dokter", 
+      href: "/doctors", 
+      icon: Stethoscope, 
+      show: userModules.connect 
+    },
+    { 
+      name: "Cabang", 
+      href: "/branches", 
+      icon: Building2, 
+      show: role === "DIRECTOR" || role === "MANAGER" || role === "SUPER_ADMIN" 
+    },
+    { 
+      name: "Pengaturan", 
+      href: "/settings/organization", 
+      icon: Settings, 
+      show: role === "DIRECTOR" || role === "SUPER_ADMIN" 
+    },
+  ].filter((item) => item.show);
+
+  const displayName = user?.name || "Admin Klinik";
+  const initials = displayName
+    .split(" ")
+    .map((n) => n[0])
+    .slice(0, 2)
+    .join("")
+    .toUpperCase();
 
   return (
     <>
       <div className="md:hidden flex items-center justify-between p-4 border-b bg-sidebar">
-        <span className="font-semibold text-base text-sidebar-foreground tracking-tight">
-          Think Edge Dental
-        </span>
+        <div className="flex items-center gap-2">
+          <ToothMark />
+          <span className="font-semibold text-base text-sidebar-foreground tracking-tight">
+            Think Edge Dental
+          </span>
+        </div>
         <button
           type="button"
           aria-label="Buka menu navigasi"
@@ -105,16 +160,28 @@ export function Sidebar() {
         </nav>
 
         <div className="p-3 border-t border-sidebar-border">
-          <div className="flex items-center gap-3 px-3 py-2">
-            <div className="h-8 w-8 rounded-full bg-sidebar-accent flex items-center justify-center text-white font-bold text-xs shrink-0">
-              AD
+          <div className="flex items-center justify-between px-2 py-2">
+            <div className="flex items-center gap-3 min-w-0">
+              <div className="h-8 w-8 rounded-full bg-sidebar-accent flex items-center justify-center text-white font-bold text-xs shrink-0">
+                {initials}
+              </div>
+              <div className="flex flex-col min-w-0">
+                <span className="text-sm font-medium text-white truncate">
+                  {displayName}
+                </span>
+                <span className="text-[10px] text-primary uppercase font-bold tracking-wider">
+                  {role}
+                </span>
+              </div>
             </div>
-            <div className="flex flex-col min-w-0">
-              <span className="text-sm font-medium text-white truncate">
-                Admin Klinik
-              </span>
-              <span className="text-xs text-white/50">Pusat</span>
-            </div>
+
+            <button
+              onClick={() => signOut({ callbackUrl: "/login" })}
+              className="text-white/40 hover:text-destructive p-1 rounded transition-colors md:hidden"
+              title="Keluar"
+            >
+              <LogOut className="w-4 h-4" />
+            </button>
           </div>
         </div>
       </aside>
