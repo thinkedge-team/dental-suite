@@ -2,12 +2,14 @@
 
 import { useState } from "react";
 import { signIn } from "next-auth/react";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Mail, LockKeyhole, ArrowRight, Activity } from "lucide-react";
 
 export function LoginForm() {
+  const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -18,17 +20,6 @@ export function LoginForm() {
     setLoading(true);
     setError(null);
 
-    // TODO: Wire up actual Auth.js once backend is ready
-    // Mocking for now
-    setTimeout(() => {
-        if(email && password) {
-             window.location.href = "/portal/dashboard";
-        } else {
-             setError("Email atau password salah.");
-             setLoading(false);
-        }
-    }, 1000)
-    /*
     const res = await signIn("credentials", {
       email,
       password,
@@ -36,24 +27,22 @@ export function LoginForm() {
     });
 
     if (res?.error) {
-      setError("Email atau password salah.");
+      setError("Email atau kata sandi salah. Periksa kembali dan coba lagi.");
       setLoading(false);
-      return;
+    } else {
+      router.push("/dashboard");
     }
-    window.location.href = "/portal/dashboard";
-    */
   }
 
   return (
-    <Card>
-      <CardHeader className="text-center">
-        <CardTitle>Masuk</CardTitle>
-        <CardDescription>Masukkan email dan kata sandi Anda</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
+    <form onSubmit={handleSubmit} className="space-y-6">
+      <div className="space-y-4">
+        <div className="space-y-1.5">
+          <Label htmlFor="email" className="text-foreground font-medium text-sm flex items-center gap-2">
+            Email
+          </Label>
+          <div className="relative">
+            <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
               id="email"
               type="email"
@@ -62,27 +51,70 @@ export function LoginForm() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               disabled={loading}
+              className="h-12 pl-10 bg-card border-border focus-visible:ring-primary shadow-sm"
             />
           </div>
-          <div className="space-y-2">
-            <Label htmlFor="password">Kata Sandi</Label>
+        </div>
+        <div className="space-y-1.5">
+          <div className="flex items-center justify-between">
+            <Label htmlFor="password" className="text-foreground font-medium text-sm flex items-center gap-2">
+              Kata Sandi
+            </Label>
+            <a href="#" className="text-xs text-primary font-medium hover:underline">Lupa sandi?</a>
+          </div>
+          <div className="relative">
+            <LockKeyhole className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
               id="password"
               type="password"
+              placeholder="Masukkan kata sandi (min. 8 karakter)"
               required
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               disabled={loading}
+              className="h-12 pl-10 bg-card border-border focus-visible:ring-primary shadow-sm"
             />
           </div>
+        </div>
+      </div>
 
-          {error && <p className="text-sm font-medium text-destructive">{error}</p>}
+      {error && (
+        <div className="text-sm text-destructive bg-destructive/10 border border-destructive/20 px-4 py-3 rounded-lg flex items-start gap-3">
+          <Activity className="h-4 w-4 mt-0.5 shrink-0" />
+          <p className="leading-tight">{error}</p>
+        </div>
+      )}
 
-          <Button type="submit" className="w-full" disabled={loading}>
-            {loading ? "Memproses..." : "Masuk"}
-          </Button>
-        </form>
-      </CardContent>
-    </Card>
+      <Button
+        type="submit"
+        className="w-full h-12 bg-primary hover:bg-primary/90 text-primary-foreground font-semibold text-base shadow-md group"
+        disabled={loading}
+      >
+        {loading ? "Memverifikasi..." : "Masuk ke Dasbor"}
+        {!loading && <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />}
+      </Button>
+
+      <div className="pt-6 border-t border-border/60 mt-8">
+        <div className="rounded-lg bg-muted/30 p-4 border border-border/50">
+          <p className="text-[11px] uppercase tracking-widest text-muted-foreground mb-3 font-bold">Kredensial Demo Tersedia</p>
+          <div className="space-y-2 text-xs text-muted-foreground font-medium">
+            <div className="flex justify-between items-center group cursor-default hover:text-foreground transition-colors">
+              <span className="flex items-center gap-2"><span className="w-1.5 h-1.5 rounded-full bg-primary" /> director@demo.com</span>
+              <span className="font-mono bg-background px-1.5 py-0.5 rounded text-[10px] border border-border">demo123456</span>
+            </div>
+            <div className="flex justify-between items-center group cursor-default hover:text-foreground transition-colors">
+              <span className="flex items-center gap-2"><span className="w-1.5 h-1.5 rounded-full bg-slate-400" /> manager@demo.com</span>
+              <span className="font-mono bg-background px-1.5 py-0.5 rounded text-[10px] border border-border">demo123456</span>
+            </div>
+            <div className="flex justify-between items-center group cursor-default hover:text-foreground transition-colors">
+              <span className="flex items-center gap-2"><span className="w-1.5 h-1.5 rounded-full bg-slate-300" /> staff@demo.com</span>
+              <span className="font-mono bg-background px-1.5 py-0.5 rounded text-[10px] border border-border">demo123456</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </form>
   );
 }
+
+
