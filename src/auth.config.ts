@@ -10,7 +10,14 @@ export const authConfig = {
 
       // Public surfaces: patient web (GROW/CONNECT) stays open.
       const isPublic =
-        pathname === "/" || pathname.startsWith("/book") || pathname.startsWith("/s/");
+        pathname === "/" ||
+        pathname.startsWith("/layanan") ||
+        pathname.startsWith("/dokter") ||
+        pathname.startsWith("/lokasi") ||
+        pathname.startsWith("/asuransi") ||
+        pathname.startsWith("/images") ||
+        pathname.startsWith("/book") ||
+        pathname.startsWith("/s/");
 
       if (isPublic) return true;
       if (isLoggedIn) return true;
