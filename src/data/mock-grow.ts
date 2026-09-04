@@ -10,6 +10,7 @@ export interface MockService {
   basePrice: number;
   featured: boolean;
   insuranceCovered: boolean;
+  imageUrl?: string;
   indications: string[];
   steps: string[];
   faqs: { question: string; answer: string }[];
@@ -45,6 +46,7 @@ export interface MockBranch {
   phone: string;
   whatsapp: string;
   hours: string;
+  imageUrl?: string;
   facilities: string[];
   mapEmbedUrl: string;
 }
@@ -70,6 +72,7 @@ export const mockServices: MockService[] = [
     basePrice: 450000,
     featured: true,
     insuranceCovered: true,
+    imageUrl: '/images/service-scaling.jpg',
     indications: ['Gusi sering berdarah saat sikat gigi', 'Karang gigi menumpuk', 'Bau mulut tidak sedap'],
     steps: ['Pemeriksaan intraoral & foto rongga mulut', 'Scaling ultrasonik pada rahang atas & bawah', 'Polesing pasta fluorida untuk proteksi enamel'],
     faqs: [
@@ -89,6 +92,7 @@ export const mockServices: MockService[] = [
     basePrice: 550000,
     featured: true,
     insuranceCovered: true,
+    imageUrl: '/images/clinic-room.jpg',
     indications: ['Gigi berlubang ringan hingga sedang', 'Gigi depan sompel atau retak', 'Penggantian tambalan lama'],
     steps: ['Pembersihan jaringan karies secara steril', 'Etsa dan bonding enamel', 'Aplikasi komposit lapis demi lapis dengan light-curing', 'Polesing akhir hingga kilap alami'],
     faqs: [
@@ -107,6 +111,7 @@ export const mockServices: MockService[] = [
     basePrice: 2500000,
     featured: true,
     insuranceCovered: false,
+    imageUrl: '/images/service-bleaching.jpg',
     indications: ['Gigi menguning akibat kopi/teh/rokok', 'Perubahan warna usia', 'Persiapan acara pernikahan/foto penting'],
     steps: ['Pembersihan awal & isolasi gusi dengan gingival barrier', 'Aplikasi gel pemutih medis', 'Aktivasi sinar LED 3 siklus @ 15 menit', 'Aplikasi gel anti-sensitivitas'],
     faqs: [
@@ -125,6 +130,7 @@ export const mockServices: MockService[] = [
     basePrice: 2800000,
     featured: false,
     insuranceCovered: true,
+    imageUrl: '/images/clinic-room.jpg',
     indications: ['Nyeri berulang di rahang belakang', 'Gusi bengkak di sekitar gigi bungsu', 'Gigi mendesak susunan gigi lain'],
     steps: ['Analisis foto rontgen panoramik', 'Anestesi lokal profundal', 'Pemisahan gigi dan pengangkatan presisi', 'Penjahitan dan instruksi pasca-bedah'],
     faqs: [
@@ -146,7 +152,7 @@ export const mockDoctors: MockDoctor[] = [
     experienceYears: 9,
     education: ['Dokter Gigi - Universitas Indonesia (2015)', 'Spesialis Konservasi Gigi - Universitas Indonesia (2019)'],
     bio: 'drg. Sarah memiliki keahlian mendalam dalam perawatan mikroskopik saluran akar dan restorasi estetik minimal invasif untuk mempertahankan gigi asli selama mungkin.',
-    photoUrl: '/images/dashboard-hero.jpg',
+    photoUrl: '/images/doctor-sarah.jpg',
     branches: ['Kelapa Gading', 'Pluit'],
     schedule: [
       { day: 'Senin', branch: 'Kelapa Gading', hours: '10:00 - 16:00' },
@@ -167,7 +173,7 @@ export const mockDoctors: MockDoctor[] = [
     experienceYears: 12,
     education: ['Dokter Gigi - Universitas Padjadjaran (2012)', 'Spesialis Bedah Mulut - Universitas Airlangga (2017)'],
     bio: 'drg. Budi memimpin divisi bedah mulut dengan pengalaman lebih dari 1.500 kasus impaksi gigi dan prosedur implan gigi berteknologi computer-guided.',
-    photoUrl: '/images/dashboard-hero.jpg',
+    photoUrl: '/images/doctor-budi.jpg',
     branches: ['Kelapa Gading', 'Pluit'],
     schedule: [
       { day: 'Selasa', branch: 'Pluit', hours: '13:00 - 20:00' },
@@ -187,7 +193,7 @@ export const mockDoctors: MockDoctor[] = [
     experienceYears: 7,
     education: ['Dokter Gigi - Universitas Gadjah Mada (2017)', 'Spesialis Ortodonti - Universitas Indonesia (2022)'],
     bio: 'drg. Jessica berspesialisasi dalam perawatan kawat gigi konvensional maupun aligner transparan untuk mengoreksi gigitan dan menciptakan senyum simetris harmonis.',
-    photoUrl: '/images/dashboard-hero.jpg',
+    photoUrl: '/images/doctor-jessica.jpg',
     branches: ['Kelapa Gading'],
     schedule: [
       { day: 'Senin', branch: 'Kelapa Gading', hours: '13:00 - 20:00' },
@@ -207,6 +213,7 @@ export const mockBranches: MockBranch[] = [
     phone: '(021) 4587-9901',
     whatsapp: '6281234567890',
     hours: 'Senin - Sabtu: 09:00 - 20:00 WIB (Minggu Libur)',
+    imageUrl: '/images/branch-kelapa-gading.jpg',
     facilities: ['4 Dental Unit Ergonomis', 'Dental X-Ray Digital Panoramik', 'Ruang Sterilisasi Standar Autoklaf Kelas B', 'Lounge Pasien & WiFi Cepat', 'Parkir Mobil Luas & Valet Gratis'],
     mapEmbedUrl: 'https://maps.google.com'
   },
@@ -219,6 +226,7 @@ export const mockBranches: MockBranch[] = [
     phone: '(021) 6682-1102',
     whatsapp: '6281234567891',
     hours: 'Senin - Sabtu: 09:00 - 20:00 WIB (Minggu Libur)',
+    imageUrl: '/images/branch-pluit.jpg',
     facilities: ['3 Dental Unit Khusus Bedah & Estetika', 'Intraoral Scanner 3D', 'Ruang Tindakan VIP Ramah Anak', 'Area Parkir Basemen Nyaman'],
     mapEmbedUrl: 'https://maps.google.com'
   }

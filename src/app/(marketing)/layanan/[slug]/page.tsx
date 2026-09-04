@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import {
   Clock,
   ShieldCheck,
@@ -113,6 +114,20 @@ export default async function ServiceDetailPage({
             <h2 className="text-xl font-semibold text-foreground tracking-tight flex items-center gap-2">
               Tentang Perawatan
             </h2>
+
+            {service.imageUrl && (
+              <div className="relative w-full h-64 sm:h-80 rounded-2xl overflow-hidden bg-muted border border-border/70 shadow-xs mb-4">
+                <Image
+                  src={service.imageUrl}
+                  alt={service.name}
+                  fill
+                  priority
+                  sizes="(max-width: 1024px) 100vw, 800px"
+                  className="object-cover"
+                />
+              </div>
+            )}
+
             <div className="rounded-2xl bg-card border border-border/70 p-6 shadow-xs leading-relaxed text-muted-foreground text-sm md:text-base space-y-3">
               <p>{service.description}</p>
             </div>

@@ -54,7 +54,7 @@ export default function HomePage() {
           <div
             className="absolute inset-0 z-0 opacity-30 mix-blend-luminosity"
             style={{
-              backgroundImage: 'url("/images/dashboard-hero.jpg")',
+              backgroundImage: 'url("/images/clinic-room.jpg")',
               backgroundSize: "cover",
               backgroundPosition: "center",
             }}

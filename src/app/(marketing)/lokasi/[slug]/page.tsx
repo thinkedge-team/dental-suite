@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import {
   MapPin,
   Clock,
@@ -7,11 +8,13 @@ import {
   MessageCircle,
   Building2,
   ChevronRight,
-  CheckCircle2,
+  Sparkles,
   ExternalLink,
-  Users,
-  Navigation,
   ShieldCheck,
+  Calendar,
+  Navigation,
+  CheckCircle2,
+  Users,
 } from "lucide-react";
 import { mockBranches, mockDoctors } from "@/data/mock-grow";
 import { DoctorCard } from "@/components/grow/doctor-card";
@@ -81,6 +84,19 @@ export default async function BranchDetailPage({
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start mb-16">
         {/* Left Column: Branch Information Card */}
         <div className="lg:col-span-7 space-y-6">
+          {branch.imageUrl && (
+            <div className="relative w-full h-64 sm:h-80 rounded-2xl overflow-hidden bg-muted border border-border/70 shadow-xs">
+              <Image
+                src={branch.imageUrl}
+                alt={branch.name}
+                fill
+                priority
+                sizes="(max-width: 1024px) 100vw, 700px"
+                className="object-cover"
+              />
+            </div>
+          )}
+
           <div className="space-y-3">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-semibold">
               <Building2 className="w-3.5 h-3.5" /> Cabang Resmi Klinik
