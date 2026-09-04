@@ -16,7 +16,6 @@ import {
   Settings,
   ShieldCheck
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 interface HeaderProps {

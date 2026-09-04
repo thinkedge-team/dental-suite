@@ -246,7 +246,7 @@ export default async function DoctorDetailPage({
                     </span>
                   </div>
                   <Link
-                    href={`/kontak`}
+                    href={`/lokasi/${branch === "Pluit" ? "pluit" : "kelapa-gading"}`}
                     className="text-xs font-semibold text-primary hover:underline"
                   >
                     Peta Lokasi

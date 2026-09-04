@@ -1,7 +1,6 @@
 import { Metadata } from "next";
 import Link from "next/link";
 import {
-  ShieldCheck,
   CreditCard,
   CheckCircle2,
   HelpCircle,
@@ -9,7 +8,6 @@ import {
   FileCheck,
   UserCheck,
   MessageCircle,
-  ArrowRight,
   Sparkles,
 } from "lucide-react";
 import { mockInsurances } from "@/data/mock-grow";

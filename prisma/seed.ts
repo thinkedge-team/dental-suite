@@ -36,7 +36,7 @@ async function main() {
     },
   });
 
-  const branch2 = await prisma.branch.upsert({
+  await prisma.branch.upsert({
     where: { organizationId_slug: { organizationId: org.id, slug: 'pluit' } },
     update: {},
     create: {

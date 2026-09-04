@@ -2,14 +2,11 @@ import { Metadata } from "next";
 import Link from "next/link";
 import {
   MapPin,
-  Building2,
   FileText,
   ShieldCheck,
   CalendarCheck,
   MessageCircle,
-  Sparkles,
   Layers,
-  ArrowRight,
 } from "lucide-react";
 import { mockBranches } from "@/data/mock-grow";
 import { BranchCard } from "@/components/grow/branch-card";

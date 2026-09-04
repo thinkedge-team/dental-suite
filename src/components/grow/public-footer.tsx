@@ -51,28 +51,23 @@ export function PublicFooter() {
             </h4>
             <ul className="space-y-2 text-xs">
               <li>
-                <Link href="/layanan" className="text-muted-foreground hover:text-foreground transition-colors inline-flex items-center gap-1">
+                <Link href="/layanan/scaling-gigi" className="text-muted-foreground hover:text-foreground transition-colors inline-flex items-center gap-1">
                   Pembersihan Karang (Scaling)
                 </Link>
               </li>
               <li>
-                <Link href="/layanan" className="text-muted-foreground hover:text-foreground transition-colors inline-flex items-center gap-1">
+                <Link href="/layanan/tambal-gigi-estetis" className="text-muted-foreground hover:text-foreground transition-colors inline-flex items-center gap-1">
                   Penambalan Estetis (Resin Komposit)
                 </Link>
               </li>
               <li>
-                <Link href="/layanan" className="text-muted-foreground hover:text-foreground transition-colors inline-flex items-center gap-1">
+                <Link href="/layanan/bleaching-gigi" className="text-muted-foreground hover:text-foreground transition-colors inline-flex items-center gap-1">
                   Pemutihan Gigi (In-Office Bleaching)
                 </Link>
               </li>
               <li>
-                <Link href="/layanan" className="text-muted-foreground hover:text-foreground transition-colors inline-flex items-center gap-1">
-                  Perawatan Saluran Akar (Endodontik)
-                </Link>
-              </li>
-              <li>
-                <Link href="/layanan" className="text-muted-foreground hover:text-foreground transition-colors inline-flex items-center gap-1">
-                  Pemasangan Behel Gigi (Ortodonti)
+                <Link href="/layanan/odontektomi-gigi-bungsu" className="text-muted-foreground hover:text-foreground transition-colors inline-flex items-center gap-1">
+                  Pencabutan Gigi Bungsu (Odontektomi)
                 </Link>
               </li>
               <li>
@@ -92,22 +87,26 @@ export function PublicFooter() {
               <div>
                 <div className="flex items-center gap-1.5 font-semibold text-foreground">
                   <MapPin className="w-3.5 h-3.5 text-primary shrink-0" />
-                  <span>Cabang Kelapa Gading</span>
+                  <Link href="/lokasi/kelapa-gading" className="hover:text-primary transition-colors">
+                    Cabang Kelapa Gading
+                  </Link>
                 </div>
-                <p className="text-[11px] mt-0.5">Jl. Boulevard Raya Blok LA No. 12, Jakarta Utara</p>
+                <p className="text-[11px] mt-0.5">Jl. Boulevard Raya Blok LB 3 No. 12, Kelapa Gading</p>
                 <p className="text-[11px] text-muted-foreground/80 flex items-center gap-1 mt-0.5">
-                  <Clock className="w-3 h-3" /> Senin – Sabtu: 09:00 – 21:00 WIB
+                  <Clock className="w-3 h-3" /> Senin – Sabtu: 09:00 – 20:00 WIB
                 </p>
               </div>
 
               <div className="pt-2 border-t border-border/40">
                 <div className="flex items-center gap-1.5 font-semibold text-foreground">
                   <MapPin className="w-3.5 h-3.5 text-primary shrink-0" />
-                  <span>Cabang Pluit</span>
+                  <Link href="/lokasi/pluit" className="hover:text-primary transition-colors">
+                    Cabang Pluit
+                  </Link>
                 </div>
-                <p className="text-[11px] mt-0.5">Jl. Pluit Sakti Raya No. 45, Jakarta Utara</p>
+                <p className="text-[11px] mt-0.5">Ruko Pluit Junction Blok A No. 8, Jl. Pluit Raya</p>
                 <p className="text-[11px] text-muted-foreground/80 flex items-center gap-1 mt-0.5">
-                  <Clock className="w-3 h-3" /> Setiap Hari: 10:00 – 20:00 WIB
+                  <Clock className="w-3 h-3" /> Senin – Sabtu: 09:00 – 20:00 WIB
                 </p>
               </div>
             </div>

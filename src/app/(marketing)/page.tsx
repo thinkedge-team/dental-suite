@@ -83,31 +83,42 @@ export default function HomePage() {
 
             <div className="space-y-3">
               {[
-                { name: "Pembersihan Gigi (Scaling)", price: "Rp 250.000", duration: "45 menit" },
-                { name: "Penambalan Gigi Estetis", price: "Rp 400.000", duration: "60 menit" },
-                { name: "Pemutihan Gigi (Bleaching)", price: "Rp 800.000", duration: "90 menit" },
-                { name: "Konsultasi & Pemeriksaan", price: "Rp 150.000", duration: "20 menit" },
+                { name: "Pembersihan Gigi (Scaling)", price: "Rp 450.000", duration: "45 menit", href: "/layanan/scaling-gigi" },
+                { name: "Penambalan Gigi Estetis", price: "Rp 550.000", duration: "60 menit", href: "/layanan/tambal-gigi-estetis" },
+                { name: "Pemutihan Gigi (Bleaching)", price: "Rp 2.500.000", duration: "60 menit", href: "/layanan/bleaching-gigi" },
+                { name: "Pencabutan Gigi Bungsu", price: "Rp 2.800.000", duration: "60 menit", href: "/layanan/odontektomi-gigi-bungsu" },
               ].map((item, i) => (
-                <div
+                <Link
                   key={i}
-                  className="flex justify-between items-center p-3.5 rounded-xl bg-white/5 border border-white/10 backdrop-blur-sm"
+                  href={item.href}
+                  className="flex justify-between items-center p-3.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 hover:border-primary/40 backdrop-blur-sm transition-all group/item"
                 >
                   <div>
-                    <p className="text-sm font-medium text-white">{item.name}</p>
+                    <p className="text-sm font-medium text-white group-hover/item:text-primary transition-colors">{item.name}</p>
                     <p className="text-xs text-white/50 flex items-center gap-1 mt-0.5">
                       <Clock className="w-3 h-3" /> {item.duration}
                     </p>
                   </div>
-                  <span className="text-sm font-bold text-primary font-mono">{item.price}</span>
-                </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-bold text-primary font-mono">{item.price}</span>
+                    <ArrowRight className="w-3.5 h-3.5 text-white/40 group-hover/item:text-primary group-hover/item:translate-x-0.5 transition-all" />
+                  </div>
+                </Link>
               ))}
             </div>
 
             <div className="flex items-center justify-between text-xs text-white/60 pt-2 border-t border-white/10">
-              <Link href="/lokasi" className="flex items-center gap-2 hover:text-white transition-colors">
+              <div className="flex items-center gap-3">
                 <MapPin className="w-4 h-4 text-primary shrink-0" />
-                <span>Jakarta Utara: Kelapa Gading & Pluit</span>
-              </Link>
+                <span className="text-white/40">Cabang:</span>
+                <Link href="/lokasi/kelapa-gading" className="hover:text-primary transition-colors underline decoration-white/20 underline-offset-2">
+                  Kelapa Gading
+                </Link>
+                <span className="text-white/20">•</span>
+                <Link href="/lokasi/pluit" className="hover:text-primary transition-colors underline decoration-white/20 underline-offset-2">
+                  Pluit
+                </Link>
+              </div>
               <Link href="/dokter" className="text-primary hover:underline font-semibold">
                 Jadwal Dokter
               </Link>
