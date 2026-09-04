@@ -44,6 +44,7 @@ export default async function PortalLayout({
           organizationName={session.user.organizationName}
           branchName={session.user.branchName}
           role={session.user.role}
+          userName={session.user.name}
           branches={branches}
         />
         <div className="flex-1 overflow-auto p-4 md:p-8">

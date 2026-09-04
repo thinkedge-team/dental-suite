@@ -19,6 +19,7 @@ interface HeaderProps {
   organizationName: string;
   branchName?: string | null;
   role: string;
+  userName?: string | null;
   branches?: Array<{ id: string; name: string }>;
 }
 
@@ -26,12 +27,21 @@ export function PortalHeader({
   organizationName,
   branchName,
   role,
+  userName,
   branches = [],
 }: HeaderProps) {
   const isDirector = role === "DIRECTOR" || role === "SUPER_ADMIN";
   const [selectedBranch, setSelectedBranch] = useState<string>(branchName || "Semua Cabang");
   const [branchDropdownOpen, setBranchDropdownOpen] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
+
+  const displayName = userName || "Pengguna";
+  const initials = displayName
+    .split(" ")
+    .map((n) => n[0])
+    .slice(0, 2)
+    .join("")
+    .toUpperCase();
 
   return (
     <header className="hidden md:flex h-16 items-center justify-between border-b border-border/60 bg-card/90 backdrop-blur-md px-6 lg:px-8 sticky top-0 z-30 transition-colors">
@@ -175,6 +185,23 @@ export function PortalHeader({
 
         <div className="h-5 w-px bg-border/80" />
 
+        {/* Logged in User Profile Info */}
+        <div className="flex items-center gap-2.5 pl-1">
+          <div className="h-8 w-8 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center text-primary font-bold text-xs shrink-0">
+            {initials}
+          </div>
+          <div className="flex flex-col min-w-0 hidden sm:flex">
+            <span className="text-xs font-semibold text-foreground truncate max-w-[140px]">
+              {displayName}
+            </span>
+            <span className="text-[10px] text-muted-foreground font-medium truncate">
+              {role.toLowerCase()}
+            </span>
+          </div>
+        </div>
+
+        <div className="h-5 w-px bg-border/80" />
+
         <Button
           variant="ghost"
           size="sm"
@@ -183,7 +210,7 @@ export function PortalHeader({
           title="Keluar dari sesi"
         >
           <LogOut className="w-3.5 h-3.5" />
-          <span>Keluar</span>
+          <span className="hidden sm:inline">Keluar</span>
         </Button>
       </div>
     </header>
