@@ -46,22 +46,11 @@ export function PortalHeader({
   return (
     <header className="hidden md:flex h-16 items-center justify-between border-b border-border/60 bg-card/90 backdrop-blur-md px-6 lg:px-8 sticky top-0 z-30 transition-colors">
       <div className="flex items-center gap-4">
-        <div className="flex flex-col">
-          <div className="flex items-center gap-2">
-            <span className="font-bold text-foreground text-sm tracking-tight">
-              {organizationName}
-            </span>
-            <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-primary/10 text-primary border border-primary/20">
-              {role}
-            </span>
-          </div>
-          <div className="flex items-center gap-1.5 text-[11px] text-muted-foreground mt-0.5">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-            <span>Klinik Operasional</span>
-          </div>
-        </div>
+        <span className="font-bold text-foreground text-sm tracking-tight">
+          {organizationName}
+        </span>
 
-        <div className="h-6 w-px bg-border/80 mx-1" />
+        <div className="h-4 w-px bg-border/80 mx-0.5" />
 
         <div className="relative">
           <button
