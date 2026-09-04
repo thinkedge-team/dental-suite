@@ -79,7 +79,11 @@ export function LoginForm() {
       </div>
 
       {error && (
-        <div className="text-sm text-destructive bg-destructive/10 border border-destructive/20 px-4 py-3 rounded-lg flex items-start gap-3">
+        <div 
+          role="alert" 
+          aria-live="polite"
+          className="text-sm text-destructive bg-destructive/10 border border-destructive/20 px-4 py-3 rounded-lg flex items-start gap-3"
+        >
           <Activity className="h-4 w-4 mt-0.5 shrink-0" />
           <p className="leading-tight">{error}</p>
         </div>
@@ -94,25 +98,39 @@ export function LoginForm() {
         {!loading && <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />}
       </Button>
 
-      <div className="pt-6 border-t border-border/60 mt-8">
-        <div className="rounded-lg bg-muted/30 p-4 border border-border/50">
-          <p className="text-[11px] uppercase tracking-widest text-muted-foreground mb-3 font-bold">Kredensial Demo Tersedia</p>
-          <div className="space-y-2 text-xs text-muted-foreground font-medium">
-            <div className="flex justify-between items-center group cursor-default hover:text-foreground transition-colors">
-              <span className="flex items-center gap-2"><span className="w-1.5 h-1.5 rounded-full bg-primary" /> director@demo.com</span>
-              <span className="font-mono bg-background px-1.5 py-0.5 rounded text-[10px] border border-border">demo123456</span>
-            </div>
-            <div className="flex justify-between items-center group cursor-default hover:text-foreground transition-colors">
-              <span className="flex items-center gap-2"><span className="w-1.5 h-1.5 rounded-full bg-slate-400" /> manager@demo.com</span>
-              <span className="font-mono bg-background px-1.5 py-0.5 rounded text-[10px] border border-border">demo123456</span>
-            </div>
-            <div className="flex justify-between items-center group cursor-default hover:text-foreground transition-colors">
-              <span className="flex items-center gap-2"><span className="w-1.5 h-1.5 rounded-full bg-slate-300" /> staff@demo.com</span>
-              <span className="font-mono bg-background px-1.5 py-0.5 rounded text-[10px] border border-border">demo123456</span>
+      {process.env.NODE_ENV !== "production" && (
+        <div className="pt-6 border-t border-border/60 mt-8">
+          <div className="rounded-lg bg-muted/30 p-4 border border-border/50">
+            <p className="text-[11px] uppercase tracking-widest text-muted-foreground mb-3 font-bold">Kredensial Demo (Dev Mode)</p>
+            <div className="space-y-2 text-xs text-muted-foreground font-medium">
+              <button
+                type="button"
+                onClick={() => { setEmail("director@demo.com"); setPassword("demo123456"); }}
+                className="w-full flex justify-between items-center group hover:text-foreground transition-colors text-left"
+              >
+                <span className="flex items-center gap-2"><span className="w-1.5 h-1.5 rounded-full bg-primary" /> director@demo.com</span>
+                <span className="font-mono bg-background px-1.5 py-0.5 rounded text-[10px] border border-border">Isi Form</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => { setEmail("manager@demo.com"); setPassword("demo123456"); }}
+                className="w-full flex justify-between items-center group hover:text-foreground transition-colors text-left"
+              >
+                <span className="flex items-center gap-2"><span className="w-1.5 h-1.5 rounded-full bg-slate-400" /> manager@demo.com</span>
+                <span className="font-mono bg-background px-1.5 py-0.5 rounded text-[10px] border border-border">Isi Form</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => { setEmail("staff@demo.com"); setPassword("demo123456"); }}
+                className="w-full flex justify-between items-center group hover:text-foreground transition-colors text-left"
+              >
+                <span className="flex items-center gap-2"><span className="w-1.5 h-1.5 rounded-full bg-slate-300" /> staff@demo.com</span>
+                <span className="font-mono bg-background px-1.5 py-0.5 rounded text-[10px] border border-border">Isi Form</span>
+              </button>
             </div>
           </div>
         </div>
-      </div>
+      )}
     </form>
   );
 }

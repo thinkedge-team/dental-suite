@@ -14,7 +14,7 @@ export default function LoginPage() {
         <div 
           className="absolute inset-0 z-0 opacity-40 mix-blend-luminosity"
           style={{
-            backgroundImage: 'url("https://image.pollinations.ai/prompt/luxurious%20modern%20dental%20clinic%20interior,%20warm%20orange%20accents,%20dark%20charcoal%20and%20ink%20elements,%20clean%20minimalist%20architecture,%20soft%20clinical%20lighting,%20high%20end%20aesthetic,%20no%20text,%20photorealistic?width=1920&height=1080&nologo=true&seed=88")',
+            backgroundImage: 'url("/images/login-bg.jpg")',
             backgroundSize: 'cover',
             backgroundPosition: 'center',
             filter: 'contrast(1.1) brightness(0.85)'
