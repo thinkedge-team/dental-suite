@@ -119,13 +119,13 @@ export function Sidebar({ user, modules }: SidebarProps) {
       <aside
         id="sidebar-drawer"
         className={cn(
-          "fixed inset-y-0 left-0 z-50 bg-sidebar text-sidebar-foreground/80 transition-all duration-300 ease-in-out md:relative flex flex-col",
+          "fixed inset-y-0 left-0 z-50 bg-sidebar text-sidebar-foreground/80 transition-all duration-300 ease-in-out md:relative md:h-screen md:sticky md:top-0 flex flex-col shrink-0 overflow-hidden",
           mobileMenuOpen ? "translate-x-0 w-60" : "-translate-x-full md:translate-x-0",
           isCollapsed ? "md:w-[68px]" : "md:w-60"
         )}
       >
         <div className={cn(
-          "flex h-16 items-center border-b border-sidebar-border transition-all",
+          "flex h-16 items-center border-b border-sidebar-border transition-all shrink-0",
           isCollapsed ? "justify-center px-2" : "justify-between px-5"
         )}>
           <div className="flex items-center gap-3 overflow-hidden">
@@ -156,7 +156,7 @@ export function Sidebar({ user, modules }: SidebarProps) {
           </button>
         </div>
 
-        <nav className="flex flex-col gap-1 p-2.5 flex-1">
+        <nav className="flex flex-col gap-1 p-2.5 flex-1 overflow-y-auto overflow-x-hidden">
           {navigation.map((item) => {
             const isActive = pathname.startsWith(item.href);
             return (
@@ -195,7 +195,7 @@ export function Sidebar({ user, modules }: SidebarProps) {
           })}
         </nav>
 
-        <div className="p-2.5 border-t border-sidebar-border">
+        <div className="p-2.5 border-t border-sidebar-border shrink-0">
           <div className={cn(
             "flex items-center rounded-lg transition-all",
             isCollapsed ? "justify-center p-1" : "justify-between px-2 py-2"

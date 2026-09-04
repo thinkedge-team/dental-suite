@@ -30,7 +30,7 @@ export default async function PortalLayout({
   });
 
   return (
-    <div className="flex min-h-screen bg-background flex-col md:flex-row font-sans">
+    <div className="flex h-screen overflow-hidden bg-background font-sans flex-col md:flex-row">
       <Sidebar 
         user={{
           name: session.user.name,
@@ -39,7 +39,7 @@ export default async function PortalLayout({
         }}
         modules={session.user.modules}
       />
-      <main className="flex-1 flex flex-col min-w-0 overflow-hidden">
+      <main className="flex-1 flex flex-col min-w-0 h-full overflow-hidden">
         <PortalHeader
           organizationName={session.user.organizationName}
           branchName={session.user.branchName}
@@ -47,7 +47,7 @@ export default async function PortalLayout({
           userName={session.user.name}
           branches={branches}
         />
-        <div className="flex-1 overflow-auto p-4 md:p-8">
+        <div className="flex-1 overflow-y-auto p-4 md:p-8">
           <div className="mx-auto max-w-6xl">{children}</div>
         </div>
       </main>
