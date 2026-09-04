@@ -25,6 +25,7 @@ import { mockServices, mockDoctors, mockBranches, mockInsurances } from "@/data/
 import { ServiceCard } from "@/components/grow/service-card";
 import { DoctorCard } from "@/components/grow/doctor-card";
 import { BranchCard } from "@/components/grow/branch-card";
+import { BeforeAfterSlider } from "@/components/grow/before-after-slider";
 
 export default function HomePage() {
   const [activeFaq, setActiveFaq] = useState<number | null>(null);
@@ -171,7 +172,60 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* 2. VALUE PROPOSITION / BENTO EXCELLENCE */}
+      {/* 2. INTERACTIVE BEFORE & AFTER CLINICAL TRANSFORMATION */}
+      <section className="max-w-6xl mx-auto px-6">
+        <div className="grid lg:grid-cols-12 gap-10 items-center">
+          <div className="lg:col-span-5 space-y-5">
+            <span className="text-xs uppercase font-bold text-primary tracking-widest block">
+              Bukti Hasil Klinis
+            </span>
+            <h2 className="text-3xl sm:text-4xl font-bold text-foreground tracking-tight leading-tight">
+              Transformasi senyum nyata dengan teknik minimal invasif.
+            </h2>
+            <p className="text-muted-foreground text-sm sm:text-base leading-relaxed">
+              Geser garis slider di samping untuk melihat perbandingan gigi sebelum dan sesudah prosedur pembersihan karang ultrasonik dan pemutihan profesional dalam satu kali kunjungan.
+            </p>
+
+            <div className="space-y-3 pt-2">
+              <div className="flex items-start gap-3 p-3.5 rounded-xl bg-card border border-border/70">
+                <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0 mt-0.5" />
+                <div>
+                  <p className="text-sm font-semibold text-foreground">Warna Cerah Alami Merata</p>
+                  <p className="text-xs text-muted-foreground">Kenaikan hingga 6 sampai 8 tingkat kecerahan tanpa merusak lapisan enamel.</p>
+                </div>
+              </div>
+              <div className="flex items-start gap-3 p-3.5 rounded-xl bg-card border border-border/70">
+                <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0 mt-0.5" />
+                <div>
+                  <p className="text-sm font-semibold text-foreground">Gusi Sehat & Bebas Radang</p>
+                  <p className="text-xs text-muted-foreground">Pengangkatan plak subgingival tuntas untuk mencegah pendarahan dan bau mulut.</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="pt-2">
+              <Link
+                href="/layanan/bleaching-gigi"
+                className="inline-flex items-center gap-2 text-sm font-semibold text-primary hover:underline"
+              >
+                <span>Pelajari Prosedur Pemutihan Gigi</span>
+                <ArrowRight className="w-4 h-4" />
+              </Link>
+            </div>
+          </div>
+
+          <div className="lg:col-span-7">
+            <BeforeAfterSlider
+              beforeImage="/images/smile-before.jpg"
+              afterImage="/images/smile-after.jpg"
+              beforeLabel="Sebelum Perawatan"
+              afterLabel="Sesudah Bleaching & Scaling"
+            />
+          </div>
+        </div>
+      </section>
+
+      {/* 3. VALUE PROPOSITION / BENTO EXCELLENCE */}
       <section className="max-w-6xl mx-auto px-6">
         <div className="text-center space-y-3 mb-12">
           <span className="text-xs uppercase font-bold text-primary tracking-widest block">
