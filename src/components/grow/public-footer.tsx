@@ -4,7 +4,7 @@ import { ShieldCheck, MapPin, Clock, Phone, ArrowUpRight } from "lucide-react";
 export function PublicFooter() {
   return (
     <footer className="border-t border-border/60 bg-card/60 text-card-foreground font-sans">
-      <div className="max-w-6xl mx-auto px-6 py-12 md:py-16">
+      <div className="max-w-[1440px] mx-auto px-6 sm:px-8 lg:px-12 py-14 md:py-20">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10">
           {/* Column 1: Clinic Info & Kemenkes accreditation */}
           <div className="space-y-4">

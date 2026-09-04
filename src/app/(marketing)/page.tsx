@@ -75,8 +75,8 @@ export default function HomePage() {
   return (
     <div className="space-y-28 md:space-y-40 pb-32 font-sans selection:bg-primary/20">
       {/* 1. HERO SECTION: Clean Asymmetric Editorial with Contextual Photography */}
-      <section className="relative pt-6 md:pt-14 overflow-hidden">
-        <div className="max-w-6xl mx-auto px-6">
+      <section className="relative pt-8 md:pt-20 overflow-hidden">
+        <div className="max-w-[1440px] mx-auto px-6 sm:px-8 lg:px-12">
           <div className="grid lg:grid-cols-12 gap-12 lg:gap-10 items-center">
             {/* Left Content Column */}
             <div className="lg:col-span-7 space-y-6">
@@ -185,7 +185,7 @@ export default function HomePage() {
       </section>
 
       {/* 2. INTERACTIVE CLINICAL TRANSFORMATION SLIDER (Genuine Before-After Proof) */}
-      <section className="max-w-6xl mx-auto px-6">
+      <section className="max-w-[1440px] mx-auto px-6 sm:px-8 lg:px-12">
         <div className="grid lg:grid-cols-12 gap-10 items-center">
           <div className="lg:col-span-5 space-y-5">
             <span className="text-xs uppercase font-bold text-primary tracking-widest block">
@@ -238,7 +238,7 @@ export default function HomePage() {
       </section>
 
       {/* 3. CLINICAL STANDARDS PROTOCOL: Replaces AI Slop 3-Equal Cards with Professional Checklist */}
-      <section className="max-w-6xl mx-auto px-6">
+      <section className="max-w-[1440px] mx-auto px-6 sm:px-8 lg:px-12">
         <div className="space-y-4 max-w-2xl mb-12">
           <span className="text-xs uppercase font-bold text-primary tracking-widest block">
             Protokol Klinis
@@ -277,7 +277,7 @@ export default function HomePage() {
       </section>
 
       {/* 4. FEATURED PROCEDURES SHOWCASE */}
-      <section className="max-w-6xl mx-auto px-6">
+      <section className="max-w-[1440px] mx-auto px-6 sm:px-8 lg:px-12">
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-10">
           <div className="space-y-2">
             <span className="text-xs uppercase font-bold text-primary tracking-widest block">
@@ -308,7 +308,7 @@ export default function HomePage() {
       </section>
 
       {/* 5. DOCTORS DIRECTORY SHOWCASE */}
-      <section className="max-w-6xl mx-auto px-6">
+      <section className="max-w-[1440px] mx-auto px-6 sm:px-8 lg:px-12">
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-10">
           <div className="space-y-2">
             <span className="text-xs uppercase font-bold text-primary tracking-widest block">
@@ -339,7 +339,7 @@ export default function HomePage() {
       </section>
 
       {/* 6. DUAL-BRANCH LOCATIONS */}
-      <section className="max-w-6xl mx-auto px-6">
+      <section className="max-w-[1440px] mx-auto px-6 sm:px-8 lg:px-12">
         <div className="space-y-3 mb-10 max-w-xl">
           <span className="text-xs uppercase font-bold text-primary tracking-widest block">
             Jaringan Cabang
@@ -360,7 +360,7 @@ export default function HomePage() {
       </section>
 
       {/* 7. INSURANCE & PAYMENT TRANSPARENCY */}
-      <section className="max-w-6xl mx-auto px-6">
+      <section className="max-w-[1440px] mx-auto px-6 sm:px-8 lg:px-12">
         <div className="rounded-3xl bg-card border border-border/80 p-8 sm:p-12 shadow-sm relative overflow-hidden">
           <div className="max-w-3xl space-y-5">
             <span className="inline-flex items-center gap-1.5 text-xs font-bold text-primary uppercase tracking-widest">
@@ -404,7 +404,7 @@ export default function HomePage() {
       </section>
 
       {/* 8. FAQ ACCORDION SECTION */}
-      <section className="max-w-4xl mx-auto px-6">
+      <section className="max-w-4xl mx-auto px-6 sm:px-8">
         <div className="text-center space-y-3 mb-10">
           <span className="text-xs uppercase font-bold text-primary tracking-widest block">
             Tanya Jawab
@@ -446,7 +446,7 @@ export default function HomePage() {
       </section>
 
       {/* 9. BOTTOM CONVERSION ACTION */}
-      <section className="max-w-6xl mx-auto px-6">
+      <section className="max-w-[1440px] mx-auto px-6 sm:px-8 lg:px-12">
         <div className="relative rounded-3xl bg-foreground text-background p-8 sm:p-14 overflow-hidden shadow-2xl">
           <div
             className="absolute inset-0 z-0 opacity-20"

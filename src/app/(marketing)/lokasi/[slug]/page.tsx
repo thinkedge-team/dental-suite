@@ -51,7 +51,7 @@ export default async function BranchDetailPage({
   );
 
   return (
-    <div className="py-10 md:py-16 max-w-6xl mx-auto px-6 font-sans">
+    <div className="py-10 md:py-16 max-w-[1440px] mx-auto px-6 sm:px-8 lg:px-12 font-sans">
       {/* Breadcrumbs */}
       <nav aria-label="Breadcrumb" className="mb-8">
         <ol className="flex items-center gap-2 text-xs text-muted-foreground flex-wrap">

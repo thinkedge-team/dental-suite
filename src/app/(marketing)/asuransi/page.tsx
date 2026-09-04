@@ -68,7 +68,7 @@ const INSURANCE_FAQS = [
 
 export default function InsurancePage() {
   return (
-    <div className="py-12 md:py-20 max-w-6xl mx-auto px-6 font-sans">
+    <div className="py-12 md:py-20 max-w-[1440px] mx-auto px-6 sm:px-8 lg:px-12 font-sans">
       {/* Hero Header Section */}
       <div className="text-center max-w-3xl mx-auto space-y-4 mb-14">
         <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-primary/10 text-primary text-xs font-bold uppercase tracking-wider">

@@ -19,7 +19,7 @@ export function PublicHeader() {
 
   return (
     <header className="bg-card/90 backdrop-blur-md border-b border-border/60 sticky top-0 z-40 transition-colors font-sans">
-      <div className="max-w-6xl mx-auto px-6 h-18 flex items-center justify-between">
+      <div className="max-w-[1440px] mx-auto px-6 sm:px-8 lg:px-12 h-20 flex items-center justify-between">
         {/* Brand Logo & Title */}
         <Link href="/" className="flex items-center gap-3 group">
           <div className="bg-primary/10 p-2 rounded-xl border border-primary/20 group-hover:bg-primary/20 transition-colors">
