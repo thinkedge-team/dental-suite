@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { signOut } from "next-auth/react";
 import { 
   LogOut, 
@@ -8,9 +9,12 @@ import {
   ChevronDown, 
   Search, 
   Bell, 
-  Sparkles,
-  Check,
-  Calendar
+  Sparkles, 
+  Check, 
+  Calendar,
+  User,
+  Settings,
+  ShieldCheck
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -34,6 +38,7 @@ export function PortalHeader({
   const [selectedBranch, setSelectedBranch] = useState<string>(branchName || "Semua Cabang");
   const [branchDropdownOpen, setBranchDropdownOpen] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
+  const [userDropdownOpen, setUserDropdownOpen] = useState(false);
 
   const displayName = userName || "Pengguna";
   const initials = displayName
@@ -174,33 +179,88 @@ export function PortalHeader({
 
         <div className="h-5 w-px bg-border/80" />
 
-        {/* Logged in User Profile Info */}
-        <div className="flex items-center gap-2.5 pl-1">
-          <div className="h-8 w-8 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center text-primary font-bold text-xs shrink-0">
-            {initials}
-          </div>
-          <div className="flex flex-col min-w-0 hidden sm:flex">
-            <span className="text-xs font-semibold text-foreground truncate max-w-[140px]">
-              {displayName}
-            </span>
-            <span className="text-[10px] text-muted-foreground font-medium truncate">
-              {role.toLowerCase()}
-            </span>
-          </div>
+        {/* Interactive User Profile Dropdown */}
+        <div className="relative">
+          <button
+            type="button"
+            onClick={() => setUserDropdownOpen(!userDropdownOpen)}
+            aria-label="Menu profil pengguna"
+            aria-expanded={userDropdownOpen}
+            className="flex items-center gap-2.5 p-1 rounded-xl hover:bg-muted/60 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary group"
+          >
+            <div className="h-8 w-8 rounded-full bg-primary/10 border border-primary/25 flex items-center justify-center text-primary font-bold text-xs shrink-0 group-hover:bg-primary/20 transition-colors">
+              {initials}
+            </div>
+            <div className="flex flex-col min-w-0 text-left hidden sm:flex">
+              <span className="text-xs font-semibold text-foreground truncate max-w-[130px] leading-tight">
+                {displayName}
+              </span>
+              <span className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider leading-tight mt-0.5">
+                {role.toLowerCase()}
+              </span>
+            </div>
+            <ChevronDown className={cn("w-3.5 h-3.5 text-muted-foreground transition-transform duration-200 hidden sm:block", userDropdownOpen && "rotate-180")} />
+          </button>
+
+          {/* User Profile Menu Dropdown */}
+          {userDropdownOpen && (
+            <>
+              <div 
+                aria-hidden="true" 
+                className="fixed inset-0 z-40" 
+                onClick={() => setUserDropdownOpen(false)} 
+              />
+              <div className="absolute right-0 mt-2 w-60 rounded-xl bg-card border border-border shadow-xl py-2 z-50 animate-in fade-in-0 zoom-in-95">
+                <div className="px-4 py-2 border-b border-border/60">
+                  <p className="text-xs font-bold text-foreground truncate">{displayName}</p>
+                  <p className="text-[11px] text-muted-foreground capitalize mt-0.5">{role.toLowerCase()} • {organizationName}</p>
+                </div>
+
+                <div className="py-1.5 px-1.5 space-y-0.5">
+                  <Link
+                    href="/dashboard"
+                    onClick={() => setUserDropdownOpen(false)}
+                    className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-medium text-foreground hover:bg-muted/70 transition-colors"
+                  >
+                    <User className="w-4 h-4 text-muted-foreground" />
+                    <span>Profil Pengguna</span>
+                  </Link>
+
+                  {isDirector && (
+                    <Link
+                      href="/settings/organization"
+                      onClick={() => setUserDropdownOpen(false)}
+                      className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-medium text-foreground hover:bg-muted/70 transition-colors"
+                    >
+                      <Settings className="w-4 h-4 text-muted-foreground" />
+                      <span>Pengaturan Klinik</span>
+                    </Link>
+                  )}
+
+                  <a
+                    href="#keamanan"
+                    onClick={(e) => { e.preventDefault(); setUserDropdownOpen(false); }}
+                    className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-medium text-foreground hover:bg-muted/70 transition-colors"
+                  >
+                    <ShieldCheck className="w-4 h-4 text-muted-foreground" />
+                    <span>Keamanan Akun</span>
+                  </a>
+                </div>
+
+                <div className="border-t border-border/60 pt-1.5 px-1.5">
+                  <button
+                    type="button"
+                    onClick={() => signOut({ callbackUrl: "/login" })}
+                    className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-semibold text-destructive hover:bg-destructive/10 transition-colors text-left"
+                  >
+                    <LogOut className="w-4 h-4 text-destructive" />
+                    <span>Keluar dari Akun</span>
+                  </button>
+                </div>
+              </div>
+            </>
+          )}
         </div>
-
-        <div className="h-5 w-px bg-border/80" />
-
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => signOut({ callbackUrl: "/login" })}
-          className="text-muted-foreground hover:text-destructive hover:bg-destructive/10 text-xs font-semibold gap-1.5 h-9 px-3 rounded-lg transition-colors"
-          title="Keluar dari sesi"
-        >
-          <LogOut className="w-3.5 h-3.5" />
-          <span className="hidden sm:inline">Keluar</span>
-        </Button>
       </div>
     </header>
   );
