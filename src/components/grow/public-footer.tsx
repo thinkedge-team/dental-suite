@@ -93,7 +93,7 @@ export function PublicFooter() {
                 </div>
                 <p className="text-[11px] mt-0.5">Jl. Boulevard Raya Blok LB 3 No. 12, Kelapa Gading</p>
                 <p className="text-[11px] text-muted-foreground/80 flex items-center gap-1 mt-0.5">
-                  <Clock className="w-3 h-3" /> Senin – Sabtu: 09:00 – 20:00 WIB
+                  <Clock className="w-3 h-3" /> Senin - Sabtu: 09:00 - 20:00 WIB
                 </p>
               </div>
 
@@ -106,7 +106,7 @@ export function PublicFooter() {
                 </div>
                 <p className="text-[11px] mt-0.5">Ruko Pluit Junction Blok A No. 8, Jl. Pluit Raya</p>
                 <p className="text-[11px] text-muted-foreground/80 flex items-center gap-1 mt-0.5">
-                  <Clock className="w-3 h-3" /> Senin – Sabtu: 09:00 – 20:00 WIB
+                  <Clock className="w-3 h-3" /> Senin - Sabtu: 09:00 - 20:00 WIB
                 </p>
               </div>
             </div>
