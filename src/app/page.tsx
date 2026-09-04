@@ -6,10 +6,10 @@ export default function HomePage() {
   return (
     <div className="min-h-screen bg-background font-sans text-foreground selection:bg-primary/20">
       {/* Public Header */}
-      <header className="border-b border-border/60 bg-card/80 backdrop-blur-md sticky top-0 z-40">
-        <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="bg-primary/10 p-1.5 rounded-lg border border-primary/20">
+      <header className="border-b border-border/60 bg-card/85 backdrop-blur-md sticky top-0 z-40 transition-colors">
+        <div className="max-w-6xl mx-auto px-6 h-18 flex items-center justify-between">
+          <Link href="/" className="flex items-center gap-3 group">
+            <div className="bg-primary/10 p-2 rounded-xl border border-primary/20 group-hover:bg-primary/20 transition-colors">
               <svg width="24" height="24" viewBox="0 0 28 28" fill="none" aria-hidden="true">
                 <path
                   d="M14 3C10.5 3 7 5.5 7 9c0 2 .8 3.5 1.5 5C9.5 16 10 18 10 21c0 1.5.5 3 2 3s2-2 2-3.5c0-.8.4-1.5 1-1.5s1 .7 1 1.5C16 22 16.5 24 18 24s2-1.5 2-3c0-3 .5-5 1.5-7C22.2 12.5 23 11 23 9c0-3.5-3.5-6-9-6z"
@@ -18,22 +18,48 @@ export default function HomePage() {
               </svg>
             </div>
             <div>
-              <span className="font-bold text-base tracking-tight">Klinik Gigi Senyum Sehat</span>
-              <span className="block text-[10px] text-muted-foreground uppercase tracking-widest font-semibold">by Think Edge</span>
+              <span className="font-bold text-base tracking-tight text-foreground block group-hover:text-primary transition-colors">
+                Klinik Gigi Senyum Sehat
+              </span>
+              <span className="block text-[10px] text-muted-foreground uppercase tracking-widest font-semibold">
+                Think Edge Network
+              </span>
             </div>
-          </div>
+          </Link>
 
-          <nav className="flex items-center gap-4">
-            <Link href="/login" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors hidden sm:block">
-              Portal Staf
-            </Link>
+          {/* Center Navigation Links */}
+          <nav className="hidden lg:flex items-center gap-1 bg-muted/40 p-1.5 rounded-full border border-border/60">
+            <a href="#layanan" className="px-3.5 py-1.5 rounded-full text-xs font-semibold text-muted-foreground hover:text-foreground hover:bg-card/80 transition-all">
+              Layanan Unggulan
+            </a>
+            <a href="#cabang" className="px-3.5 py-1.5 rounded-full text-xs font-semibold text-muted-foreground hover:text-foreground hover:bg-card/80 transition-all">
+              Cabang & Jadwal
+            </a>
+            <a href="#asuransi" className="px-3.5 py-1.5 rounded-full text-xs font-semibold text-muted-foreground hover:text-foreground hover:bg-card/80 transition-all">
+              BPJS & Asuransi
+            </a>
+          </nav>
+
+          {/* Right CTAs */}
+          <div className="flex items-center gap-3">
+            <a
+              href="https://wa.me/6281234567890?text=Halo%2C%20saya%20ingin%20konsultasi%20jadwal%20dokter%20gigi."
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hidden sm:inline-flex items-center gap-2 px-3.5 py-2 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 text-xs font-bold transition-colors"
+            >
+              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+              <span>WhatsApp CS</span>
+            </a>
+
             <Link 
               href="/login"
-              className="inline-flex items-center justify-center rounded-lg bg-primary hover:bg-primary/90 text-primary-foreground font-semibold h-10 px-5 shadow-sm text-sm transition-all"
+              className="inline-flex items-center justify-center rounded-lg bg-primary hover:bg-primary/90 text-primary-foreground font-semibold h-10 px-4.5 shadow-sm text-xs transition-all gap-1.5"
             >
-              Masuk Portal <ArrowRight className="ml-1.5 h-4 w-4" />
+              <span>Portal Staf</span>
+              <ArrowRight className="h-3.5 w-3.5" />
             </Link>
-          </nav>
+          </div>
         </div>
       </header>
 
