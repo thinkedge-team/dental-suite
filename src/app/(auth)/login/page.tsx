@@ -3,7 +3,7 @@ import { LoginForm } from "@/components/auth/login-form";
 import { ShieldCheck } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "Masuk — Think Edge Dental Suite",
+  title: "Masuk | Think Edge Dental Suite",
 };
 
 export default function LoginPage() {
@@ -55,7 +55,7 @@ export default function LoginPage() {
             Satu platform<br />untuk seluruh<br />jaringan klinik.
           </h1>
           <p className="text-white/70 text-sm lg:text-base leading-relaxed max-w-sm">
-            Kelola jadwal, rekam medis pasien, metrik dokter, dan performa cabang — dari satu dasbor yang dirancang khusus untuk efisiensi operasional gigi.
+            Kelola jadwal, rekam medis pasien, metrik dokter, dan performa cabang langsung dari satu dasbor yang dirancang khusus untuk efisiensi operasional gigi.
           </p>
         </div>
 

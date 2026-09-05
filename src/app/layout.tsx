@@ -12,7 +12,7 @@ const jakarta = Plus_Jakarta_Sans({
 export const metadata: Metadata = {
   title: "Think Edge Dental Suite",
   description:
-    "Satu platform digital untuk jaringan klinik gigi — GROW, CONNECT, OPERATE, INTELLIGENCE.",
+    "Satu platform digital untuk jaringan klinik gigi: GROW, CONNECT, OPERATE, INTELLIGENCE.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

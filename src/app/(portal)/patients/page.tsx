@@ -143,7 +143,7 @@ export default async function PatientsPage({
           <ul className="divide-y divide-border">
             {patients.map((patient) => {
               const notesPreview = truncateNotes(patient.notes);
-              const dobLabel = patient.dob ? DOB_FORMATTER.format(patient.dob) : "—";
+              const dobLabel = patient.dob ? DOB_FORMATTER.format(patient.dob) : "-";
               const registeredLabel = REGISTERED_FORMATTER.format(patient.createdAt);
 
               return (

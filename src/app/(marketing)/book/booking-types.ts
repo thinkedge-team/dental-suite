@@ -22,6 +22,7 @@ export interface Service {
 export interface Org {
   readonly id: string;
   readonly name: string;
+  readonly slug: string;
 }
 
 export interface BookingForm {
@@ -50,9 +51,13 @@ export function todayString(): string {
 }
 
 export function formatDateId(iso: string): string {
+  if (!iso) return "-";
   const [y, m, d] = iso.split("-");
+  if (!y || !m || !d) return iso;
   const months = ["Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus","September","Oktober","November","Desember"];
-  return `${Number(d)} ${months[Number(m) - 1]} ${y}`;
+  const monthName = months[Number(m) - 1];
+  if (!monthName) return iso;
+  return `${Number(d)} ${monthName} ${y}`;
 }
 
 export function initials(name: string): string {

@@ -1,83 +1,41 @@
+import { prisma } from "@/lib/prisma";
 import { BookingWizard } from "./booking-wizard";
 
-interface BranchDto {
-  readonly id: string;
-  readonly name: string;
-  readonly address: string | null;
-  readonly whatsapp: string | null;
-}
-
-interface DoctorDto {
-  readonly id: string;
-  readonly name: string;
-  readonly specialty: string | null;
-  readonly photoUrl: string | null;
-  readonly branches: { readonly branchId: string }[];
-}
-
-interface ServiceDto {
-  readonly id: string;
-  readonly name: string;
-  readonly durationMin: number | null;
-}
-
-interface OrgDto {
-  readonly id: string;
-  readonly name: string;
-}
-
-interface BookingPayload {
-  readonly org: OrgDto;
-  readonly branches: BranchDto[];
-  readonly doctors: DoctorDto[];
-  readonly services: ServiceDto[];
-}
-
-interface EmptyPayload {
-  readonly org: OrgDto | null;
-  readonly branches: BranchDto[];
-  readonly doctors: DoctorDto[];
-  readonly services: ServiceDto[];
-  readonly error?: string;
-}
-
-async function loadBookingData(): Promise<EmptyPayload> {
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
-  try {
-    const res = await fetch(
-      `${baseUrl}/api/public/book?orgSlug=senyum-sehat`,
-      { cache: "no-store" },
-    );
-    if (!res.ok) {
-      return {
-        org: null,
-        branches: [],
-        doctors: [],
-        services: [],
-        error: `Gagal memuat data pemesanan (${res.status})`,
-      };
-    }
-    const data = (await res.json()) as BookingPayload;
-    return {
-      org: data.org,
-      branches: data.branches,
-      doctors: data.doctors,
-      services: data.services,
-    };
-  } catch (error) {
-    console.error("Failed to load booking data:", error);
-    return {
-      org: null,
-      branches: [],
-      doctors: [],
-      services: [],
-      error: "Layanan pemesanan sedang tidak tersedia. Silakan coba lagi.",
-    };
-  }
-}
+export const dynamic = "force-dynamic";
 
 export default async function BookingPage() {
-  const { org, branches, doctors, services, error } = await loadBookingData();
+  const orgSlug = process.env.NEXT_PUBLIC_DEFAULT_ORG_SLUG ?? "senyum-sehat";
+
+  const org = await prisma.organization.findUnique({
+    where: { slug: orgSlug },
+    select: { id: true, name: true, slug: true, moduleConnect: true },
+  });
+
+  const [branches, doctors, services] = org && org.moduleConnect
+    ? await Promise.all([
+        prisma.branch.findMany({
+          where: { organizationId: org.id, isActive: true },
+          select: { id: true, name: true, address: true, whatsapp: true },
+          orderBy: { name: "asc" },
+        }),
+        prisma.doctor.findMany({
+          where: { organizationId: org.id, isActive: true },
+          select: {
+            id: true,
+            name: true,
+            specialty: true,
+            photoUrl: true,
+            branches: { select: { branchId: true } },
+          },
+          orderBy: { name: "asc" },
+        }),
+        prisma.service.findMany({
+          where: { organizationId: org.id, isActive: true },
+          select: { id: true, name: true, durationMin: true },
+          orderBy: { sortOrder: "asc" },
+        }),
+      ])
+    : [[], [], []];
 
   return (
     <div className="pb-24 pt-10 sm:pt-14">
@@ -105,7 +63,7 @@ export default async function BookingPage() {
           ) : (
             <div className="w-full max-w-2xl rounded-2xl border border-border/70 bg-card p-8 text-center shadow-sm">
               <p className="text-sm font-semibold text-foreground">
-                {error ?? "Belum ada cabang aktif untuk pemesanan saat ini."}
+                Belum ada cabang aktif untuk pemesanan saat ini.
               </p>
               <p className="mt-2 text-sm text-muted-foreground">
                 Silakan hubungi resepsionis melalui kanal WhatsApp resmi klinik untuk konfirmasi jadwal.

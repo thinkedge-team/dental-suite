@@ -27,12 +27,12 @@ export async function completeAppointment(id: string, notes?: string): Promise<v
   const session = await auth();
   if (!session?.user) throw new Error("Unauthorized");
 
-  const appointment = await prisma.appointment.findUniqueOrThrow({
-    where: { id },
+  const appointment = await prisma.appointment.findFirst({
+    where: { id, organizationId: session.user.organizationId },
     select: { patientId: true, branchId: true, doctorId: true, organizationId: true },
   });
 
-  if (appointment.organizationId !== session.user.organizationId) {
+  if (!appointment) {
     throw new Error("Unauthorized");
   }
 

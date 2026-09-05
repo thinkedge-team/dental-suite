@@ -116,13 +116,13 @@ export default async function AppointmentDetailPage({
         <dl className="mt-6 grid gap-x-8 gap-y-5 md:grid-cols-2">
           <DetailField label="Nama Pasien" value={patientName} strong />
           <DetailField label="Nomor Telepon" value={patientPhone} />
-          <DetailField label="Layanan" value={appointment.service ?? "—"} />
-          <DetailField label="Alasan Kunjungan" value={appointment.reasonForVisit ?? "—"} />
+          <DetailField label="Layanan" value={appointment.service ?? "-"} />
+          <DetailField label="Alasan Kunjungan" value={appointment.reasonForVisit ?? "-"} />
           <DetailField label="Jadwal" value={formatDateTime(appointment.scheduledAt)} />
           <DetailField label="Cabang" value={appointment.branch.address ? `${appointment.branch.name} · ${appointment.branch.address}` : appointment.branch.name} />
-          <DetailField label="Dokter" value={appointment.doctor ? `${appointment.doctor.name}${appointment.doctor.specialty ? ` · ${appointment.doctor.specialty}` : ""}` : "—"} />
+          <DetailField label="Dokter" value={appointment.doctor ? `${appointment.doctor.name}${appointment.doctor.specialty ? ` · ${appointment.doctor.specialty}` : ""}` : "-"} />
           {appointment.checkInAt && <DetailField label="Waktu Check-in" value={formatTime(appointment.checkInAt)} />}
-          {appointment.visit && <DetailField label="Catatan Kunjungan" value={appointment.visit.notes ?? "—"} />}
+          {appointment.visit && <DetailField label="Catatan Kunjungan" value={appointment.visit.notes ?? "-"} />}
         </dl>
 
         {(canCheckIn || canComplete || canCancel) && (

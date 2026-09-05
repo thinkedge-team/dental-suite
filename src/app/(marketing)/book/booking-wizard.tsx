@@ -15,7 +15,7 @@ interface Props {
   readonly services: readonly Service[];
 }
 
-export function BookingWizard({ branches, doctors, services }: Props) {
+export function BookingWizard({ org, branches, doctors, services }: Props) {
   const [step, setStep] = useState<Step>(0);
   const [form, setForm] = useState<BookingForm>({
     branchId: "", serviceId: "", doctorId: "",
@@ -55,7 +55,7 @@ export function BookingWizard({ branches, doctors, services }: Props) {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          orgSlug: "senyum-sehat",
+          orgSlug: org.slug,
           branchId: form.branchId,
           doctorId: form.doctorId || undefined,
           serviceId: form.serviceId || undefined,

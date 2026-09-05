@@ -5,11 +5,11 @@
 @custom-variant dark (&:is(.dark *));
 
 /*
-  Dental Suite — Design Tokens (Think Edge Brand)
-  Primary:    Orange #f38218  — Main actions, accents
-  Background: Paper  #f7f5f0  — Warm off-white
-  Foreground: Ink    #161817  — Deepest dark
-  Surface:    Light  #ffffff  — Pure white for cards
+  Dental Suite - Design Tokens (Think Edge Brand)
+  Primary:    Orange #f38218  - Main actions, accents
+  Background: Paper  #f7f5f0  - Warm off-white
+  Foreground: Ink    #161817  - Deepest dark
+  Surface:    Light  #ffffff  - Pure white for cards
   Border:     Line   rgba(22, 24, 23, 0.12)
   Muted:      Slate  #5b6465
 */

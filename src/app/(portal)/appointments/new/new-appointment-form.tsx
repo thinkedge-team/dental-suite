@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState, useTransition, type FormEvent, type ReactNode } from "react";
+import { useState, useTransition, type FormEvent, type ReactNode } from "react";
 import { Building2, Calendar as CalendarIcon, ClipboardList, Loader2, Phone, Stethoscope, User as UserIcon } from "lucide-react";
 
 import { createAppointment } from "@/lib/actions/appointments";
@@ -13,6 +13,7 @@ interface NewAppointmentFormProps {
   readonly doctors: readonly DoctorOption[];
   readonly branches: readonly BranchOption[];
   readonly services: readonly ServiceOption[];
+  readonly minDate: string;
 }
 
 const inputCls = "h-10 w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground shadow-sm outline-none transition-colors placeholder:text-muted-foreground focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-60";
@@ -22,7 +23,7 @@ function isRedirectError(error: unknown): error is Error & { digest: string } {
   return error instanceof Error && "digest" in error && typeof error.digest === "string" && error.digest.startsWith("NEXT_REDIRECT");
 }
 
-export function NewAppointmentForm({ doctors, branches, services }: NewAppointmentFormProps) {
+export function NewAppointmentForm({ doctors, branches, services, minDate }: NewAppointmentFormProps) {
   const [isPending, startTransition] = useTransition();
   const [patientName, setPatientName] = useState("");
   const [patientPhone, setPatientPhone] = useState("");
@@ -33,9 +34,6 @@ export function NewAppointmentForm({ doctors, branches, services }: NewAppointme
   const [serviceName, setServiceName] = useState("");
   const [walkin, setWalkin] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [minDate, setMinDate] = useState("");
-
-  useEffect(() => setMinDate(new Date().toISOString().slice(0, 10)), []);
 
   function handleSubmit(event: FormEvent<HTMLFormElement>): void {
     event.preventDefault();
@@ -77,7 +75,7 @@ export function NewAppointmentForm({ doctors, branches, services }: NewAppointme
           <FormField label="Dokter" htmlFor="doctorId" icon={<Stethoscope className="h-3.5 w-3.5" />}>
             <select id="doctorId" value={doctorId} onChange={(event) => setDoctorId(event.target.value)} className={selectCls}>
               <option value="">Pilih Dokter (Opsional)</option>
-              {doctors.map((doctor) => <option key={doctor.id} value={doctor.id}>{doctor.specialty ? `${doctor.name} — ${doctor.specialty}` : doctor.name}</option>)}
+              {doctors.map((doctor) => <option key={doctor.id} value={doctor.id}>{doctor.specialty ? `${doctor.name} · ${doctor.specialty}` : doctor.name}</option>)}
             </select>
           </FormField>
 

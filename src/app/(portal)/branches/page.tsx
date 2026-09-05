@@ -16,6 +16,7 @@ import {
 
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
+import { getWibDayBounds } from "@/lib/appointments/day-bounds";
 
 function formatWhatsapp(raw: string): string {
   const digits = raw.replace(/\D/g, "");
@@ -33,18 +34,6 @@ function formatWhatsapp(raw: string): string {
     }
   }
   return raw;
-}
-
-function startOfToday(): Date {
-  const d = new Date();
-  d.setHours(0, 0, 0, 0);
-  return d;
-}
-
-function endOfToday(): Date {
-  const d = new Date();
-  d.setHours(23, 59, 59, 999);
-  return d;
 }
 
 export default async function BranchesPage() {
@@ -69,12 +58,13 @@ export default async function BranchesPage() {
   });
 
   const branchIds = branches.map((b) => b.id);
+  const { start: startOfToday, end: endOfToday } = getWibDayBounds();
   const todayCounts = branchIds.length
     ? await prisma.appointment.groupBy({
         by: ["branchId"],
         where: {
           branchId: { in: branchIds },
-          scheduledAt: { gte: startOfToday(), lte: endOfToday() },
+          scheduledAt: { gte: startOfToday, lte: endOfToday },
         },
         _count: { _all: true },
       })
@@ -109,13 +99,15 @@ export default async function BranchesPage() {
             )}
           </p>
         </div>
-        <Link
-          href="#"
-          className="inline-flex items-center justify-center gap-2 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-5 text-sm font-semibold shadow-sm transition-colors"
+        <button
+          type="button"
+          disabled
+          title="Manajemen cabang akan tersedia di rilis modul operasional berikutnya"
+          className="inline-flex items-center justify-center gap-2 rounded-lg bg-primary/70 text-primary-foreground h-10 px-5 text-sm font-semibold shadow-sm cursor-not-allowed opacity-80"
         >
           <Plus className="h-4 w-4" />
           Tambah Cabang
-        </Link>
+        </button>
       </div>
 
       {branches.length === 0 ? (
@@ -229,19 +221,21 @@ export default async function BranchesPage() {
                 {/* Actions */}
                 <div className="flex gap-2 pt-2 border-t border-border/60">
                   <Link
-                    href="#"
+                    href={`/appointments?branch=${encodeURIComponent(branch.name)}`}
                     className="flex-1 inline-flex items-center justify-center gap-1.5 h-9 rounded-lg bg-foreground text-background text-xs font-semibold hover:bg-foreground/90 transition-colors"
                   >
                     <Eye className="h-3.5 w-3.5" />
-                    Lihat Detail
+                    Lihat Janji
                   </Link>
-                  <Link
-                    href="#"
-                    className="flex-1 inline-flex items-center justify-center gap-1.5 h-9 rounded-lg border border-border bg-background text-foreground text-xs font-semibold hover:bg-muted transition-colors"
+                  <button
+                    type="button"
+                    disabled
+                    title="Pengaturan cabang akan tersedia di rilis modul operasional"
+                    className="flex-1 inline-flex items-center justify-center gap-1.5 h-9 rounded-lg border border-border bg-muted/40 text-muted-foreground text-xs font-medium cursor-not-allowed opacity-60"
                   >
                     <Pencil className="h-3.5 w-3.5" />
                     Edit
-                  </Link>
+                  </button>
                 </div>
               </article>
             );
@@ -296,13 +290,15 @@ function EmptyState() {
       <p className="text-sm text-muted-foreground max-w-sm mx-auto mb-6">
         Mulai bangun jaringan klinik Anda dengan menambahkan cabang pertama.
       </p>
-      <Link
-        href="#"
-        className="inline-flex items-center justify-center gap-2 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-5 text-sm font-semibold shadow-sm transition-colors"
+      <button
+        type="button"
+        disabled
+        title="Penambahan cabang akan tersedia di rilis modul operasional"
+        className="inline-flex items-center justify-center gap-2 rounded-lg bg-primary/70 text-primary-foreground h-10 px-5 text-sm font-semibold shadow-sm cursor-not-allowed opacity-80"
       >
         <Plus className="h-4 w-4" />
         Tambah Cabang Pertama
-      </Link>
+      </button>
     </div>
   );
 }

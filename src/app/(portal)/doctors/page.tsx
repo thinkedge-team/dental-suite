@@ -61,13 +61,14 @@ export default async function DoctorsPage() {
             {doctors.length} dokter aktif dalam organisasi Anda
           </p>
         </div>
-        <a
-          href="#"
-          aria-disabled="true"
+        <button
+          type="button"
+          disabled
+          title="Penambahan dokter akan tersedia di rilis modul operasional"
           className="inline-flex h-10 cursor-not-allowed items-center justify-center rounded-md bg-muted px-5 text-sm font-semibold text-muted-foreground opacity-70"
         >
           + Tambah Dokter
-        </a>
+        </button>
       </header>
 
       {doctors.length === 0 ? (

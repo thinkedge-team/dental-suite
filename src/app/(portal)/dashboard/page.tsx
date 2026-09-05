@@ -1,11 +1,12 @@
-import { Calendar, Users, TrendingUp, Clock, ArrowRight, UserPlus, FileText } from "lucide-react";
-import { Button, buttonVariants } from "@/components/ui/button";
+import { Calendar, Users, Clock, ArrowRight, UserPlus, FileText, CheckCircle2, TrendingUp } from "lucide-react";
+import { buttonVariants } from "@/components/ui/button";
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { AppointmentStatus } from "@/generated/prisma";
 import Link from "next/link";
 import { STATUS_STYLES } from "@/lib/appointments/status";
+import { getWibDayBounds, getWibMonthStart } from "@/lib/appointments/day-bounds";
 
 interface MetricCardProps {
   title: string;
@@ -24,11 +25,10 @@ export default async function DashboardPage() {
   const userName = session.user.name ?? "Staf";
 
   const now = new Date();
-  const startOfToday = new Date(now); startOfToday.setUTCHours(0, 0, 0, 0);
-  const endOfToday = new Date(now); endOfToday.setUTCHours(23, 59, 59, 999);
-  const startOfMonth = new Date(now.getUTCFullYear(), now.getUTCMonth(), 1);
+  const { start: startOfToday, end: endOfToday } = getWibDayBounds(now);
+  const startOfMonth = getWibMonthStart(now);
 
-  const [todayAppointments, checkedInCount, newPatientsThisMonth, upcomingAppointments] = await Promise.all([
+  const [todayAppointments, checkedInCount, newPatientsThisMonth, completedVisitsThisMonth, upcomingAppointments] = await Promise.all([
     prisma.appointment.count({
       where: { organizationId: orgId, scheduledAt: { gte: startOfToday, lte: endOfToday } },
     }),
@@ -37,6 +37,9 @@ export default async function DashboardPage() {
     }),
     prisma.patient.count({
       where: { organizationId: orgId, deletedAt: null, createdAt: { gte: startOfMonth } },
+    }),
+    prisma.appointment.count({
+      where: { organizationId: orgId, status: AppointmentStatus.COMPLETED, scheduledAt: { gte: startOfMonth } },
     }),
     prisma.appointment.findMany({
       where: {
@@ -111,10 +114,10 @@ export default async function DashboardPage() {
           positive={true}
         />
         <MetricCard 
-          title="Pendapatan Estimasi" 
-          value="Rp4,2M" 
-          trend="Berdasarkan janji selesai" 
-          icon={<TrendingUp className="h-4 w-4 text-primary" />} 
+          title="Kunjungan Selesai" 
+          value={String(completedVisitsThisMonth)} 
+          trend="Total bulan ini" 
+          icon={<CheckCircle2 className="h-4 w-4 text-primary" />} 
           accent={true}
         />
       </div>
@@ -173,14 +176,20 @@ export default async function DashboardPage() {
           <div className="space-y-4">
             <h2 className="text-xl font-medium tracking-tight text-foreground">Aksi Cepat</h2>
             <div className="grid grid-cols-2 gap-3">
-              <Button variant="outline" className="h-20 flex-col gap-2 bg-card border-border hover:border-primary hover:text-primary transition-colors shadow-sm">
+              <Link
+                href="/appointments/new"
+                className="h-20 flex flex-col items-center justify-center gap-2 rounded-xl bg-card border border-border hover:border-primary hover:text-primary transition-colors shadow-sm"
+              >
                 <Calendar className="h-5 w-5" />
                 <span className="text-xs font-semibold">Buat Janji</span>
-              </Button>
-              <Button variant="outline" className="h-20 flex-col gap-2 bg-card border-border hover:border-primary hover:text-primary transition-colors shadow-sm">
+              </Link>
+              <Link
+                href="/patients"
+                className="h-20 flex flex-col items-center justify-center gap-2 rounded-xl bg-card border border-border hover:border-primary hover:text-primary transition-colors shadow-sm"
+              >
                 <FileText className="h-5 w-5" />
-                <span className="text-xs font-semibold">Rekam Medis</span>
-              </Button>
+                <span className="text-xs font-semibold">Data Pasien</span>
+              </Link>
             </div>
           </div>
 

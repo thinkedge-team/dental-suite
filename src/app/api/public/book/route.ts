@@ -1,13 +1,22 @@
+import { randomBytes } from "node:crypto";
 import { prisma } from "@/lib/prisma";
 import { AppointmentStatus } from "@/generated/prisma";
 
-// ponytail: in-memory rate limiter — resets on cold start; replace with Upstash Redis when traffic justifies it
+// ponytail: in-memory rate limiter with size ceiling (resets on cold start; use Redis when traffic scales)
 const RATE_WINDOW_MS = 60_000;
 const RATE_MAX = 5;
+const MAX_RATE_LIMIT_ENTRIES = 5_000;
 const ipHits = new Map<string, { count: number; resetAt: number }>();
 
 function checkRateLimit(ip: string): boolean {
   const now = Date.now();
+
+  if (ipHits.size >= MAX_RATE_LIMIT_ENTRIES) {
+    for (const [key, val] of ipHits) {
+      if (now > val.resetAt) ipHits.delete(key);
+    }
+  }
+
   const entry = ipHits.get(ip);
   if (!entry || now > entry.resetAt) {
     ipHits.set(ip, { count: 1, resetAt: now + RATE_WINDOW_MS });
@@ -189,18 +198,40 @@ export async function POST(request: Request): Promise<Response> {
     patientName,
     patientPhone,
     patientEmail,
+    notes,
   } = parsed.value;
 
-  // --- Field validation --------------------------------------------------
-  if (patientPhone.length < 8) {
+  const trimmedName = patientName.trim();
+  if (trimmedName.length < 2 || trimmedName.length > 100) {
     return Response.json(
-      { error: "patientPhone must be at least 8 characters" },
+      { error: "Nama pasien minimal 2 karakter dan maksimal 100 karakter" },
+      { status: 400 },
+    );
+  }
+
+  const cleanPhone = patientPhone.trim();
+  if (!/^\+?[0-9\s-]{8,20}$/.test(cleanPhone)) {
+    return Response.json(
+      { error: "Format nomor telepon tidak valid (8-20 digit)" },
+      { status: 400 },
+    );
+  }
+
+  if (patientEmail && (patientEmail.length > 100 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(patientEmail))) {
+    return Response.json(
+      { error: "Format email tidak valid" },
+      { status: 400 },
+    );
+  }
+
+  if (notes && notes.length > 500) {
+    return Response.json(
+      { error: "Catatan maksimal 500 karakter" },
       { status: 400 },
     );
   }
 
   try {
-    // --- Organization lookup ---------------------------------------------
     const org = await prisma.organization.findUnique({
       where: { slug: orgSlug },
       select: { id: true, moduleConnect: true },
@@ -213,17 +244,47 @@ export async function POST(request: Request): Promise<Response> {
       );
     }
 
-    // --- Branch validation ------------------------------------------------
     const branch = await prisma.branch.findFirst({
       where: { id: branchId, organizationId: org.id, isActive: true },
       select: { id: true },
     });
 
     if (!branch) {
-      return Response.json({ error: "Invalid branch" }, { status: 400 });
+      return Response.json({ error: "Cabang tidak valid atau tidak aktif" }, { status: 400 });
     }
 
-    // --- Date validation --------------------------------------------------
+    let validDoctorId: string | null = null;
+    if (doctorId) {
+      const doctor = await prisma.doctor.findFirst({
+        where: {
+          id: doctorId,
+          organizationId: org.id,
+          isActive: true,
+          branches: { some: { branchId } },
+        },
+        select: { id: true },
+      });
+      if (!doctor) {
+        return Response.json(
+          { error: "Dokter tidak valid atau tidak praktik di cabang ini" },
+          { status: 400 },
+        );
+      }
+      validDoctorId = doctor.id;
+    }
+
+    let serviceName: string | null = null;
+    if (serviceId) {
+      const serviceRecord = await prisma.service.findFirst({
+        where: { id: serviceId, organizationId: org.id, isActive: true },
+        select: { name: true },
+      });
+      if (!serviceRecord) {
+        return Response.json({ error: "Layanan tidak valid" }, { status: 400 });
+      }
+      serviceName = serviceRecord.name;
+    }
+
     const scheduledDate = new Date(scheduledAt);
     if (Number.isNaN(scheduledDate.getTime())) {
       return Response.json(
@@ -238,33 +299,34 @@ export async function POST(request: Request): Promise<Response> {
       );
     }
 
-    // --- Patient upsert ---------------------------------------------------
     const patient = await prisma.patient.upsert({
       where: {
         organizationId_phone: {
           organizationId: org.id,
-          phone: patientPhone,
+          phone: cleanPhone,
         },
       },
-      update: { name: patientName },
+      update: {},
       create: {
         organizationId: org.id,
-        name: patientName,
-        phone: patientPhone,
-        email: patientEmail ?? null,
+        name: trimmedName,
+        phone: cleanPhone,
+        email: patientEmail?.trim() || null,
       },
     });
 
-    // --- Appointment creation ---------------------------------------------
+    const cancelToken = randomBytes(16).toString("hex");
     const appointment = await prisma.appointment.create({
       data: {
         organizationId: org.id,
         branchId,
-        doctorId: doctorId ?? null,
+        doctorId: validDoctorId,
         patientId: patient.id,
-        patientName,
-        patientPhone,
-        service: serviceId ?? null,
+        patientName: trimmedName,
+        patientPhone: cleanPhone,
+        service: serviceName,
+        reasonForVisit: notes?.trim() ? notes.trim() : null,
+        cancelToken,
         scheduledAt: scheduledDate,
         walkin: false,
         status: AppointmentStatus.CONFIRMED,
@@ -275,7 +337,18 @@ export async function POST(request: Request): Promise<Response> {
       { success: true, appointmentId: appointment.id },
       { status: 201 },
     );
-  } catch (error) {
+  } catch (error: unknown) {
+    if (
+      typeof error === "object" &&
+      error !== null &&
+      "code" in error &&
+      (error as { code: string }).code === "P2002"
+    ) {
+      return Response.json(
+        { error: "Slot jadwal sudah terisi. Silakan pilih waktu lain." },
+        { status: 409 },
+      );
+    }
     console.error("POST /api/public/book failed:", error);
     return Response.json(
       { error: "Internal server error" },

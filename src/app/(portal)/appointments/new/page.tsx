@@ -29,12 +29,15 @@ export default async function NewAppointmentPage() {
     }),
   ]);
 
+  const minDate = new Date().toISOString().slice(0, 10);
+
   return (
     <div className="space-y-6 pb-10">
       <NewAppointmentForm
         doctors={doctors}
         branches={branches}
         services={services}
+        minDate={minDate}
       />
     </div>
   );

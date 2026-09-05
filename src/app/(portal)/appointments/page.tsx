@@ -9,13 +9,13 @@ import {
   Stethoscope,
   Phone,
   User as UserIcon,
-  MoreHorizontal,
 } from "lucide-react";
 
 import { auth } from "@/auth";
 import { AppointmentStatus } from "@/generated/prisma";
 import { STATUS_STYLES } from "@/lib/appointments/status";
 import { prisma } from "@/lib/prisma";
+import { getWibTodayIso, getWibIsoBounds } from "@/lib/appointments/day-bounds";
 
 type SearchParams = {
   date?: string;
@@ -28,11 +28,7 @@ const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 const VALID_STATUSES = new Set<string>(Object.values(AppointmentStatus));
 
 function todayIsoDate(): string {
-  const now = new Date();
-  const year = now.getUTCFullYear();
-  const month = String(now.getUTCMonth() + 1).padStart(2, "0");
-  const day = String(now.getUTCDate()).padStart(2, "0");
-  return `${year}-${month}-${day}`;
+  return getWibTodayIso();
 }
 
 function shiftDate(iso: string, deltaDays: number): string {
@@ -49,13 +45,7 @@ function shiftDate(iso: string, deltaDays: number): string {
 }
 
 function dayBounds(iso: string): { start: Date; end: Date } {
-  const parts = iso.split("-").map(Number);
-  const year = parts[0] ?? 1970;
-  const month = parts[1] ?? 1;
-  const day = parts[2] ?? 1;
-  const start = new Date(Date.UTC(year, month - 1, day, 0, 0, 0, 0));
-  const end = new Date(Date.UTC(year, month - 1, day, 23, 59, 59, 999));
-  return { start, end };
+  return getWibIsoBounds(iso);
 }
 
 function formatLongDate(iso: string): string {
@@ -274,9 +264,12 @@ export default async function AppointmentsPage({
                   {/* Patient name + walk-in pill */}
                   <div className="col-span-3 min-w-0">
                     <div className="flex flex-wrap items-center gap-2">
-                      <span className="text-sm font-medium text-foreground truncate">
+                      <Link
+                        href={`/appointments/${apt.id}`}
+                        className="text-sm font-medium text-foreground truncate hover:text-primary hover:underline"
+                      >
                         {patientName}
-                      </span>
+                      </Link>
                       {apt.walkin && (
                         <span className="inline-flex items-center rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-primary">
                           Walk-in
@@ -298,13 +291,13 @@ export default async function AppointmentsPage({
 
                   {/* Service */}
                   <div className="col-span-2 flex items-center gap-1.5 min-w-0 text-sm text-foreground">
-                    <span className="truncate">{apt.service ?? "—"}</span>
+                    <span className="truncate">{apt.service ?? "-"}</span>
                   </div>
 
                   {/* Doctor */}
                   <div className="col-span-1 flex items-center gap-1.5 min-w-0 text-sm text-muted-foreground">
                     <Stethoscope className="h-3.5 w-3.5 shrink-0 md:hidden lg:inline" />
-                    <span className="truncate">{apt.doctor?.name ?? "—"}</span>
+                    <span className="truncate">{apt.doctor?.name ?? "-"}</span>
                   </div>
 
                   {/* Branch */}
@@ -325,24 +318,10 @@ export default async function AppointmentsPage({
                   {/* Actions */}
                   <div className="col-span-1 flex items-center gap-1 md:justify-end">
                     <Link
-                      href="#"
-                      className="text-xs font-semibold text-primary hover:text-primary/80"
+                      href={`/appointments/${apt.id}`}
+                      className="text-xs font-semibold text-primary hover:text-primary/80 hover:underline"
                     >
-                      Ubah
-                    </Link>
-                    <span className="text-muted-foreground/40">·</span>
-                    <Link
-                      href="#"
-                      className="text-xs font-semibold text-muted-foreground hover:text-red-600"
-                    >
-                      Batal
-                    </Link>
-                    <Link
-                      href="#"
-                      aria-label="Aksi lain"
-                      className="ml-1 inline-flex h-7 w-7 items-center justify-center rounded-md text-muted-foreground hover:bg-muted hover:text-foreground"
-                    >
-                      <MoreHorizontal className="h-4 w-4" />
+                      Detail
                     </Link>
                   </div>
                 </div>
