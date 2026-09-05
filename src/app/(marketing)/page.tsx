@@ -5,8 +5,6 @@ import Link from "next/link";
 import Image from "next/image";
 import {
   ShieldCheck,
-  Clock,
-  MapPin,
   ArrowRight,
   Sparkles,
   Calendar,
@@ -14,10 +12,12 @@ import {
   ChevronDown,
   CheckCircle2,
   Activity,
-  Layers,
-  Award,
+  Star,
+  Quote,
+  GraduationCap,
+  Microscope,
 } from "lucide-react";
-import { mockServices, mockDoctors, mockBranches, mockInsurances } from "@/data/mock-grow";
+import { mockServices, mockDoctors, mockBranches, mockInsurances, mockTestimonials, mockTechnologies } from "@/data/mock-grow";
 import { ServiceCard } from "@/components/grow/service-card";
 import { DoctorCard } from "@/components/grow/doctor-card";
 import { BranchCard } from "@/components/grow/branch-card";
@@ -25,6 +25,7 @@ import { BeforeAfterSlider } from "@/components/grow/before-after-slider";
 
 export default function HomePage() {
   const [activeFaq, setActiveFaq] = useState<number | null>(null);
+  const [activeTech, setActiveTech] = useState(0);
 
   const treatmentProtocols = [
     {
@@ -270,7 +271,212 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* 4. FEATURED PROCEDURES SHOWCASE */}
+      {/* 4. ABOUT FOUNDER / MEDICAL DIRECTOR */}
+      <section className="max-w-[1440px] mx-auto px-6 sm:px-8 lg:px-12">
+        <div className="grid lg:grid-cols-12 gap-10 lg:gap-16 items-center">
+          {/* Portrait Column */}
+          <div className="lg:col-span-5 relative">
+            <div className="relative rounded-3xl overflow-hidden aspect-[3/4] max-h-[560px] shadow-2xl">
+              <Image
+                src="/images/founder-portrait.jpg"
+                alt="drg. Aditya Nugraha, Sp.KG, M.Kes - Direktur Medis"
+                fill
+                sizes="(max-width: 1024px) 100vw, 480px"
+                className="object-cover object-top"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
+
+              {/* Floating experience badge */}
+              <div className="absolute bottom-5 left-5 right-5">
+                <div className="bg-card/95 backdrop-blur-md border border-border/80 rounded-2xl p-4 shadow-xl">
+                  <div className="flex items-center justify-between gap-4">
+                    <div>
+                      <p className="text-xs text-muted-foreground font-semibold uppercase tracking-wider">Direktur Medis</p>
+                      <p className="text-sm font-bold text-foreground mt-0.5">drg. Aditya Nugraha, Sp.KG, M.Kes</p>
+                    </div>
+                    <div className="text-right shrink-0">
+                      <p className="text-2xl font-bold text-primary">15+</p>
+                      <p className="text-[10px] text-muted-foreground font-semibold">Tahun Pengalaman</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Content Column */}
+          <div className="lg:col-span-7 space-y-7">
+            <div className="space-y-4">
+              <span className="inline-flex items-center gap-1.5 text-xs font-bold text-primary uppercase tracking-wider">
+                <GraduationCap className="w-4 h-4" />
+                Tentang Direktur Medis
+              </span>
+              <h2 className="text-3xl sm:text-4xl font-bold text-foreground tracking-tight leading-tight">
+                Dedikasi 15 tahun membangun standar klinis yang melampaui ekspektasi pasien.
+              </h2>
+              <p className="text-muted-foreground text-sm sm:text-base leading-relaxed">
+                drg. Aditya Nugraha meraih spesialisasi Konservasi Gigi dari Universitas Indonesia dan gelar Master Kesehatan dari Universitas Gadjah Mada. Sebelum mendirikan Think Edge Dental Suite, beliau adalah konsultan klinis di Rumah Sakit Cipto Mangunkusumo dan menjadi instruktur pelatihan implan gigi untuk dokter-dokter muda se-Jabodetabek.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              {[
+                { num: "50K+", label: "Pasien Ditangani" },
+                { num: "4.9★", label: "Rating Google Maps" },
+                { num: "2 Cabang", label: "Jakarta Utara" },
+                { num: "6+", label: "Mitra Asuransi" },
+              ].map((stat) => (
+                <div key={stat.label} className="rounded-2xl bg-card border border-border/70 p-5 space-y-1">
+                  <p className="text-2xl font-bold text-primary">{stat.num}</p>
+                  <p className="text-xs text-muted-foreground font-semibold">{stat.label}</p>
+                </div>
+              ))}
+            </div>
+
+            <div className="space-y-3">
+              {[
+                "Lulusan Sp.KG Universitas Indonesia, M.Kes Universitas Gadjah Mada",
+                "Konsultan Klinis eks RSUPN Cipto Mangunkusumo Jakarta",
+                "Instruktur nasional pelatihan implan gigi bersertifikasi ITI",
+              ].map((cred) => (
+                <div key={cred} className="flex items-start gap-3">
+                  <CheckCircle2 className="w-4 h-4 text-primary shrink-0 mt-0.5" />
+                  <p className="text-sm text-foreground font-medium">{cred}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* 5. MEDICAL TECHNOLOGY SHOWCASE */}
+      <section className="max-w-[1440px] mx-auto px-6 sm:px-8 lg:px-12">
+        <div className="space-y-3 max-w-2xl mb-10">
+          <span className="inline-flex items-center gap-1.5 text-xs font-bold text-primary uppercase tracking-wider">
+            <Microscope className="w-4 h-4" />
+            Teknologi Medis Unggulan
+          </span>
+          <h2 className="text-3xl sm:text-4xl font-bold text-foreground tracking-tight">
+            Peralatan klinis setara standar rumah sakit swasta premium.
+          </h2>
+        </div>
+
+        {/* Tab Navigation */}
+        <div className="flex gap-2 mb-8 overflow-x-auto pb-1">
+          {mockTechnologies.map((tech, idx) => (
+            <button
+              key={tech.id}
+              type="button"
+              onClick={() => setActiveTech(idx)}
+              className={`shrink-0 px-4 py-2.5 rounded-xl text-sm font-semibold transition-all ${
+                activeTech === idx
+                  ? "bg-primary text-primary-foreground shadow-md shadow-primary/20"
+                  : "bg-card border border-border/70 text-muted-foreground hover:text-foreground hover:border-primary/40"
+              }`}
+            >
+              {tech.name.split(" ").slice(0, 2).join(" ")}
+            </button>
+          ))}
+        </div>
+
+        {/* Active Tech Panel */}
+        {mockTechnologies[activeTech] && (
+          <div className="grid lg:grid-cols-12 gap-8 items-center">
+            <div className="lg:col-span-6 relative rounded-2xl overflow-hidden aspect-video shadow-xl">
+              <Image
+                src={mockTechnologies[activeTech].imageUrl}
+                alt={mockTechnologies[activeTech].name}
+                fill
+                sizes="(max-width: 1024px) 100vw, 700px"
+                className="object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-tr from-black/40 to-transparent" />
+              <div className="absolute top-4 left-4">
+                <span className="px-3 py-1.5 rounded-lg bg-primary text-primary-foreground text-xs font-bold shadow">
+                  {mockTechnologies[activeTech].tagline}
+                </span>
+              </div>
+            </div>
+
+            <div className="lg:col-span-6 space-y-6">
+              <div>
+                <h3 className="text-2xl sm:text-3xl font-bold text-foreground tracking-tight">
+                  {mockTechnologies[activeTech].name}
+                </h3>
+                <p className="text-muted-foreground text-sm sm:text-base leading-relaxed mt-3">
+                  {mockTechnologies[activeTech].description}
+                </p>
+              </div>
+
+              <div className="space-y-3">
+                {mockTechnologies[activeTech].benefits.map((b) => (
+                  <div key={b} className="flex items-start gap-3 p-3.5 rounded-xl bg-card border border-border/70">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+                    <p className="text-sm text-foreground font-medium leading-snug">{b}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+      </section>
+
+      {/* 6. PATIENT TESTIMONIALS */}
+      <section className="max-w-[1440px] mx-auto px-6 sm:px-8 lg:px-12">
+        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-10">
+          <div className="space-y-2 max-w-xl">
+            <h2 className="text-3xl sm:text-4xl font-bold text-foreground tracking-tight">
+              50.000+ pasien mempercayakan senyum mereka kepada kami.
+            </h2>
+            <div className="flex items-center gap-2">
+              <div className="flex">
+                {[...Array(5)].map((_, i) => (
+                  <Star key={i} className="w-4 h-4 fill-amber-400 text-amber-400" />
+                ))}
+              </div>
+              <span className="text-sm font-bold text-foreground">4.9</span>
+              <span className="text-sm text-muted-foreground">· Ulasan Google Maps Terverifikasi</span>
+            </div>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {mockTestimonials.map((t) => (
+            <div key={t.id} className="rounded-2xl bg-card border border-border/70 p-6 space-y-4 hover:border-primary/40 transition-colors shadow-xs">
+              <div className="flex items-start justify-between">
+                <div className="flex">
+                  {[...Array(t.rating)].map((_, i) => (
+                    <Star key={i} className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
+                  ))}
+                </div>
+                <Quote className="w-5 h-5 text-primary/30" />
+              </div>
+
+              <p className="text-sm text-foreground leading-relaxed">{t.content}</p>
+
+              <div className="pt-2 border-t border-border/50">
+                <div className="flex items-center gap-3">
+                  <div className="relative w-9 h-9 rounded-full overflow-hidden bg-muted shrink-0">
+                    <Image src={t.avatarUrl ?? "/images/doctor-sarah.jpg"} alt={t.name} fill className="object-cover" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-bold text-foreground">{t.name}</p>
+                    <p className="text-[11px] text-muted-foreground">{t.role} · {t.location}</p>
+                  </div>
+                  {t.verified && (
+                    <CheckCircle2 className="w-4 h-4 text-emerald-600 ml-auto shrink-0" />
+                  )}
+                </div>
+                <p className="text-[10px] text-muted-foreground mt-2 font-medium">
+                  Prosedur: {t.treatment} · {t.date}
+                </p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* 7. FEATURED PROCEDURES SHOWCASE */}
       <section className="max-w-[1440px] mx-auto px-6 sm:px-8 lg:px-12">
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-10">
           <div className="space-y-2">
@@ -298,7 +504,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* 5. DOCTORS DIRECTORY SHOWCASE */}
+      {/* 8. DOCTORS DIRECTORY SHOWCASE */}
       <section className="max-w-[1440px] mx-auto px-6 sm:px-8 lg:px-12">
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-10">
           <div className="space-y-2">
@@ -326,7 +532,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* 6. DUAL-BRANCH LOCATIONS */}
+      {/* 9. DUAL-BRANCH LOCATIONS */}
       <section className="max-w-[1440px] mx-auto px-6 sm:px-8 lg:px-12">
         <div className="space-y-3 mb-10 max-w-xl">
           <h2 className="text-3xl sm:text-4xl font-bold text-foreground tracking-tight">
@@ -344,7 +550,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* 7. INSURANCE & PAYMENT TRANSPARENCY */}
+      {/* 10. INSURANCE & PAYMENT TRANSPARENCY */}
       <section className="max-w-[1440px] mx-auto px-6 sm:px-8 lg:px-12">
         <div className="rounded-3xl bg-card border border-border/80 p-8 sm:p-12 shadow-sm relative overflow-hidden">
           <div className="max-w-3xl space-y-5">
@@ -384,7 +590,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* 8. FAQ ACCORDION SECTION */}
+      {/* 11. FAQ ACCORDION SECTION */}
       <section className="max-w-4xl mx-auto px-6 sm:px-8">
         <div className="text-center space-y-3 mb-10">
           <h2 className="text-3xl font-bold text-foreground tracking-tight">
@@ -423,7 +629,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* 9. BOTTOM CONVERSION ACTION */}
+      {/* 12. BOTTOM CONVERSION ACTION */}
       <section className="max-w-[1440px] mx-auto px-6 sm:px-8 lg:px-12">
         <div className="relative rounded-3xl bg-foreground text-background p-8 sm:p-14 overflow-hidden shadow-2xl">
           <div

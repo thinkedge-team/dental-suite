@@ -59,6 +59,28 @@ export interface MockInsurance {
   supportedBranches: string[];
 }
 
+export interface MockTestimonial {
+  id: string;
+  name: string;
+  role: string;
+  location: string;
+  rating: number;
+  content: string;
+  treatment: string;
+  date: string;
+  avatarUrl?: string;
+  verified: boolean;
+}
+
+export interface MockTechnology {
+  id: string;
+  name: string;
+  tagline: string;
+  description: string;
+  imageUrl: string;
+  benefits: string[];
+}
+
 export const mockServices: MockService[] = [
   {
     id: 'srv-1',
@@ -239,4 +261,82 @@ export const mockInsurances: MockInsurance[] = [
   { id: 'ins-4', name: 'Sinarmas MSIG', type: 'CASHLESS', logoText: 'SINARMAS', supportedBranches: ['Kelapa Gading'] },
   { id: 'ins-5', name: 'BPJS Kesehatan (Rujukan Faskes 1)', type: 'REIMBURSEMENT', logoText: 'BPJS KESEHATAN', supportedBranches: ['Kelapa Gading', 'Pluit'] },
   { id: 'ins-6', name: 'FWD Insurance', type: 'CASHLESS', logoText: 'FWD', supportedBranches: ['Kelapa Gading', 'Pluit'] }
+];
+
+export const mockTestimonials: MockTestimonial[] = [
+  {
+    id: 't-1',
+    name: 'Jessica W.',
+    role: 'Product Designer',
+    location: 'Kelapa Gading',
+    rating: 5,
+    treatment: 'In-Office Dental Whitening',
+    date: '2 minggu lalu',
+    avatarUrl: '/images/doctor-jessica.jpg',
+    verified: true,
+    content: 'Awalnya sangat khawatir ngilu saat bleaching. Ternyata drg. Sarah sangat detail menjelaskan prosesnya dan aplikasinya sangat hati-hati. Gigi naik 7 shade tanpa rasa ngilu sama sekali.',
+  },
+  {
+    id: 't-2',
+    name: 'Hendrawan S.',
+    role: 'Managing Director',
+    location: 'Pluit',
+    rating: 5,
+    treatment: 'Odontektomi Gigi Bungsu Impaksi',
+    date: '1 bulan lalu',
+    avatarUrl: '/images/doctor-budi.jpg',
+    verified: true,
+    content: 'drg. Budi Sp.BM luar biasa tenang dan cekatan. Operasi gigi bungsu miring selesai dalam 35 menit. Hari kedua bengkak sudah minimal dan langsung bisa meeting kembali.',
+  },
+  {
+    id: 't-3',
+    name: 'Melissa P.',
+    role: 'Ibu Rumah Tangga',
+    location: 'Kelapa Gading',
+    rating: 5,
+    treatment: 'Scaling Ultrasonic & Tambal Estetis',
+    date: '3 minggu lalu',
+    avatarUrl: '/images/doctor-sarah.jpg',
+    verified: true,
+    content: 'Klinik gigi paling steril dan nyaman di Jakarta Utara. Tidak ada bau obat klinik yang bikin takut. Waktu janjian sangat presisi, datang jam 14.00 langsung masuk ruang tindakan.',
+  },
+];
+
+export const mockTechnologies: MockTechnology[] = [
+  {
+    id: 'tech-1',
+    name: 'Intraoral Scanner 3D Presisi',
+    tagline: 'Pemindaian Optik 45 Detik',
+    description: 'Menggantikan sendok cetak pasta alginat konvensional. Menghasilkan visualisasi 3D real-time warna asli gigi untuk perencanaan veneer, behel, dan mahkota gigi yang sempurna.',
+    imageUrl: '/images/tech-scanner.jpg',
+    benefits: [
+      'Bebas rasa mual atau tersedak saat mencetak gigi',
+      'Presisi sub-mikron untuk tepi restorasi tanpa celah',
+      'Pasien melihat langsung simulasi bentuk gigi di monitor',
+    ],
+  },
+  {
+    id: 'tech-2',
+    name: 'Digital Radiografi Panoramik & CBCT',
+    tagline: 'Dosis Radiasi Minimal 80%',
+    description: 'Diagnostik menyeluruh kondisi tulang rahang, saraf mandibular, dan letak impaksi gigi bungsu dengan sensor digital ultra-rendah radiasi.',
+    imageUrl: '/images/tech-panoramic.jpg',
+    benefits: [
+      'Radiasi 80% lebih rendah dibanding foto rontgen film lama',
+      'Deteksi karies tersembunyi dan lesi periapikal sedini mungkin',
+      'Hasil gambar langsung muncul di rekam medis digital dokter',
+    ],
+  },
+  {
+    id: 'tech-3',
+    name: 'Sterilisasi Autoklaf Vakum Kelas B',
+    tagline: 'Standar Rumah Sakit Internasional',
+    description: 'Siklus sterilisasi uap bertekanan tinggi dengan 3 kali fraksinasi pra-vakum 134°C. Memastikan penetrasi uap steril hingga ke saluran pipa terdalam pada handpiece bor gigi.',
+    imageUrl: '/images/tech-sterilization.jpg',
+    benefits: [
+      'Standar tertinggi EN 13060 Eropa untuk klinik dental bedah',
+      'Setiap instrumen di-seal dalam pouch steril individual',
+      'Verifikasi indikator biologis berkala untuk nol risiko infeksi',
+    ],
+  },
 ];
