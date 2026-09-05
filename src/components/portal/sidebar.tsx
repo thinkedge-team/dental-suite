@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils";
 import {
   LayoutDashboard,
   CalendarDays,
+  Clock,
   Users,
   Settings,
   Menu,
@@ -59,6 +60,12 @@ export function Sidebar({ user, modules }: SidebarProps) {
       name: "Jadwal Janji", 
       href: "/appointments", 
       icon: CalendarDays, 
+      show: userModules.connect 
+    },
+    { 
+      name: "Jadwal Praktik", 
+      href: "/schedule", 
+      icon: Clock, 
       show: userModules.connect 
     },
     { 
