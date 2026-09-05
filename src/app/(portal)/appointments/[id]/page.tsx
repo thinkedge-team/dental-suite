@@ -10,6 +10,7 @@ import {
 } from "@/lib/actions/appointments";
 import { STATUS_STYLES } from "@/lib/appointments/status";
 import { prisma } from "@/lib/prisma";
+import { AppointmentWaButton } from "@/components/portal/appointment-wa-button";
 
 function formatDateTime(date: Date): string {
   return new Intl.DateTimeFormat("id-ID", {
@@ -110,7 +111,24 @@ export default async function AppointmentDetailPage({
               )}
             </div>
           </div>
-          <p className="text-sm text-muted-foreground">{formatDateTime(appointment.scheduledAt)}</p>
+          <div className="flex flex-col items-start md:items-end gap-2">
+            <p className="text-sm text-muted-foreground">{formatDateTime(appointment.scheduledAt)}</p>
+            <AppointmentWaButton
+              appointment={{
+                id: appointment.id,
+                patientName,
+                patientPhone,
+                doctorName: appointment.doctor?.name ?? null,
+                branchName: appointment.branch.name,
+                branchAddress: appointment.branch.address ?? null,
+                service: appointment.service,
+                scheduledAt: appointment.scheduledAt,
+                cancelToken: appointment.cancelToken,
+                reminderSentAt: appointment.reminderSentAt,
+                reminder2hSentAt: appointment.reminder2hSentAt,
+              }}
+            />
+          </div>
         </div>
 
         <dl className="mt-6 grid gap-x-8 gap-y-5 md:grid-cols-2">

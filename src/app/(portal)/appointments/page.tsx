@@ -16,6 +16,7 @@ import { AppointmentStatus } from "@/generated/prisma";
 import { STATUS_STYLES } from "@/lib/appointments/status";
 import { prisma } from "@/lib/prisma";
 import { getWibTodayIso, getWibIsoBounds } from "@/lib/appointments/day-bounds";
+import { AppointmentWaButton } from "@/components/portal/appointment-wa-button";
 
 type SearchParams = {
   date?: string;
@@ -121,7 +122,7 @@ export default async function AppointmentsPage({
     include: {
       doctor: { select: { name: true } },
       patient: { select: { name: true, phone: true } },
-      branch: { select: { name: true } },
+      branch: { select: { name: true, address: true } },
     },
     orderBy: { scheduledAt: "asc" },
   });
@@ -316,7 +317,22 @@ export default async function AppointmentsPage({
                   </div>
 
                   {/* Actions */}
-                  <div className="col-span-1 flex items-center gap-1 md:justify-end">
+                  <div className="col-span-1 flex items-center gap-2 md:justify-end">
+                    <AppointmentWaButton
+                      appointment={{
+                        id: apt.id,
+                        patientName,
+                        patientPhone,
+                        doctorName: apt.doctor?.name ?? null,
+                        branchName: apt.branch.name,
+                        branchAddress: apt.branch.address ?? null,
+                        service: apt.service,
+                        scheduledAt: apt.scheduledAt,
+                        cancelToken: apt.cancelToken,
+                        reminderSentAt: apt.reminderSentAt,
+                        reminder2hSentAt: apt.reminder2hSentAt,
+                      }}
+                    />
                     <Link
                       href={`/appointments/${apt.id}`}
                       className="text-xs font-semibold text-primary hover:text-primary/80 hover:underline"

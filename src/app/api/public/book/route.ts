@@ -299,6 +299,26 @@ export async function POST(request: Request): Promise<Response> {
       );
     }
 
+    if (validDoctorId) {
+      const activeBlock = await prisma.scheduleBlock.findFirst({
+        where: {
+          doctorId: validDoctorId,
+          branchId,
+          startAt: { lte: scheduledDate },
+          endAt: { gte: scheduledDate },
+        },
+        select: { reason: true },
+      });
+      if (activeBlock) {
+        return Response.json(
+          {
+            error: `Dokter sedang berhalangan pada jadwal yang dipilih: ${activeBlock.reason ?? "Jadwal diblokir"}`,
+          },
+          { status: 400 },
+        );
+      }
+    }
+
     const patient = await prisma.patient.upsert({
       where: {
         organizationId_phone: {
