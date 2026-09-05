@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ArrowRight, Menu, X } from "lucide-react";
+import { ArrowRight, Calendar, Menu, X } from "lucide-react";
 
 const NAV_LINKS = [
   { href: "/", label: "Beranda" },
@@ -77,8 +77,16 @@ export function PublicHeader() {
           </a>
 
           <Link
+            href="/book"
+            className="hidden sm:inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-primary hover:bg-primary/90 text-primary-foreground font-semibold h-9 text-xs shadow-xs transition-all"
+          >
+            <Calendar className="h-3.5 w-3.5" />
+            <span>Buat Janji</span>
+          </Link>
+
+          <Link
             href="/login"
-            className="hidden sm:inline-flex items-center justify-center rounded-lg bg-primary hover:bg-primary/90 text-primary-foreground font-semibold h-9 px-4 shadow-xs text-xs transition-all gap-1.5"
+            className="hidden sm:inline-flex items-center justify-center rounded-lg border border-border/80 bg-card hover:bg-muted text-foreground font-semibold h-9 px-4 text-xs transition-all gap-1.5"
           >
             <span>Portal Staf</span>
             <ArrowRight className="h-3.5 w-3.5" />
@@ -133,6 +141,15 @@ export function PublicHeader() {
               <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
               <span>WhatsApp CS (Konsultasi Cepat)</span>
             </a>
+
+            <Link
+              href="/book"
+              onClick={() => setMobileMenuOpen(false)}
+              className="inline-flex items-center justify-center gap-1.5 rounded-lg bg-primary hover:bg-primary/90 text-primary-foreground font-semibold h-10 px-4 shadow-xs text-xs transition-all"
+            >
+              <Calendar className="h-3.5 w-3.5" />
+              <span>Buat Janji Temu</span>
+            </Link>
 
             <Link
               href="/login"
