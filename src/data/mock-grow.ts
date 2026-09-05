@@ -81,6 +81,134 @@ export interface MockTechnology {
   benefits: string[];
 }
 
+export interface MockPromo {
+  id: string;
+  title: string;
+  description: string;
+  badge: string;
+  badgeColor: string;
+  discountValue: string;
+  discountLabel: string;
+  priceFrom: string;
+  priceOriginal?: string;
+  expiresLabel: string;
+  ctaText: string;
+  imageUrl: string;
+  category: string;
+  whatsappMessage: string;
+}
+
+export interface MockGalleryItem {
+  id: string;
+  title: string;
+  description: string;
+  category: 'Klinik' | 'Peralatan' | 'Tim';
+  imageUrl: string;
+  size: 'normal' | 'wide' | 'tall';
+}
+
+export const mockPromos: MockPromo[] = [
+  {
+    id: 'promo-1',
+    title: 'Pemutihan Gigi Profesional In-Office',
+    description: 'Naik 6-8 shade kecerahan dalam 60 menit dengan teknologi LED bleaching tanpa ngilu.',
+    badge: 'Terlaris',
+    badgeColor: '#f38218',
+    discountValue: '30%',
+    discountLabel: 'OFF',
+    priceFrom: 'Rp 750.000',
+    priceOriginal: 'Rp 1.100.000',
+    expiresLabel: 'Berlaku s/d 30 Sep 2026',
+    ctaText: 'Booking via WhatsApp',
+    imageUrl: '/images/promo-whitening.jpg',
+    category: 'Estetika',
+    whatsappMessage: 'Halo, saya ingin booking Promo Pemutihan Gigi Profesional.',
+  },
+  {
+    id: 'promo-2',
+    title: 'Scaling Ultrasonic + Poles Gigi Gratis',
+    description: 'Bersihkan karang gigi menyeluruh sekaligus dapatkan poles gigi gratis di kunjungan yang sama.',
+    badge: 'Terbatas',
+    badgeColor: '#059669',
+    discountValue: '25%',
+    discountLabel: 'OFF',
+    priceFrom: 'Rp 300.000',
+    priceOriginal: 'Rp 400.000',
+    expiresLabel: 'Berlaku s/d 15 Okt 2026',
+    ctaText: 'Booking via WhatsApp',
+    imageUrl: '/images/promo-scaling.jpg',
+    category: 'Pencegahan',
+    whatsappMessage: 'Halo, saya ingin booking Promo Scaling Ultrasonic.',
+  },
+  {
+    id: 'promo-3',
+    title: 'Konsultasi Implan Gigi Gratis',
+    description: 'Foto panoramik digital + konsultasi rencana tindakan implan dengan dokter spesialis bedah mulut tanpa biaya.',
+    badge: 'Konsultasi Gratis',
+    badgeColor: '#7c3aed',
+    discountValue: '100%',
+    discountLabel: 'GRATIS',
+    priceFrom: 'Rp 0',
+    priceOriginal: 'Rp 250.000',
+    expiresLabel: 'Berlaku s/d 31 Okt 2026',
+    ctaText: 'Daftar Sekarang',
+    imageUrl: '/images/promo-implant.jpg',
+    category: 'Bedah Mulut',
+    whatsappMessage: 'Halo, saya ingin mendaftar Konsultasi Implan Gigi Gratis.',
+  },
+];
+
+export const mockGallery: MockGalleryItem[] = [
+  {
+    id: 'gal-1',
+    title: 'Ruang Tunggu Pasien',
+    description: 'Ruang tunggu modern dengan pencahayaan alami dan furnitur ergonomis.',
+    category: 'Klinik',
+    imageUrl: '/images/gallery-lounge.jpg',
+    size: 'wide',
+  },
+  {
+    id: 'gal-2',
+    title: 'Ruang Tindakan Utama',
+    description: 'Dental unit terkini dengan LED operasi dan monitor intraoral.',
+    category: 'Klinik',
+    imageUrl: '/images/gallery-treatment-room.jpg',
+    size: 'normal',
+  },
+  {
+    id: 'gal-3',
+    title: 'Ruang Sterilisasi',
+    description: 'Autoklaf vakum kelas B dengan sistem verifikasi biologis tiap siklus.',
+    category: 'Peralatan',
+    imageUrl: '/images/gallery-sterilization.jpg',
+    size: 'normal',
+  },
+  {
+    id: 'gal-4',
+    title: 'Tim Medis Profesional',
+    description: 'Dokter spesialis dan tenaga medis berpengalaman siap melayani.',
+    category: 'Tim',
+    imageUrl: '/images/gallery-team.jpg',
+    size: 'wide',
+  },
+  {
+    id: 'gal-5',
+    title: 'Unit Panoramik Digital',
+    description: 'Rontgen panoramik beresolusi tinggi dengan dosis radiasi minimal.',
+    category: 'Peralatan',
+    imageUrl: '/images/gallery-xray-room.jpg',
+    size: 'normal',
+  },
+  {
+    id: 'gal-6',
+    title: 'Area Resepsionis',
+    description: 'Check-in digital dan reservasi terkelola di area resepsionis modern.',
+    category: 'Klinik',
+    imageUrl: '/images/gallery-reception.jpg',
+    size: 'normal',
+  },
+];
+
 export const mockServices: MockService[] = [
   {
     id: 'srv-1',
