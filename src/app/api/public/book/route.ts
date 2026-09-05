@@ -1,6 +1,23 @@
 import { prisma } from "@/lib/prisma";
 import { AppointmentStatus } from "@/generated/prisma";
 
+// ponytail: in-memory rate limiter — resets on cold start; replace with Upstash Redis when traffic justifies it
+const RATE_WINDOW_MS = 60_000;
+const RATE_MAX = 5;
+const ipHits = new Map<string, { count: number; resetAt: number }>();
+
+function checkRateLimit(ip: string): boolean {
+  const now = Date.now();
+  const entry = ipHits.get(ip);
+  if (!entry || now > entry.resetAt) {
+    ipHits.set(ip, { count: 1, resetAt: now + RATE_WINDOW_MS });
+    return true;
+  }
+  if (entry.count >= RATE_MAX) return false;
+  entry.count++;
+  return true;
+}
+
 // ---------------------------------------------------------------------------
 // GET /api/public/book?orgSlug=senyum-sehat
 // Returns branches, doctors, and services for the booking form.
@@ -145,6 +162,11 @@ function parseBookingBody(body: unknown): ParseResult {
 }
 
 export async function POST(request: Request): Promise<Response> {
+  const ip = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown";
+  if (!checkRateLimit(ip)) {
+    return Response.json({ error: "Terlalu banyak permintaan. Coba lagi dalam 1 menit." }, { status: 429 });
+  }
+
   // --- Parse body --------------------------------------------------------
   let rawBody: unknown;
   try {

@@ -91,11 +91,26 @@ export async function createAppointment(data: {
   const session = await auth();
   if (!session?.user) throw new Error("Unauthorized");
 
+  const branch = await prisma.branch.findFirst({
+    where: { id: data.branchId, organizationId: session.user.organizationId, isActive: true },
+    select: { id: true },
+  });
+  if (!branch) throw new Error("Cabang tidak valid atau bukan milik organisasi Anda");
+
+  if (data.scheduledAt <= new Date()) throw new Error("Jadwal harus di masa mendatang");
+
+  const patient = await prisma.patient.upsert({
+    where: { organizationId_phone: { organizationId: session.user.organizationId, phone: data.patientPhone } },
+    update: {},
+    create: { organizationId: session.user.organizationId, name: data.patientName, phone: data.patientPhone },
+  });
+
   await prisma.appointment.create({
     data: {
       organizationId: session.user.organizationId,
       patientName: data.patientName,
       patientPhone: data.patientPhone,
+      patientId: patient.id,
       doctorId: data.doctorId ?? null,
       branchId: data.branchId,
       scheduledAt: data.scheduledAt,

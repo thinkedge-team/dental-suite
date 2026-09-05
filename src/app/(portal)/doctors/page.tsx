@@ -40,9 +40,6 @@ export default async function DoctorsPage() {
       schedules: {
         select: {
           dayOfWeek: true,
-          startTime: true,
-          endTime: true,
-          branchId: true,
         },
       },
       _count: {

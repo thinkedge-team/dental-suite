@@ -8,15 +8,8 @@ import {
   checkInAppointment,
   completeAppointment,
 } from "@/lib/actions/appointments";
+import { STATUS_STYLES } from "@/lib/appointments/status";
 import { prisma } from "@/lib/prisma";
-
-const STATUS_STYLES: Record<AppointmentStatus, { readonly className: string; readonly label: string }> = {
-  CONFIRMED: { className: "bg-emerald-100 text-emerald-800", label: "Terkonfirmasi" },
-  CHECKED_IN: { className: "bg-orange-100 text-orange-800", label: "Check-in" },
-  COMPLETED: { className: "bg-slate-100 text-slate-700", label: "Selesai" },
-  CANCELLED: { className: "bg-red-100 text-red-800", label: "Dibatalkan" },
-  NO_SHOW: { className: "bg-zinc-100 text-zinc-700", label: "Tidak Hadir" },
-};
 
 function formatDateTime(date: Date): string {
   return new Intl.DateTimeFormat("id-ID", {
@@ -53,9 +46,9 @@ export default async function AppointmentDetailPage({
     where: { id, organizationId: session.user.organizationId },
     include: {
       doctor: { select: { name: true, specialty: true, photoUrl: true } },
-      patient: true,
+      patient: { select: { name: true, phone: true } },
       branch: { select: { name: true, address: true } },
-      visit: true,
+      visit: { select: { notes: true } },
     },
   });
 
