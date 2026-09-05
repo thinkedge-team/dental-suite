@@ -124,6 +124,46 @@ export async function createAppointment(data: {
   redirect("/appointments");
 }
 
+export async function cancelWithToken(token: string, reason: string): Promise<{ ok: boolean; error?: string }> {
+  if (!token || token.trim().length === 0) {
+    return { ok: false, error: "Token tidak valid" };
+  }
+
+  const appointment = await prisma.appointment.findUnique({
+    where: { cancelToken: token },
+  });
+
+  if (!appointment) {
+    return { ok: false, error: "Token pembatalan tidak ditemukan" };
+  }
+
+  if (appointment.status === AppointmentStatus.CANCELLED || appointment.status === AppointmentStatus.COMPLETED) {
+    return { ok: false, error: "Janji temu sudah dibatalkan atau sudah selesai" };
+  }
+
+  const twoHoursMs = 2 * 60 * 60 * 1000;
+  if (appointment.scheduledAt.getTime() - Date.now() < twoHoursMs) {
+    return {
+      ok: false,
+      error: "Pembatalan mandiri ditutup 2 jam sebelum jadwal. Silakan hubungi nomor WhatsApp klinik secara langsung.",
+    };
+  }
+
+  await prisma.appointment.update({
+    where: { id: appointment.id, organizationId: appointment.organizationId },
+    data: {
+      status: AppointmentStatus.CANCELLED,
+      cancelledAt: new Date(),
+      reasonForVisit: appointment.reasonForVisit === null ? reason : `${appointment.reasonForVisit} | ${reason}`,
+    },
+  });
+
+  revalidatePath("/appointments");
+  revalidatePath(`/appointments/${appointment.id}`);
+
+  return { ok: true };
+}
+
 export async function markReminderSent(
   id: string,
   type: "1day" | "2hour",

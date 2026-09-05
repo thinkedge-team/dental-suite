@@ -17,7 +17,9 @@ export const authConfig = {
         pathname.startsWith("/asuransi") ||
         pathname.startsWith("/images") ||
         pathname.startsWith("/book") ||
-        pathname.startsWith("/s/");
+        pathname.startsWith("/s/") ||
+        pathname === "/cancel" ||
+        pathname.startsWith("/cancel/");
 
       if (isPublic) return true;
       if (isLoggedIn) return true;
