@@ -1,5 +1,3 @@
-"use server";
-
 export interface WaAppointmentData {
   patientName: string;
   branchName: string;

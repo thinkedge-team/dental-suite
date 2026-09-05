@@ -57,6 +57,11 @@ function formatWibTimeOnly(date: Date): string {
   return `${time} WIB`;
 }
 
+function checkCutoff(scheduledAt: Date): boolean {
+  const twoHoursMs = 2 * 60 * 60 * 1000;
+  return scheduledAt.getTime() - Date.now() < twoHoursMs;
+}
+
 export default async function CancelPage({ searchParams }: CancelPageProps) {
   const { token } = await searchParams;
 
@@ -210,9 +215,7 @@ export default async function CancelPage({ searchParams }: CancelPageProps) {
   }
 
   // State 3: Within 2 Hours Cutoff Rule
-  const twoHoursMs = 2 * 60 * 60 * 1000;
-  const timeDiff = appointment.scheduledAt.getTime() - Date.now();
-  const isCutoff = timeDiff < twoHoursMs;
+  const isCutoff = checkCutoff(appointment.scheduledAt);
 
   if (isCutoff) {
     return (

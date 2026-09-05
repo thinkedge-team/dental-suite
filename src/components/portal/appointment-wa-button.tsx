@@ -35,20 +35,11 @@ export function AppointmentWaButton({
   const [isPending, startTransition] = useTransition();
   const menuRef = useRef<HTMLDivElement>(null);
 
-  const [reminderSentAt, setReminderSentAt] = useState<Date | string | null>(
-    appointment.reminderSentAt ?? null,
-  );
-  const [reminder2hSentAt, setReminder2hSentAt] = useState<
-    Date | string | null
-  >(appointment.reminder2hSentAt ?? null);
+  const [optimistic1d, setOptimistic1d] = useState(false);
+  const [optimistic2h, setOptimistic2h] = useState(false);
 
-  useEffect(() => {
-    setReminderSentAt(appointment.reminderSentAt ?? null);
-  }, [appointment.reminderSentAt]);
-
-  useEffect(() => {
-    setReminder2hSentAt(appointment.reminder2hSentAt ?? null);
-  }, [appointment.reminder2hSentAt]);
+  const reminderSentAt = appointment.reminderSentAt || optimistic1d;
+  const reminder2hSentAt = appointment.reminder2hSentAt || optimistic2h;
 
   useEffect(() => {
     function handlePointerDown(e: MouseEvent) {
@@ -109,11 +100,10 @@ export function AppointmentWaButton({
       try {
         const res = await markReminderSent(appointment.id, type);
         if (res.success) {
-          const nowIso = new Date().toISOString();
           if (type === "1day") {
-            setReminderSentAt(nowIso);
+            setOptimistic1d(true);
           } else {
-            setReminder2hSentAt(nowIso);
+            setOptimistic2h(true);
           }
         }
       } catch (err) {
