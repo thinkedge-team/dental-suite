@@ -123,3 +123,33 @@ export async function createAppointment(data: {
   revalidatePath("/appointments");
   redirect("/appointments");
 }
+
+export async function markReminderSent(
+  id: string,
+  type: "1day" | "2hour",
+): Promise<{ success: boolean }> {
+  const session = await auth();
+  if (!session?.user) throw new Error("Unauthorized");
+
+  const now = new Date();
+
+  let field: "reminderSentAt" | "reminder2hSentAt";
+
+  if (type === "1day") {
+    field = "reminderSentAt";
+  } else {
+    field = "reminder2hSentAt";
+  }
+
+  await prisma.appointment.update({
+    where: { id, organizationId: session.user.organizationId },
+    data: {
+      [field]: now,
+    },
+  });
+
+  revalidatePath("/appointments");
+  revalidatePath(`/appointments/${id}`);
+
+  return { success: true };
+}
