@@ -10,7 +10,7 @@ vi.mock("next/cache", () => ({
   revalidatePath: vi.fn(),
 }));
 
-import { calculateNewStock } from "@/lib/actions/inventory";
+import { calculateNewStock } from "@/lib/inventory/calc";
 
 describe("Inventory stock delta calculations (calculateNewStock)", () => {
   it("increments stock on RESTOCK", () => {

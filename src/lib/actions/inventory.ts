@@ -1,44 +1,11 @@
+"use server";
+
 import { revalidatePath } from "next/cache";
 
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { InventoryLogType } from "@/generated/prisma";
-
-export function calculateNewStock(
-  previousStock: number,
-  type: "USAGE" | "RESTOCK" | "ADJUSTMENT" | "DAMAGED",
-  quantity: number,
-): { valid: boolean; newStock: number; delta: number; error?: string } {
-  if (quantity <= 0 || !Number.isInteger(quantity)) {
-    return {
-      valid: false,
-      newStock: previousStock,
-      delta: 0,
-      error: "Jumlah mutasi harus bilangan bulat positif lebih dari 0.",
-    };
-  }
-
-  let delta = 0;
-  if (type === "RESTOCK") {
-    delta = quantity;
-  } else if (type === "USAGE" || type === "DAMAGED") {
-    delta = -quantity;
-  } else if (type === "ADJUSTMENT") {
-    delta = quantity - previousStock;
-  }
-
-  const newStock = previousStock + delta;
-  if (newStock < 0) {
-    return {
-      valid: false,
-      newStock: previousStock,
-      delta: 0,
-      error: "Stok saat ini tidak mencukupi untuk pemakaian tersebut.",
-    };
-  }
-
-  return { valid: true, newStock, delta };
-}
+import { calculateNewStock } from "@/lib/inventory/calc";
 
 export async function recordStockMutation(
   data: {
@@ -49,7 +16,6 @@ export async function recordStockMutation(
   },
   ctx?: { session: { user: { organizationId: string; role: string; branchId?: string | null; id: string } } },
 ): Promise<{ ok: boolean; error?: string; currentStock?: number }> {
-  "use server";
   const session = ctx?.session ?? (await auth());
   if (!session?.user?.organizationId) {
     return { ok: false, error: "Unauthorized" };
@@ -64,7 +30,6 @@ export async function recordStockMutation(
 
   try {
     const currentStock = await prisma.$transaction(async (tx) => {
-      // 1. Read item inside transaction to ensure atomicity and avoid race conditions
       const item = await tx.inventoryItem.findFirst({
         where: {
           id: data.itemId,
@@ -83,24 +48,20 @@ export async function recordStockMutation(
         throw new Error("Item inventaris tidak ditemukan.");
       }
 
-      // 2. Branch scoping enforcement
       if (!isDirector && item.branchId !== userBranchId) {
         throw new Error("Akses cabang tidak diizinkan");
       }
 
-      // 3. Pure delta and validation calculation
       const calc = calculateNewStock(item.stock, data.type, data.quantity);
       if (!calc.valid) {
         throw new Error(calc.error || "Mutasi stok tidak valid.");
       }
 
-      // 4. Update stock atomically
       await tx.inventoryItem.update({
         where: { id: item.id },
         data: { stock: calc.newStock },
       });
 
-      // 5. Create audit log
       await tx.inventoryLog.create({
         data: {
           itemId: item.id,
@@ -140,8 +101,6 @@ export async function createInventoryItem(
   },
   ctx?: { session: { user: { organizationId: string; role: string; branchId?: string | null; id: string } } },
 ): Promise<{ ok: boolean; error?: string; itemId?: string }> {
-  "use server";
-
   const session = ctx?.session ?? (await auth());
   if (!session?.user?.organizationId) {
     return { ok: false, error: "Unauthorized" };
@@ -150,12 +109,10 @@ export async function createInventoryItem(
   const { organizationId, role, branchId: userBranchId, id: userId } = session.user;
   const isDirector = role === "DIRECTOR" || role === "SUPER_ADMIN";
 
-  // Branch scoping check for creation
   if (!isDirector && data.branchId !== userBranchId) {
     return { ok: false, error: "Akses cabang tidak diizinkan" };
   }
 
-  // Validate branch exists and belongs to user's organization
   const branch = await prisma.branch.findFirst({
     where: {
       id: data.branchId,
@@ -183,7 +140,6 @@ export async function createInventoryItem(
         },
       });
 
-      // If initial stock > 0, create initial RESTOCK log
       if (created.stock > 0) {
         await tx.inventoryLog.create({
           data: {
@@ -224,8 +180,6 @@ export async function updateInventoryItem(
   },
   ctx?: { session: { user: { organizationId: string; role: string; branchId?: string | null; id: string } } },
 ): Promise<{ ok: boolean; error?: string }> {
-  "use server";
-
   const session = ctx?.session ?? (await auth());
   if (!session?.user?.organizationId) {
     return { ok: false, error: "Unauthorized" };
@@ -234,7 +188,6 @@ export async function updateInventoryItem(
   const { organizationId, role, branchId: userBranchId } = session.user;
   const isDirector = role === "DIRECTOR" || role === "SUPER_ADMIN";
 
-  // Check item belongs to user's organization
   const existing = await prisma.inventoryItem.findFirst({
     where: {
       id,
@@ -252,7 +205,6 @@ export async function updateInventoryItem(
     return { ok: false, error: "Item inventaris tidak ditemukan." };
   }
 
-  // Branch scoping enforcement for non-director/non-super-admin
   if (!isDirector && existing.branchId !== userBranchId) {
     return { ok: false, error: "Akses cabang tidak diizinkan" };
   }

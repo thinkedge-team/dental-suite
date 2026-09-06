@@ -3,7 +3,8 @@
 import { useEffect, useRef, useState, useTransition } from "react";
 import { AlertCircle, ArrowDown, ArrowUp, Check, Loader2, RefreshCw, X } from "lucide-react";
 
-import { calculateNewStock, recordStockMutation } from "@/lib/actions/inventory";
+import { recordStockMutation } from "@/lib/actions/inventory";
+import { calculateNewStock } from "@/lib/inventory/calc";
 
 export interface MutationModalItem {
   readonly id: string;

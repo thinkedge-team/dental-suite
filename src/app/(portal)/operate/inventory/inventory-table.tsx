@@ -17,7 +17,6 @@ import {
   ItemModal,
   ItemModalBranchOption,
   ItemModalEditData,
-  STANDARD_INVENTORY_CATEGORIES,
 } from "./item-modal";
 import { MutationModal, MutationModalItem } from "./mutation-modal";
 import { StockLogDrawer, StockLogDrawerItem } from "./stock-log-drawer";
