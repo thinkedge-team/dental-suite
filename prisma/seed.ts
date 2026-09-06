@@ -1,4 +1,4 @@
-import { AppointmentStatus, InventoryLogType, PrismaClient, Role } from '../src/generated/prisma';
+import { AttendanceStatus, AppointmentStatus, InventoryLogType, PrismaClient, Role } from '../src/generated/prisma';
 import * as bcrypt from 'bcryptjs';
 
 const prisma = new PrismaClient();
@@ -348,6 +348,95 @@ async function main() {
     await prisma.inventoryLog.create({ data: { type: 'RESTOCK' as const, quantity: d.st, previousStock: 0, currentStock: d.st, itemId: i.id, userId: mu!.id } });
   }
   console.log('Inventory seeding complete!');
+
+  console.log('Seeding shifts and attendance...');
+
+  const now = new Date();
+  const utcDay = now.getUTCDay();
+  const daysSinceMonday = (utcDay + 6) % 7;
+
+  function wibDateAtStartOfDay(dayOffset: number): Date {
+    const d = new Date();
+    d.setUTCDate(d.getUTCDate() + dayOffset);
+    d.setUTCHours(0 - 7, 0, 0, 0);
+    return d;
+  }
+
+  const todayWib = new Date();
+  todayWib.setUTCHours(0 - 7, 0, 0, 0);
+
+  for (let i = 0; i < 7; i++) {
+    const shiftDate = wibDateAtStartOfDay(i - daysSinceMonday);
+
+    const existingManagerShift = await prisma.shift.findFirst({
+      where: {
+        userId: mu!.id,
+        branchId: bi,
+        date: shiftDate,
+      },
+    });
+
+    const managerShift = existingManagerShift
+      ? existingManagerShift
+      : await prisma.shift.create({
+          data: {
+            branchId: bi,
+            userId: mu!.id,
+            date: shiftDate,
+            startTime: '08:00',
+            endTime: '15:00',
+            shiftType: 'PAGI',
+            notes: 'Shift Pagi Manager',
+          },
+        });
+
+    const existingStaffShift = await prisma.shift.findFirst({
+      where: {
+        userId: bu!.id,
+        branchId: bi,
+        date: shiftDate,
+      },
+    });
+
+    if (!existingStaffShift) {
+      await prisma.shift.create({
+        data: {
+          branchId: bi,
+          userId: bu!.id,
+          date: shiftDate,
+          startTime: '14:00',
+          endTime: '21:00',
+          shiftType: 'SIANG',
+          notes: 'Shift Siang Staff',
+        },
+      });
+    }
+
+    if (shiftDate.getTime() === todayWib.getTime()) {
+      const existingAttendance = await prisma.attendanceRecord.findFirst({
+        where: {
+          userId: mu!.id,
+          date: shiftDate,
+        },
+      });
+
+      if (!existingAttendance) {
+        await prisma.attendanceRecord.create({
+          data: {
+            branchId: bi,
+            userId: mu!.id,
+            shiftId: managerShift.id,
+            date: shiftDate,
+            clockInAt: wibToday(7, 55),
+            status: AttendanceStatus.ON_TIME,
+            notes: 'Hadir tepat waktu',
+          },
+        });
+      }
+    }
+  }
+
+  console.log('Shifts and attendance seeding complete!');
   console.log('\nDemo accounts:');
   console.log('  Director: director@demo.com / demo123456');
   console.log('  Manager:  manager@demo.com  / demo123456');

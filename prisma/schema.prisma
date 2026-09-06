@@ -61,6 +61,7 @@ model Branch {
   schedules      Schedule[]
   scheduleBlocks ScheduleBlock[]
   shifts         Shift[]
+  attendances    AttendanceRecord[]
   inventory      InventoryItem[]
   approvals      ApprovalRequest[]
   appointments   Appointment[]
@@ -86,6 +87,7 @@ model User {
   accounts  Account[]
   sessions  Session[]
   shifts    Shift[]
+  attendances AttendanceRecord[]
   approvals ApprovalRequest[]
   inventoryLogs InventoryLog[]
 }
@@ -281,12 +283,44 @@ model Shift {
   userId    String
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   date      DateTime
-  startTime String
-  endTime   String
+  startTime String   // "08:00"
+  endTime   String   // "15:00"
+  shiftType String   @default("PAGI") // "PAGI", "SIANG", "FULLDAY", "CUSTOM"
+  notes     String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  attendance AttendanceRecord?
+
   @@index([branchId, date])
+  @@index([userId, date])
+}
+
+model AttendanceRecord {
+  id         String           @id @default(cuid())
+  branchId   String
+  branch     Branch           @relation(fields: [branchId], references: [id], onDelete: Cascade)
+  userId     String
+  user       User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  shiftId    String?          @unique
+  shift      Shift?           @relation(fields: [shiftId], references: [id], onDelete: SetNull)
+  date       DateTime         // Date of attendance (anchored at 00:00:00 WIB)
+  clockInAt  DateTime
+  clockOutAt DateTime?
+  status     AttendanceStatus @default(ON_TIME)
+  notes      String?
+  createdAt  DateTime         @default(now())
+  updatedAt  DateTime         @updatedAt
+
+  @@index([branchId, date])
+  @@index([userId, date])
+}
+
+enum AttendanceStatus {
+  ON_TIME
+  LATE
+  EARLY_LEAVE
+  PRESENT
 }
 
 model InventoryItem {
