@@ -1,101 +1,74 @@
 /// <reference types="vitest" />
 
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi } from "vitest";
 
-// Pure calculation function for stock mutation
-// Calculates new stock based on current stock, type, and quantity
-// Returns the new stock value; validates inputs and prevents negative stock
-function calculateNewStock(
-  currentStock: number,
-  type: "USAGE" | "RESTOCK" | "ADJUSTMENT" | "DAMAGED",
-  quantity: number,
-  previousStock?: number
-): number {
-  // Validate quantity > 0 and integer
-  if (!Number.isInteger(quantity) || quantity <= 0) {
-    throw new Error("Jumlah harus lebih besar dari 0");
-  }
+vi.mock("@/auth", () => ({
+  auth: vi.fn(),
+}));
 
-  let delta: number;
+vi.mock("next/cache", () => ({
+  revalidatePath: vi.fn(),
+}));
 
-  switch (type) {
-    case "RESTOCK":
-      delta = quantity;
-      break;
-    case "USAGE":
-    case "DAMAGED":
-      delta = -quantity;
-      break;
-    case "ADJUSTMENT":
-      // ADJUSTMENT: new stock = quantity (the desired stock level)
-      // delta = quantity - previousStock
-      // But we return the new stock directly: quantity
-      return quantity;
-    default:
-      throw new Error("Tipe mutasi tidak valid");
-  }
+import { calculateNewStock } from "@/lib/actions/inventory";
 
-  const nextStock = currentStock + delta;
-
-  // Prevent negative stock
-  if (nextStock < 0) {
-    throw new Error("Stok saat ini tidak mencukupi untuk pemakaian tersebut.");
-  }
-
-  return nextStock;
-}
-
-describe("calculateNewStock pure calculation logic", () => {
-  it("calculates RESTOCK: currentStock + quantity", () => {
-    const result = calculateNewStock(10, "RESTOCK", 5);
-    expect(result).toBe(15);
+describe("Inventory stock delta calculations (calculateNewStock)", () => {
+  it("increments stock on RESTOCK", () => {
+    const res = calculateNewStock(10, "RESTOCK", 5);
+    expect(res.valid).toBe(true);
+    expect(res.newStock).toBe(15);
+    expect(res.delta).toBe(5);
   });
 
-  it("calculates USAGE: currentStock - quantity", () => {
-    const result = calculateNewStock(10, "USAGE", 3);
-    expect(result).toBe(7);
+  it("decrements stock on USAGE and DAMAGED", () => {
+    const resUsage = calculateNewStock(10, "USAGE", 4);
+    expect(resUsage.valid).toBe(true);
+    expect(resUsage.newStock).toBe(6);
+    expect(resUsage.delta).toBe(-4);
+
+    const resDamaged = calculateNewStock(6, "DAMAGED", 2);
+    expect(resDamaged.valid).toBe(true);
+    expect(resDamaged.newStock).toBe(4);
+    expect(resDamaged.delta).toBe(-2);
   });
 
-  it("calculates DAMAGED: currentStock - quantity", () => {
-    const result = calculateNewStock(10, "DAMAGED", 4);
-    expect(result).toBe(6);
-  });
-
-  it("calculates ADJUSTMENT: returns quantity (desired stock level)", () => {
-    const result = calculateNewStock(10, "ADJUSTMENT", 7);
-    expect(result).toBe(7);
-  });
-
-  it("prevents negative stock on USAGE that would go below zero", () => {
-    // currentStock=2, usage of 5 would give -3, should throw
-    expect(() => calculateNewStock(2, "USAGE", 5)).toThrow(
-      "Stok saat ini tidak mencukupi untuk pemakaian tersebut."
-    );
+  it("prevents negative stock on excess USAGE", () => {
+    const res = calculateNewStock(5, "USAGE", 10);
+    expect(res.valid).toBe(false);
+    expect(res.error).toBe("Stok saat ini tidak mencukupi untuk pemakaian tersebut.");
   });
 
   it("allows USAGE when quantity exactly equals current stock", () => {
-    const result = calculateNewStock(5, "USAGE", 5);
-    expect(result).toBe(0);
+    const res = calculateNewStock(5, "USAGE", 5);
+    expect(res.valid).toBe(true);
+    expect(res.newStock).toBe(0);
+    expect(res.delta).toBe(-5);
+  });
+
+  it("adjusts stock correctly to a target physical count on ADJUSTMENT", () => {
+    const res1 = calculateNewStock(12, "ADJUSTMENT", 15);
+    expect(res1.valid).toBe(true);
+    expect(res1.newStock).toBe(15);
+    expect(res1.delta).toBe(3);
+
+    const res2 = calculateNewStock(12, "ADJUSTMENT", 8);
+    expect(res2.valid).toBe(true);
+    expect(res2.newStock).toBe(8);
+    expect(res2.delta).toBe(-4);
   });
 
   it("rejects non-positive quantity", () => {
-    expect(() => calculateNewStock(10, "USAGE", 0)).toThrow(
-      "Jumlah harus lebih besar dari 0"
-    );
-    expect(() => calculateNewStock(10, "USAGE", -3)).toThrow(
-      "Jumlah harus lebih besar dari 0"
+    expect(calculateNewStock(10, "RESTOCK", 0).valid).toBe(false);
+    expect(calculateNewStock(10, "RESTOCK", -5).valid).toBe(false);
+    expect(calculateNewStock(10, "USAGE", 0).error).toBe(
+      "Jumlah mutasi harus bilangan bulat positif lebih dari 0."
     );
   });
 
   it("rejects non-integer quantity", () => {
-    expect(() => calculateNewStock(10, "USAGE", 3.5)).toThrow(
-      "Jumlah harus lebih besar dari 0"
+    expect(calculateNewStock(10, "USAGE", 3.5).valid).toBe(false);
+    expect(calculateNewStock(10, "USAGE", 3.5).error).toBe(
+      "Jumlah mutasi harus bilangan bulat positif lebih dari 0."
     );
-  });
-
-  it("handles ADJUSTMENT with different previous stock values", () => {
-    // ADJUSTMENT returns the quantity as the new stock level regardless of previous
-    expect(calculateNewStock(100, "ADJUSTMENT", 50)).toBe(50);
-    expect(calculateNewStock(100, "ADJUSTMENT", 200)).toBe(200);
   });
 });
