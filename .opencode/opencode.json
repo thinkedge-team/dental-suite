@@ -1,0 +1,5 @@
+{
+  "agents": {
+    "default_model": "ag/gemini-pro-agent"
+  }
+}

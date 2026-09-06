@@ -1,4 +1,4 @@
-import { AppointmentStatus, PrismaClient, Role } from '../src/generated/prisma';
+import { AppointmentStatus, InventoryLogType, PrismaClient, Role } from '../src/generated/prisma';
 import * as bcrypt from 'bcryptjs';
 
 const prisma = new PrismaClient();
@@ -16,13 +16,13 @@ async function main() {
   // 1. Organization
   const org = await prisma.organization.upsert({
     where: { slug: 'senyum-sehat' },
-    update: {},
+    update: { moduleOperate: true },
     create: {
       name: 'Klinik Gigi Senyum Sehat',
       slug: 'senyum-sehat',
       moduleGrow: true,
       moduleConnect: true,
-      moduleOperate: false,
+      moduleOperate: true,
       moduleIntelligence: false,
     },
   });
@@ -298,7 +298,56 @@ async function main() {
     });
   }
 
-  console.log('Seed complete!');
+  const du = await prisma.user.findUnique({ where: { email: 'director@demo.com' } });
+  const mu = await prisma.user.findUnique({ where: { email: 'manager@demo.com' } });
+  const bu = await prisma.user.findUnique({ where: { email: 'staff@demo.com' } });
+  const bi = branch1.id;
+  const b2 = branch2.id;
+  const af1 = [
+    { n: 'Lidocaine HCl 2% + Epinephrine', s: 'MED-LIDO-01', st: 8, ms: 20, u: 'ampul', c: 'Anestesi & Farmasi' },
+    { n: 'Mepivacaine 3% Non-Vasoconstrictor', s: 'MED-MEPI-02', st: 25, ms: 15, u: 'ampul', c: 'Anestesi & Farmasi' },
+    { n: 'Amoxicillin 500mg', s: 'MED-AMOX-03', st: 50, ms: 30, u: 'strip', c: 'Anestesi & Farmasi' },
+  ];
+  for (const d of af1) {
+    const i = await prisma.inventoryItem.create({ data: { branchId: bi, name: d.n, sku: d.s, stock: d.st, minStock: d.ms, unit: d.u, category: d.c } });
+    await prisma.inventoryLog.create({ data: { type: 'RESTOCK' as const, previousStock: 0, currentStock: d.st, itemId: i.id, userId: mu!.id } });
+  }
+  const bt1 = [
+    { n: 'Composite Resin Filtek Z250 A2', s: 'MAT-COMP-A2', st: 6, ms: 5, u: 'syringe', c: 'Bahan Tambal & Restorasi' },
+    { n: 'Bonding Agent Universal', s: 'MAT-BOND-01', st: 3, ms: 4, u: 'botol', c: 'Bahan Tambal & Restorasi' },
+    { n: 'Etching Gel 37%', s: 'MAT-ETCH-01', st: 12, ms: 5, u: 'syringe', c: 'Bahan Tambal & Restorasi' },
+  ];
+  for (const d of bt1) {
+    const i = await prisma.inventoryItem.create({ data: { branchId: bi, name: d.n, sku: d.s, stock: d.st, minStock: d.ms, unit: d.u, category: d.c } });
+    await prisma.inventoryLog.create({ data: { type: 'RESTOCK' as const, previousStock: 0, currentStock: d.st, itemId: i.id, userId: mu!.id } });
+  }
+  const hp1 = [
+    { n: 'Dental Needle 30G Short', s: 'DISP-NDL-30', st: 150, ms: 50, u: 'pcs', c: 'Habis Pakai & Sterilisasi' },
+    { n: 'Latex Examination Gloves M', s: 'DISP-GLV-M', st: 0, ms: 10, u: 'box', c: 'Habis Pakai & Sterilisasi' },
+    { n: 'Masker Medis 3-Ply Earloop', s: 'DISP-MASK-01', st: 20, ms: 10, u: 'box', c: 'Habis Pakai & Sterilisasi' },
+    { n: 'Pouch Sterilisasi Autoclave 90x230mm', s: 'STER-PCH-01', st: 80, ms: 30, u: 'pcs', c: 'Habis Pakai & Sterilisasi' },
+  ];
+  for (const d of hp1) {
+    const i = await prisma.inventoryItem.create({ data: { branchId: bi, name: d.n, sku: d.s, stock: d.st, minStock: d.ms, unit: d.u, category: d.c } });
+    await prisma.inventoryLog.create({ data: { type: 'RESTOCK' as const, previousStock: 0, currentStock: d.st, itemId: i.id, userId: mu!.id } });
+  }
+  const o1 = [
+    { n: 'Bracket Metal MBT 0.022 Kit', s: 'ORTH-BRK-01', st: 15, ms: 10, u: 'set', c: 'Ortodonti' },
+    { n: 'Niti Archwire 0.014 Upper', s: 'ORTH-WIRE-01', st: 30, ms: 20, u: 'pcs', c: 'Ortodonti' },
+  ];
+  for (const d of o1) {
+    const i = await prisma.inventoryItem.create({ data: { branchId: bi, name: d.n, sku: d.s, stock: d.st, minStock: d.ms, unit: d.u, category: d.c } });
+    await prisma.inventoryLog.create({ data: { type: 'RESTOCK' as const, previousStock: 0, currentStock: d.st, itemId: i.id, userId: mu!.id } });
+  }
+  const ib1 = [
+    { n: 'Blade Bisturi No. 15', s: 'SURG-BLD-15', st: 45, ms: 25, u: 'pcs', c: 'Instrumen Bedah' },
+    { n: 'Benang Jahit Silk 3-0', s: 'SURG-SLK-30', st: 2, ms: 8, u: 'pcs', c: 'Instrumen Bedah' },
+  ];
+  for (const d of ib1) {
+    const i = await prisma.inventoryItem.create({ data: { branchId: bi, name: d.n, sku: d.s, stock: d.st, minStock: d.ms, unit: d.u, category: d.c } });
+    await prisma.inventoryLog.create({ data: { type: 'RESTOCK' as const, previousStock: 0, currentStock: d.st, itemId: i.id, userId: mu!.id } });
+  }
+  console.log('Inventory seeding complete!');
   console.log('\nDemo accounts:');
   console.log('  Director: director@demo.com / demo123456');
   console.log('  Manager:  manager@demo.com  / demo123456');

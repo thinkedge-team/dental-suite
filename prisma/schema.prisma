@@ -1,4 +1,4 @@
-// Think Edge Dental Suite — Finalized schema (Phase 3)
+// Think Edge Dental Suite - Finalized schema (Phase 3)
 
 generator client {
   provider = "prisma-client-js"
@@ -87,6 +87,7 @@ model User {
   sessions  Session[]
   shifts    Shift[]
   approvals ApprovalRequest[]
+  inventoryLogs InventoryLog[]
 }
 
 enum Role {
@@ -297,10 +298,38 @@ model InventoryItem {
   stock     Int      @default(0)
   minStock  Int      @default(0)
   unit      String   @default("pcs")
+  category  String   @default("Umum")
+  logs      InventoryLog[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  @@index([branchId, stock])
+  @@index([branchId, category])
+}
+
+// ─── INVENTORY LOGS ──────────────────────────────────────────────────────────────
+
+enum InventoryLogType {
+  USAGE
+  RESTOCK
+  ADJUSTMENT
+  DAMAGED
+}
+
+model InventoryLog {
+  id            String           @id @default(cuid())
+  itemId        String
+  item          InventoryItem    @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  userId        String
+  user          User             @relation(fields: [userId], references: [id])
+  type          InventoryLogType
+  quantity      Int
+  previousStock Int
+  currentStock  Int
+  notes         String?
+  createdAt     DateTime         @default(now())
+
+  @@index([itemId, createdAt])
+  @@index([userId])
 }
 
 model ApprovalRequest {
