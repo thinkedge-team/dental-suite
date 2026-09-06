@@ -7,7 +7,6 @@ import {
   Calendar,
   CheckCircle2,
   Clock,
-  ExternalLink,
   FileText,
   Loader2,
   Package,

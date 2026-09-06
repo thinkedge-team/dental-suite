@@ -78,18 +78,17 @@ export function ApprovalRequestModal({
   const [isPending, startTransition] = useTransition();
   const dialogRef = useRef<HTMLDivElement>(null);
 
-  // Sync state when prefilledItem or defaultBranchId changes
-  useEffect(() => {
+  const [prevPrefilledItem, setPrevPrefilledItem] = useState(prefilledItem);
+  if (prefilledItem !== prevPrefilledItem) {
+    setPrevPrefilledItem(prefilledItem);
     if (prefilledItem) {
       setSelectedBranchId(prefilledItem.branchId);
       setSelectedItemId(prefilledItem.itemId);
       setCustomItemName(prefilledItem.itemName);
       setProcUnit(prefilledItem.unit);
       setActiveTab("PROCUREMENT");
-    } else if (defaultBranchId) {
-      setSelectedBranchId(defaultBranchId);
     }
-  }, [prefilledItem, defaultBranchId]);
+  }
 
   // Handle escape key
   useEffect(() => {

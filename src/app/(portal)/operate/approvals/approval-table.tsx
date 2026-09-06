@@ -2,19 +2,12 @@
 
 import { useMemo, useState } from "react";
 import {
-  AlertTriangle,
-  Building2,
-  Calendar,
   CheckCircle2,
   Clock,
-  ExternalLink,
-  FilePlus2,
   FileText,
-  Filter,
   Package,
   PlusCircle,
   Search,
-  User,
   Wrench,
   XCircle,
 } from "lucide-react";
@@ -22,7 +15,6 @@ import {
   ApprovalRequestModal,
   ApprovalRequestModalBranch,
   ApprovalRequestModalInventoryItem,
-  ApprovalRequestModalPrefilledItem,
 } from "./approval-request-modal";
 import {
   ApprovalDetailDrawer,
@@ -37,7 +29,7 @@ import {
   type OtherPayload,
 } from "@/lib/approvals/types";
 
-export interface ApprovalTableRowData extends ApprovalDetailDrawerItem {}
+export type ApprovalTableRowData = ApprovalDetailDrawerItem;
 
 interface ApprovalTableProps {
   readonly items: readonly ApprovalTableRowData[];
