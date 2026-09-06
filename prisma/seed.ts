@@ -1,4 +1,4 @@
-import { AttendanceStatus, AppointmentStatus, InventoryLogType, PrismaClient, Role } from '../src/generated/prisma';
+import { AttendanceStatus, AppointmentStatus, InventoryLogType, PrismaClient, Role, ApprovalType, ApprovalStatus } from '../src/generated/prisma';
 import * as bcrypt from 'bcryptjs';
 
 const prisma = new PrismaClient();
@@ -437,6 +437,74 @@ async function main() {
   }
 
   console.log('Shifts and attendance seeding complete!');
+
+  console.log('Seeding approval requests...');
+  const existingProcurement = await prisma.approvalRequest.findFirst({
+    where: {
+      organizationId: org.id,
+      branchId: bi,
+      type: ApprovalType.PROCUREMENT,
+    },
+  });
+
+  if (!existingProcurement) {
+    const lidoItem = await prisma.inventoryItem.findFirst({
+      where: { branchId: bi, sku: 'MED-LIDO-01' },
+    });
+
+    await prisma.approvalRequest.create({
+      data: {
+        organizationId: org.id,
+        branchId: bi,
+        requestedById: bu!.id,
+        type: ApprovalType.PROCUREMENT,
+        status: ApprovalStatus.PENDING,
+        payload: {
+          title: 'Pengadaan Anestesi Lidocaine',
+          itemId: lidoItem?.id,
+          itemName: lidoItem?.name || 'Lidocaine HCl 2% + Epinephrine',
+          category: lidoItem?.category || 'Anestesi & Farmasi',
+          currentStock: lidoItem?.stock ?? 8,
+          minStock: lidoItem?.minStock ?? 20,
+          unit: lidoItem?.unit || 'ampul',
+          quantity: 30,
+          estimatedCost: 450000,
+          urgency: 'URGENT',
+          notes: 'Stok kritis menipis di bawah ambang batas minimum.',
+        },
+      },
+    });
+  }
+
+  const existingMaintenance = await prisma.approvalRequest.findFirst({
+    where: {
+      organizationId: org.id,
+      branchId: bi,
+      type: ApprovalType.MAINTENANCE,
+    },
+  });
+
+  if (!existingMaintenance) {
+    await prisma.approvalRequest.create({
+      data: {
+        organizationId: org.id,
+        branchId: bi,
+        requestedById: bu!.id,
+        type: ApprovalType.MAINTENANCE,
+        status: ApprovalStatus.APPROVED,
+        reviewNote: 'Disetujui. Teknisi vendor dijadwalkan visit besok pagi.',
+        payload: {
+          title: 'Perbaikan Selang Suction Unit 2',
+          equipmentName: 'Dental Unit Kursi 2',
+          urgency: 'URGENT',
+          estimatedCost: 350000,
+          description: 'Selang suction mengalami retak dan daya hisap menurun drastis saat tindakan.',
+        },
+      },
+    });
+  }
+  console.log('Approval requests seeding complete!');
+
   console.log('\nDemo accounts:');
   console.log('  Director: director@demo.com / demo123456');
   console.log('  Manager:  manager@demo.com  / demo123456');
