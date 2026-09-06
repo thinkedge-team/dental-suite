@@ -15,6 +15,7 @@ import {
   Stethoscope,
   Building2,
   Package,
+  CheckSquare,
   UserCheck,
   LogOut,
   ChevronLeft,
@@ -86,6 +87,12 @@ export function Sidebar({ user, modules }: SidebarProps) {
       name: "Inventaris Medis", 
       href: "/operate/inventory", 
       icon: Package, 
+      show: userModules.operate 
+    },
+    { 
+      name: "Persetujuan", 
+      href: "/operate/approvals", 
+      icon: CheckSquare, 
       show: userModules.operate 
     },
     { 
