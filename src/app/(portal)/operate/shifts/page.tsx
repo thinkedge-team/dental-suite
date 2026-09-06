@@ -6,9 +6,7 @@ import {
   CalendarDays,
   ChevronLeft,
   ChevronRight,
-  Clock,
   Lock,
-  Users,
 } from "lucide-react";
 
 import { auth } from "@/auth";

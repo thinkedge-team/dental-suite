@@ -6,7 +6,6 @@ import {
   Calendar,
   CheckCircle2,
   Clock,
-  Coffee,
   Info,
   Loader2,
   LogIn,

@@ -3,10 +3,7 @@
 import { useMemo, useState } from "react";
 import {
   AlertCircle,
-  Calendar,
   CheckCircle2,
-  Clock,
-  Filter,
   Search,
   Timer,
   UserCheck,
@@ -263,7 +260,6 @@ export function AttendanceBoard({
               ) : (
                 filteredRecords.map((record) => {
                   const statusInfo = getStatusBadge(record.status);
-                  const isCurrentlyActive = record.clockInAt && !record.clockOutAt;
 
                   return (
                     <tr key={record.id} className="transition-colors hover:bg-muted/20">
