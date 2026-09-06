@@ -43,7 +43,7 @@ async function main() {
     },
   });
 
-  await prisma.branch.upsert({
+  const branch2 = await prisma.branch.upsert({
     where: { organizationId_slug: { organizationId: org.id, slug: 'pluit' } },
     update: {},
     create: {
@@ -310,7 +310,7 @@ async function main() {
   ];
   for (const d of af1) {
     const i = await prisma.inventoryItem.create({ data: { branchId: bi, name: d.n, sku: d.s, stock: d.st, minStock: d.ms, unit: d.u, category: d.c } });
-    await prisma.inventoryLog.create({ data: { type: 'RESTOCK' as const, previousStock: 0, currentStock: d.st, itemId: i.id, userId: mu!.id } });
+    await prisma.inventoryLog.create({ data: { type: 'RESTOCK' as const, quantity: d.st, previousStock: 0, currentStock: d.st, itemId: i.id, userId: mu!.id } });
   }
   const bt1 = [
     { n: 'Composite Resin Filtek Z250 A2', s: 'MAT-COMP-A2', st: 6, ms: 5, u: 'syringe', c: 'Bahan Tambal & Restorasi' },
@@ -319,7 +319,7 @@ async function main() {
   ];
   for (const d of bt1) {
     const i = await prisma.inventoryItem.create({ data: { branchId: bi, name: d.n, sku: d.s, stock: d.st, minStock: d.ms, unit: d.u, category: d.c } });
-    await prisma.inventoryLog.create({ data: { type: 'RESTOCK' as const, previousStock: 0, currentStock: d.st, itemId: i.id, userId: mu!.id } });
+    await prisma.inventoryLog.create({ data: { type: 'RESTOCK' as const, quantity: d.st, previousStock: 0, currentStock: d.st, itemId: i.id, userId: mu!.id } });
   }
   const hp1 = [
     { n: 'Dental Needle 30G Short', s: 'DISP-NDL-30', st: 150, ms: 50, u: 'pcs', c: 'Habis Pakai & Sterilisasi' },
@@ -329,7 +329,7 @@ async function main() {
   ];
   for (const d of hp1) {
     const i = await prisma.inventoryItem.create({ data: { branchId: bi, name: d.n, sku: d.s, stock: d.st, minStock: d.ms, unit: d.u, category: d.c } });
-    await prisma.inventoryLog.create({ data: { type: 'RESTOCK' as const, previousStock: 0, currentStock: d.st, itemId: i.id, userId: mu!.id } });
+    await prisma.inventoryLog.create({ data: { type: 'RESTOCK' as const, quantity: d.st, previousStock: 0, currentStock: d.st, itemId: i.id, userId: mu!.id } });
   }
   const o1 = [
     { n: 'Bracket Metal MBT 0.022 Kit', s: 'ORTH-BRK-01', st: 15, ms: 10, u: 'set', c: 'Ortodonti' },
@@ -337,7 +337,7 @@ async function main() {
   ];
   for (const d of o1) {
     const i = await prisma.inventoryItem.create({ data: { branchId: bi, name: d.n, sku: d.s, stock: d.st, minStock: d.ms, unit: d.u, category: d.c } });
-    await prisma.inventoryLog.create({ data: { type: 'RESTOCK' as const, previousStock: 0, currentStock: d.st, itemId: i.id, userId: mu!.id } });
+    await prisma.inventoryLog.create({ data: { type: 'RESTOCK' as const, quantity: d.st, previousStock: 0, currentStock: d.st, itemId: i.id, userId: mu!.id } });
   }
   const ib1 = [
     { n: 'Blade Bisturi No. 15', s: 'SURG-BLD-15', st: 45, ms: 25, u: 'pcs', c: 'Instrumen Bedah' },
@@ -345,7 +345,7 @@ async function main() {
   ];
   for (const d of ib1) {
     const i = await prisma.inventoryItem.create({ data: { branchId: bi, name: d.n, sku: d.s, stock: d.st, minStock: d.ms, unit: d.u, category: d.c } });
-    await prisma.inventoryLog.create({ data: { type: 'RESTOCK' as const, previousStock: 0, currentStock: d.st, itemId: i.id, userId: mu!.id } });
+    await prisma.inventoryLog.create({ data: { type: 'RESTOCK' as const, quantity: d.st, previousStock: 0, currentStock: d.st, itemId: i.id, userId: mu!.id } });
   }
   console.log('Inventory seeding complete!');
   console.log('\nDemo accounts:');
