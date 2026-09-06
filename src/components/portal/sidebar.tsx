@@ -15,6 +15,7 @@ import {
   Stethoscope,
   Building2,
   Package,
+  UserCheck,
   LogOut,
   ChevronLeft,
   ChevronRight,
@@ -85,6 +86,18 @@ export function Sidebar({ user, modules }: SidebarProps) {
       name: "Inventaris Medis", 
       href: "/operate/inventory", 
       icon: Package, 
+      show: userModules.operate 
+    },
+    { 
+      name: "Jadwal Shift", 
+      href: "/operate/shifts", 
+      icon: CalendarDays, 
+      show: userModules.operate 
+    },
+    { 
+      name: "Presensi Staf", 
+      href: "/operate/attendance", 
+      icon: UserCheck, 
       show: userModules.operate 
     },
     { 
