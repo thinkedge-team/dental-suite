@@ -10,9 +10,14 @@ import {
   PackagePlus,
   Pencil,
   Search,
+  ShoppingCart,
   XCircle,
 } from "lucide-react";
 
+import {
+  ApprovalRequestModal,
+  ApprovalRequestModalPrefilledItem,
+} from "../approvals/approval-request-modal";
 import {
   ItemModal,
   ItemModalBranchOption,
@@ -62,6 +67,9 @@ export function InventoryTable({
 
   const [logDrawerItem, setLogDrawerItem] = useState<StockLogDrawerItem | null>(null);
   const [isLogDrawerOpen, setIsLogDrawerOpen] = useState(false);
+
+  const [procurementPrefill, setProcurementPrefill] = useState<ApprovalRequestModalPrefilledItem | null>(null);
+  const [isApprovalModalOpen, setIsApprovalModalOpen] = useState(false);
 
   // Filtered items computation
   const filteredItems = useMemo(() => {
@@ -121,6 +129,16 @@ export function InventoryTable({
   function handleOpenLogs(item: InventoryTableRowData) {
     setLogDrawerItem(item);
     setIsLogDrawerOpen(true);
+  }
+
+  function handleOpenProcurement(item: InventoryTableRowData) {
+    setProcurementPrefill({
+      branchId: item.branchId,
+      itemId: item.id,
+      itemName: item.name,
+      unit: item.unit,
+    });
+    setIsApprovalModalOpen(true);
   }
 
   return (
@@ -286,6 +304,16 @@ export function InventoryTable({
                         <div className="flex items-center justify-end gap-1.5">
                           <button
                             type="button"
+                            onClick={() => handleOpenProcurement(item)}
+                            title="Ajukan Pengadaan Barang"
+                            className="inline-flex items-center gap-1 rounded-lg border border-border bg-background px-2.5 py-1 text-xs font-medium text-foreground transition-colors hover:border-primary hover:bg-primary/5 hover:text-primary"
+                          >
+                            <ShoppingCart className="size-3" />
+                            <span>Pengadaan</span>
+                          </button>
+
+                          <button
+                            type="button"
                             onClick={() => handleOpenMutation(item)}
                             title="Catat Mutasi Stok"
                             className="inline-flex items-center gap-1 rounded-lg border border-border bg-background px-2.5 py-1 text-xs font-medium text-foreground transition-colors hover:border-primary hover:bg-primary/5 hover:text-primary"
@@ -367,6 +395,26 @@ export function InventoryTable({
         onClose={() => {
           setIsLogDrawerOpen(false);
           setLogDrawerItem(null);
+        }}
+      />
+
+      <ApprovalRequestModal
+        isOpen={isApprovalModalOpen}
+        branches={branches}
+        inventoryItems={items.map((i) => ({
+          id: i.id,
+          name: i.name,
+          sku: i.sku,
+          branchId: i.branchId,
+          stock: i.stock,
+          minStock: i.minStock,
+          unit: i.unit,
+        }))}
+        prefilledItem={procurementPrefill}
+        defaultBranchId={currentBranchId}
+        onClose={() => {
+          setIsApprovalModalOpen(false);
+          setProcurementPrefill(null);
         }}
       />
     </div>
