@@ -14,6 +14,7 @@ import {
   X,
   Stethoscope,
   Building2,
+  Package,
   LogOut,
   ChevronLeft,
   ChevronRight,
@@ -79,6 +80,12 @@ export function Sidebar({ user, modules }: SidebarProps) {
       href: "/doctors", 
       icon: Stethoscope, 
       show: userModules.connect 
+    },
+    { 
+      name: "Inventaris Medis", 
+      href: "/operate/inventory", 
+      icon: Package, 
+      show: userModules.operate 
     },
     { 
       name: "Cabang", 

@@ -28,7 +28,14 @@ export default async function DashboardPage() {
   const { start: startOfToday, end: endOfToday } = getWibDayBounds(now);
   const startOfMonth = getWibMonthStart(now);
 
-  const [todayAppointments, checkedInCount, newPatientsThisMonth, completedVisitsThisMonth, upcomingAppointments] = await Promise.all([
+  const [
+    todayAppointments,
+    checkedInCount,
+    newPatientsThisMonth,
+    completedVisitsThisMonth,
+    upcomingAppointments,
+    allInventoryItems,
+  ] = await Promise.all([
     prisma.appointment.count({
       where: { organizationId: orgId, scheduledAt: { gte: startOfToday, lte: endOfToday } },
     }),
@@ -54,7 +61,30 @@ export default async function DashboardPage() {
       orderBy: { scheduledAt: "asc" },
       take: 5,
     }),
+    prisma.inventoryItem.findMany({
+      where: {
+        branch: {
+          organizationId: orgId,
+          isActive: true,
+        },
+      },
+      include: {
+        branch: {
+          select: {
+            name: true,
+          },
+        },
+      },
+      orderBy: [
+        { stock: "asc" },
+        { name: "asc" },
+      ],
+    }),
   ]);
+
+  const lowStockItems = allInventoryItems.filter(
+    (item) => item.stock <= item.minStock
+  );
 
   return (
     <div className="space-y-8 pb-10">
@@ -194,17 +224,54 @@ export default async function DashboardPage() {
           </div>
 
           <div className="rounded-xl border border-border bg-card shadow-sm p-5 space-y-4">
-            <h3 className="text-sm font-semibold uppercase tracking-widest text-muted-foreground">Peringatan Sistem</h3>
-            
-            <div className="flex gap-3 items-start">
-              <div className="w-2 h-2 mt-1.5 rounded-full bg-amber-500 shrink-0" />
-              <div>
-                <p className="text-sm font-medium text-foreground">Stok Anestesi Menipis</p>
-                <p className="text-xs text-muted-foreground mt-0.5">Cabang Kelapa Gading (Sisa: 12 vial)</p>
-              </div>
+            <div className="flex items-center justify-between">
+              <h3 className="text-sm font-semibold uppercase tracking-widest text-muted-foreground">
+                Peringatan Sistem
+              </h3>
+              {lowStockItems.length > 0 && (
+                <Link
+                  href="/operate/inventory"
+                  className="text-xs font-semibold text-primary hover:underline"
+                >
+                  Lihat Semua
+                </Link>
+              )}
             </div>
             
-            <div className="flex gap-3 items-start">
+            {lowStockItems.length > 0 ? (
+              lowStockItems.slice(0, 3).map((item) => {
+                const isOutOfStock = item.stock === 0;
+                return (
+                  <div key={item.id} className="flex gap-3 items-start">
+                    <div
+                      className={`w-2 h-2 mt-1.5 rounded-full shrink-0 ${
+                        isOutOfStock ? "bg-rose-500" : "bg-amber-500"
+                      }`}
+                    />
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium text-foreground truncate">
+                        {isOutOfStock ? `Stok Habis: ${item.name}` : `Stok Menipis: ${item.name}`}
+                      </p>
+                      <p className="text-xs text-muted-foreground mt-0.5 truncate">
+                        {item.branch?.name ? `Cabang ${item.branch.name}` : "Klinik"} (Sisa: {item.stock} {item.unit})
+                      </p>
+                    </div>
+                  </div>
+                );
+              })
+            ) : (
+              <div className="flex gap-3 items-start">
+                <div className="w-2 h-2 mt-1.5 rounded-full bg-emerald-500 shrink-0" />
+                <div>
+                  <p className="text-sm font-medium text-foreground">Stok Inventaris Aman</p>
+                  <p className="text-xs text-muted-foreground mt-0.5">
+                    Seluruh stok obat & bahan medis dalam batas aman.
+                  </p>
+                </div>
+              </div>
+            )}
+            
+            <div className="flex gap-3 items-start border-t border-border/50 pt-3">
               <div className="w-2 h-2 mt-1.5 rounded-full bg-primary shrink-0" />
               <div>
                 <p className="text-sm font-medium text-foreground">Pembaruan Sistem</p>
