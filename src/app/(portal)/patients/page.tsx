@@ -1,5 +1,6 @@
+import Link from "next/link";
 import { redirect } from "next/navigation";
-import { Search, Users, Phone, Mail, Calendar, CalendarClock, ClipboardList, UserRound } from "lucide-react";
+import { Search, Users, Phone, Mail, Calendar, CalendarClock, ClipboardList, UserRound, ArrowRight } from "lucide-react";
 
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
@@ -151,15 +152,20 @@ export default async function PatientsPage({
                   key={patient.id}
                   className="grid grid-cols-1 gap-4 px-5 py-4 transition-colors hover:bg-muted/30 md:grid-cols-12 md:items-center"
                 >
-                  {/* Name + contact */}
+                  {/* Name + contact - clickable */}
                   <div className="col-span-4 flex items-start gap-3 min-w-0">
                     <div className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-muted/60 text-muted-foreground">
                       <UserRound className="h-4 w-4" />
                     </div>
                     <div className="min-w-0">
-                      <p className="truncate text-sm font-semibold text-foreground">
-                        {patient.name}
-                      </p>
+                      <Link
+                        href={`/patients/${patient.id}`}
+                        className="underline underline-offset-2 text-primary hover:text-primary-foreground transition-colors"
+                      >
+                        <p className="truncate text-sm font-semibold text-foreground">
+                          {patient.name}
+                        </p>
+                      </Link>
                       <p className="mt-0.5 flex items-center gap-1.5 text-xs text-muted-foreground">
                         <Phone className="h-3 w-3 shrink-0" />
                         <span className="truncate">{patient.phone}</span>
@@ -220,6 +226,16 @@ export default async function PatientsPage({
                       Terdaftar:{" "}
                     </span>
                     <span className="tabular-nums">{registeredLabel}</span>
+                  </div>
+                  <div className="col-span-1 text-right">
+                    <Link
+                      href={`/patients/${patient.id}`}
+                      className="inline-flex items-center gap-1 rounded-lg bg-primary/10 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-primary"
+                      title="Lihat Detail Pasien"
+                    >
+                      <ArrowRight className="h-3.5 w-3.5" />
+                      Detail
+                    </Link>
                   </div>
                 </li>
               );
