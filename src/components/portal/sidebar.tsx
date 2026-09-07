@@ -20,6 +20,8 @@ import {
   LogOut,
   ChevronLeft,
   ChevronRight,
+  BarChart3,
+  FileSpreadsheet,
 } from "lucide-react";
 import { useState } from "react";
 
@@ -101,11 +103,23 @@ export function Sidebar({ user, modules }: SidebarProps) {
       icon: CalendarDays, 
       show: userModules.operate 
     },
-    { 
-      name: "Presensi Staf", 
-      href: "/operate/attendance", 
-      icon: UserCheck, 
-      show: userModules.operate 
+    {
+      name: "Presensi Staf",
+      href: "/operate/attendance",
+      icon: UserCheck,
+      show: userModules.operate
+    },
+    {
+      name: "Analitik & KPI",
+      href: "/operate/analytics",
+      icon: BarChart3,
+      show: userModules.intelligence
+    },
+    {
+      name: "Laporan & Ekspor",
+      href: "/operate/reports",
+      icon: FileSpreadsheet,
+      show: userModules.intelligence
     },
     { 
       name: "Cabang", 
