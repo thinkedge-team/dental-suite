@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { User, Mail, Shield, Building, KeyRound } from "lucide-react";
+import { Mail, Shield, Building, KeyRound, BadgeCheck } from "lucide-react";
 
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
@@ -34,33 +34,43 @@ export default async function ProfilePage() {
 
   const branchLabel = user.branch?.name ?? "Semua Cabang (Pusat)";
 
-  return (
-    <div className="space-y-6 max-w-4xl">
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight text-foreground">Profil Pengguna</h1>
-        <p className="text-sm text-muted-foreground">
-          Kelola informasi identitas akun dan penugasan operasional Anda.
-        </p>
-      </div>
+  // Compute initials for avatar
+  const initials = (user.name || user.email || "DS")
+    .split(" ")
+    .map((n) => n[0])
+    .filter(Boolean)
+    .slice(0, 2)
+    .join("")
+    .toUpperCase();
 
+  return (
+    <div className="space-y-6 max-w-5xl">
       <div className="grid gap-6 md:grid-cols-3">
         {/* Account Info Card */}
         <Card className="md:col-span-1 border-border/80 bg-card">
-          <CardHeader>
-            <CardTitle className="text-base flex items-center gap-2">
-              <User className="w-4 h-4 text-primary" />
-              Informasi Akun
-            </CardTitle>
-            <CardDescription className="text-xs">
-              Detail otoritas dan keanggotaan pengguna.
-            </CardDescription>
+          <CardHeader className="pb-4">
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center text-primary font-bold text-base shadow-sm">
+                {initials}
+              </div>
+              <div className="min-w-0 flex-1">
+                <CardTitle className="text-base truncate">{user.name}</CardTitle>
+                <CardDescription className="text-xs truncate">{user.email}</CardDescription>
+              </div>
+            </div>
           </CardHeader>
-          <CardContent className="space-y-4 text-xs">
+          <CardContent className="space-y-4 text-xs pt-2">
             <div className="space-y-1">
               <span className="text-muted-foreground flex items-center gap-1.5 font-medium">
-                <Mail className="w-3.5 h-3.5" /> Email
+                <Mail className="w-3.5 h-3.5" /> Email Akun
               </span>
-              <p className="font-semibold text-foreground break-all">{user.email}</p>
+              <div className="flex items-center gap-1.5 flex-wrap">
+                <span className="font-semibold text-foreground break-all">{user.email}</span>
+                <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-medium bg-emerald-100 text-emerald-800 border border-emerald-300 dark:bg-emerald-950/60 dark:text-emerald-300 dark:border-emerald-800">
+                  <BadgeCheck className="w-3 h-3 text-emerald-600 dark:text-emerald-400" />
+                  Terverifikasi
+                </span>
+              </div>
             </div>
 
             <div className="space-y-1">
@@ -99,7 +109,7 @@ export default async function ProfilePage() {
           <CardHeader>
             <CardTitle className="text-base">Pengaturan Data Pribadi</CardTitle>
             <CardDescription className="text-xs">
-              Ubah nama tampilan yang digunakan pada seluruh catatan sistem.
+              Ubah nama tampilan yang digunakan pada seluruh catatan sistem dan rekam aktivitas.
             </CardDescription>
           </CardHeader>
           <CardContent>

@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { ShieldAlert, Lock, CheckCircle } from "lucide-react";
+import { ShieldCheck, Lock, CheckCircle, ShieldAlert } from "lucide-react";
 
 import { auth } from "@/auth";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -12,14 +12,7 @@ export default async function SecurityPage() {
   }
 
   return (
-    <div className="space-y-6 max-w-4xl">
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight text-foreground">Keamanan Akun</h1>
-        <p className="text-sm text-muted-foreground">
-          Kelola kredensial akses dan perlindungan akun Anda di sistem klinik.
-        </p>
-      </div>
-
+    <div className="space-y-6 max-w-5xl">
       <div className="grid gap-6 md:grid-cols-3">
         {/* Security Guidelines Card */}
         <Card className="md:col-span-1 border-border/80 bg-card">
@@ -29,7 +22,7 @@ export default async function SecurityPage() {
               Kebijakan Password
             </CardTitle>
             <CardDescription className="text-xs">
-              Pedoman standar keamanan sandi pengguna.
+              Pedoman standar keamanan sandi pengguna klinik.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-3 text-xs text-muted-foreground">
@@ -43,6 +36,10 @@ export default async function SecurityPage() {
             </div>
             <div className="flex items-start gap-2">
               <CheckCircle className="w-3.5 h-3.5 text-emerald-500 mt-0.5 shrink-0" />
+              <span>Tersimpan dengan enkripsi aman standar industri (bcrypt).</span>
+            </div>
+            <div className="flex items-start gap-2">
+              <ShieldCheck className="w-3.5 h-3.5 text-emerald-500 mt-0.5 shrink-0" />
               <span>Hindari memakai informasi pribadi atau kata yang mudah ditebak.</span>
             </div>
 
@@ -63,7 +60,7 @@ export default async function SecurityPage() {
           <CardHeader>
             <CardTitle className="text-base">Ubah Password</CardTitle>
             <CardDescription className="text-xs">
-              Pastikan Anda mengingat password baru sebelum memperbarui.
+              Pastikan Anda mengingat password baru sebelum memperbarui kredensial akun.
             </CardDescription>
           </CardHeader>
           <CardContent>
