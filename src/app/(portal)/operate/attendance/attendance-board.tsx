@@ -234,8 +234,90 @@ export function AttendanceBoard({
           </div>
         </div>
 
-        {/* Live Attendees Table */}
-        <div className="overflow-x-auto rounded-2xl border border-border bg-card shadow-xs">
+        <div className="space-y-3 block sm:hidden">
+          {filteredRecords.length === 0 ? (
+            <div className="rounded-xl border border-border bg-card p-8 text-center text-muted-foreground shadow-xs">
+              <UserCheck className="mx-auto size-8 opacity-40 mb-2" />
+              <p className="text-sm font-medium text-foreground">
+                {searchTerm
+                  ? `Tidak ada catatan presensi yang cocok dengan "${searchTerm}".`
+                  : "Belum ada catatan presensi yang tercatat hari ini."}
+              </p>
+            </div>
+          ) : (
+            filteredRecords.map((record) => {
+              const statusInfo = getStatusBadge(record.status);
+
+              return (
+                <div
+                  key={record.id}
+                  className="rounded-xl border border-border bg-card p-3.5 shadow-xs space-y-3"
+                >
+                  <div className="flex items-start justify-between gap-2">
+                    <div>
+                      <div className="font-semibold text-foreground">
+                        {record.userName}
+                      </div>
+                      <div className="mt-0.5 inline-block rounded-md bg-muted px-1.5 py-0.5 text-[10px] font-medium text-muted-foreground">
+                        {record.userRole}
+                      </div>
+                    </div>
+                    <span
+                      className={`inline-flex items-center rounded-lg border px-2 py-0.5 text-[10px] font-semibold ${statusInfo.badgeClass}`}
+                    >
+                      {statusInfo.label}
+                    </span>
+                  </div>
+
+                  {record.scheduledShift && (
+                    <div className="rounded-lg bg-muted/40 px-2.5 py-1.5 text-xs flex items-center justify-between">
+                      <span className="text-muted-foreground text-[11px]">Shift Terjadwal:</span>
+                      <span className="font-medium text-foreground text-[11px]">
+                        {record.scheduledShift.shiftType} ({record.scheduledShift.startTime} - {record.scheduledShift.endTime})
+                      </span>
+                    </div>
+                  )}
+
+                  <div className="grid grid-cols-3 gap-2 border-t border-b border-border/50 py-2 text-center text-xs">
+                    <div>
+                      <div className="text-[10px] text-muted-foreground uppercase font-semibold">Masuk</div>
+                      <div className="font-mono font-medium text-foreground mt-0.5">
+                        {formatWibTime(record.clockInAt)}
+                      </div>
+                    </div>
+                    <div>
+                      <div className="text-[10px] text-muted-foreground uppercase font-semibold">Pulang</div>
+                      <div className="font-mono font-medium mt-0.5">
+                        {record.clockOutAt ? (
+                          <span className="text-foreground">{formatWibTime(record.clockOutAt)}</span>
+                        ) : (
+                          <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-600 dark:text-emerald-400">
+                            <span className="size-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                            Aktif
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                    <div>
+                      <div className="text-[10px] text-muted-foreground uppercase font-semibold">Durasi</div>
+                      <div className="font-medium text-foreground mt-0.5">
+                        {calculateDurationString(record.clockInAt, record.clockOutAt)}
+                      </div>
+                    </div>
+                  </div>
+
+                  {record.notes && (
+                    <div className="text-[11px] text-muted-foreground bg-muted/20 rounded-lg p-2 italic">
+                      Catatan: {record.notes}
+                    </div>
+                  )}
+                </div>
+              );
+            })
+          )}
+        </div>
+
+        <div className="hidden sm:block overflow-x-auto rounded-2xl border border-border bg-card shadow-xs">
           <table className="w-full min-w-[760px] border-collapse text-left text-xs">
             <thead>
               <tr className="border-b border-border bg-muted/40">

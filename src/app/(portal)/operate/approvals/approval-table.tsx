@@ -236,8 +236,160 @@ export function ApprovalTable({
         </div>
       </div>
 
-      {/* Table Container */}
-      <div className="overflow-hidden rounded-xl border border-border bg-card shadow-xs">
+      <div className="space-y-3 block sm:hidden">
+        {filteredItems.length === 0 ? (
+          <div className="rounded-xl border border-border bg-card p-8 text-center text-muted-foreground shadow-xs">
+            <FileText className="mx-auto size-8 opacity-40 mb-2" />
+            <p className="text-sm font-medium text-foreground">Tidak ada permohonan pengajuan</p>
+            <p className="text-xs text-muted-foreground mt-0.5">
+              {searchQuery
+                ? "Tidak ada permohonan yang sesuai dengan filter pencarian."
+                : "Belum ada permohonan persetujuan terdaftar pada filter ini."}
+            </p>
+          </div>
+        ) : (
+          filteredItems.map((item) => {
+            const payload = item.payload;
+            let itemTitle = `Pengajuan #${item.id.slice(0, 8)}`;
+            let urgency: "NORMAL" | "URGENT" = "NORMAL";
+            let estCost: number | undefined = undefined;
+
+            if (item.type === "PROCUREMENT" && isProcurementPayload(payload)) {
+              const proc = payload as ProcurementPayload;
+              itemTitle = proc.title;
+              urgency = proc.urgency;
+              estCost = proc.estimatedCost;
+            } else if (item.type === "MAINTENANCE" && isMaintenancePayload(payload)) {
+              const maint = payload as MaintenancePayload;
+              itemTitle = maint.title;
+              urgency = maint.urgency;
+              estCost = maint.estimatedCost;
+            } else if (item.type === "OTHER" && isOtherPayload(payload)) {
+              const other = payload as OtherPayload;
+              itemTitle = other.title;
+              estCost = other.estimatedCost;
+            }
+
+            const isUrgent = urgency === "URGENT";
+
+            return (
+              <div
+                key={item.id}
+                className="rounded-xl border border-border bg-card p-3.5 shadow-xs space-y-3"
+              >
+                <div className="flex items-start justify-between gap-2">
+                  <div>
+                    <div className="font-semibold text-foreground leading-snug">
+                      {itemTitle}
+                    </div>
+                    <div className="text-[11px] font-mono text-muted-foreground mt-0.5">
+                      {formatWIB(item.createdAt)}
+                    </div>
+                  </div>
+                  {isUrgent ? (
+                    <span className="shrink-0 inline-flex items-center rounded-md bg-rose-500/10 px-2 py-0.5 text-[10px] font-semibold text-rose-600 dark:text-rose-400">
+                      Mendesak
+                    </span>
+                  ) : (
+                    <span className="shrink-0 inline-flex items-center rounded-md bg-muted px-2 py-0.5 text-[10px] font-medium text-muted-foreground">
+                      Normal
+                    </span>
+                  )}
+                </div>
+
+                <div className="flex items-center justify-between text-xs">
+                  <div>
+                    <div className="font-medium text-foreground">
+                      {item.requestedBy.name || item.requestedBy.email || "Staf"}
+                    </div>
+                    <div className="text-[11px] text-muted-foreground">
+                      {item.branch.name} · <span className="font-mono">{item.requestedBy.role}</span>
+                    </div>
+                  </div>
+
+                  <div>
+                    {item.type === "PROCUREMENT" && (
+                      <span className="inline-flex items-center gap-1 rounded-md bg-blue-500/10 px-2 py-0.5 text-[11px] font-medium text-blue-700 dark:text-blue-300">
+                        <Package className="size-3" />
+                        Pengadaan
+                      </span>
+                    )}
+                    {item.type === "MAINTENANCE" && (
+                      <span className="inline-flex items-center gap-1 rounded-md bg-amber-500/10 px-2 py-0.5 text-[11px] font-medium text-amber-700 dark:text-amber-300">
+                        <Wrench className="size-3" />
+                        Pemeliharaan
+                      </span>
+                    )}
+                    {item.type === "OTHER" && (
+                      <span className="inline-flex items-center gap-1 rounded-md bg-purple-500/10 px-2 py-0.5 text-[11px] font-medium text-purple-700 dark:text-purple-300">
+                        <FileText className="size-3" />
+                        Lainnya
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-between border-t border-border/50 pt-2.5">
+                  <div>
+                    <div className="text-[10px] text-muted-foreground uppercase font-semibold">
+                      Estimasi Biaya
+                    </div>
+                    <div className="font-mono text-xs font-bold text-foreground">
+                      {estCost ? formatRupiah(estCost) : "-"}
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    {item.status === "PENDING" && (
+                      <span className="inline-flex items-center gap-1 rounded-full border border-amber-500/30 bg-amber-500/10 px-2.5 py-0.5 text-[11px] font-semibold text-amber-700 dark:text-amber-300">
+                        <Clock className="size-3" />
+                        Menunggu
+                      </span>
+                    )}
+                    {item.status === "APPROVED" && (
+                      <span className="inline-flex items-center gap-1 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2.5 py-0.5 text-[11px] font-semibold text-emerald-700 dark:text-emerald-300">
+                        <CheckCircle2 className="size-3" />
+                        Disetujui
+                      </span>
+                    )}
+                    {item.status === "REJECTED" && (
+                      <span className="inline-flex items-center gap-1 rounded-full border border-rose-500/30 bg-rose-500/10 px-2.5 py-0.5 text-[11px] font-semibold text-rose-700 dark:text-rose-300">
+                        <XCircle className="size-3" />
+                        Ditolak
+                      </span>
+                    )}
+
+                    <button
+                      type="button"
+                      onClick={() => handleOpenDetail(item)}
+                      className="inline-flex items-center gap-1 rounded-lg border border-border bg-background px-2.5 py-1 text-xs font-medium text-foreground transition-colors hover:border-primary hover:bg-primary/5 hover:text-primary"
+                    >
+                      <span>Detail</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            );
+          })
+        )}
+
+        <div className="rounded-xl border border-border bg-muted/20 px-3.5 py-2.5 text-[11px] text-muted-foreground flex flex-col gap-1.5">
+          <span>Menampilkan {filteredItems.length} dari {items.length} permohonan</span>
+          <div className="flex flex-wrap items-center gap-3">
+            <span className="inline-flex items-center gap-1">
+              <span className="size-2 rounded-full bg-amber-500" /> Menunggu: {items.filter(i => i.status === "PENDING").length}
+            </span>
+            <span className="inline-flex items-center gap-1">
+              <span className="size-2 rounded-full bg-emerald-500" /> Disetujui: {items.filter(i => i.status === "APPROVED").length}
+            </span>
+            <span className="inline-flex items-center gap-1">
+              <span className="size-2 rounded-full bg-rose-500" /> Ditolak: {items.filter(i => i.status === "REJECTED").length}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div className="hidden sm:block overflow-hidden rounded-xl border border-border bg-card shadow-xs">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs">
             <thead className="border-b border-border bg-muted/40 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">

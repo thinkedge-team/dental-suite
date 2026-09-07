@@ -196,8 +196,139 @@ export function InventoryTable({
         })}
       </div>
 
-      {/* Table Container */}
-      <div className="overflow-hidden rounded-xl border border-border bg-card shadow-xs">
+      <div className="space-y-3 block sm:hidden">
+        {filteredItems.length === 0 ? (
+          <div className="rounded-xl border border-border bg-card p-8 text-center text-muted-foreground shadow-xs">
+            <Package className="mx-auto size-8 opacity-40 mb-2" />
+            <p className="text-sm font-medium text-foreground">Tidak ada barang inventaris</p>
+            <p className="text-xs text-muted-foreground mt-0.5">
+              {searchQuery
+                ? "Tidak ada item yang cocok dengan pencarian kata kunci tersebut."
+                : "Kategori ini belum memiliki data inventaris terdaftar."}
+            </p>
+          </div>
+        ) : (
+          filteredItems.map((item) => {
+            const isOutOfStock = item.stock === 0;
+            const isLowStock = item.stock > 0 && item.stock <= item.minStock;
+            const isSafe = item.stock > item.minStock;
+
+            return (
+              <div
+                key={item.id}
+                className="rounded-xl border border-border bg-card p-3.5 shadow-xs space-y-3"
+              >
+                <div className="flex items-start justify-between gap-2">
+                  <div>
+                    <div className="font-semibold text-foreground leading-snug">
+                      {item.name}
+                    </div>
+                    <div className="flex flex-wrap items-center gap-1.5 mt-1 text-[11px] text-muted-foreground">
+                      <span className="font-mono">{item.sku ? `SKU: ${item.sku}` : "Tanpa SKU"}</span>
+                      {isDirector && item.branchName && (
+                        <span>· {item.branchName}</span>
+                      )}
+                    </div>
+                  </div>
+                  <span className="shrink-0 inline-block rounded-md bg-muted px-2 py-0.5 text-[10px] font-medium text-foreground">
+                    {item.category}
+                  </span>
+                </div>
+
+                <div className="flex items-center justify-between border-t border-b border-border/50 py-2">
+                  <div>
+                    <div className="text-[10px] uppercase font-semibold text-muted-foreground tracking-wider">
+                      Stok
+                    </div>
+                    <div className="font-mono text-sm font-bold text-foreground">
+                      {item.stock} {item.unit}
+                    </div>
+                    <div className="text-[10px] text-muted-foreground">
+                      Min: {item.minStock} {item.unit}
+                    </div>
+                  </div>
+
+                  <div>
+                    {isOutOfStock && (
+                      <span className="inline-flex items-center gap-1 rounded-full border border-rose-500/30 bg-rose-500/10 px-2.5 py-0.5 text-[11px] font-semibold text-rose-700 dark:text-rose-300">
+                        <XCircle className="size-3" />
+                        Habis
+                      </span>
+                    )}
+                    {isLowStock && (
+                      <span className="inline-flex items-center gap-1 rounded-full border border-amber-500/30 bg-amber-500/10 px-2.5 py-0.5 text-[11px] font-semibold text-amber-700 dark:text-amber-300">
+                        <AlertTriangle className="size-3" />
+                        Menipis
+                      </span>
+                    )}
+                    {isSafe && (
+                      <span className="inline-flex items-center gap-1 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2.5 py-0.5 text-[11px] font-semibold text-emerald-700 dark:text-emerald-300">
+                        <CheckCircle2 className="size-3" />
+                        Aman
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-2">
+                  <button
+                    type="button"
+                    onClick={() => handleOpenMutation(item)}
+                    className="inline-flex items-center justify-center gap-1 rounded-lg border border-border bg-background px-2.5 py-1.5 text-xs font-medium text-foreground transition-colors hover:border-primary hover:bg-primary/5 hover:text-primary"
+                  >
+                    <ArrowUpDown className="size-3" />
+                    <span>Catat Mutasi</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => handleOpenLogs(item)}
+                    className="inline-flex items-center justify-center gap-1 rounded-lg border border-border bg-background px-2.5 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:border-border hover:bg-muted hover:text-foreground"
+                  >
+                    <History className="size-3" />
+                    <span>Riwayat</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => handleOpenEdit(item)}
+                    className="inline-flex items-center justify-center gap-1 rounded-lg border border-border bg-background px-2.5 py-1.5 text-xs font-medium text-foreground transition-colors hover:border-border hover:bg-muted"
+                  >
+                    <Pencil className="size-3" />
+                    <span>Edit</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => handleOpenProcurement(item)}
+                    className="inline-flex items-center justify-center gap-1 rounded-lg border border-border bg-background px-2.5 py-1.5 text-xs font-medium text-foreground transition-colors hover:border-primary hover:bg-primary/5 hover:text-primary"
+                  >
+                    <ShoppingCart className="size-3" />
+                    <span>Pengadaan</span>
+                  </button>
+                </div>
+              </div>
+            );
+          })
+        )}
+
+        <div className="rounded-xl border border-border bg-muted/20 px-3.5 py-2.5 text-[11px] text-muted-foreground flex flex-col gap-1.5">
+          <span>Menampilkan {filteredItems.length} dari {items.length} barang inventaris</span>
+          <div className="flex flex-wrap items-center gap-3">
+            <span className="inline-flex items-center gap-1">
+              <span className="size-2 rounded-full bg-rose-500" /> Habis: {items.filter(i => i.stock === 0).length}
+            </span>
+            <span className="inline-flex items-center gap-1">
+              <span className="size-2 rounded-full bg-amber-500" /> Menipis: {items.filter(i => i.stock > 0 && i.stock <= i.minStock).length}
+            </span>
+            <span className="inline-flex items-center gap-1">
+              <span className="size-2 rounded-full bg-emerald-500" /> Aman: {items.filter(i => i.stock > i.minStock).length}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div className="hidden sm:block overflow-hidden rounded-xl border border-border bg-card shadow-xs">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs">
             <thead className="border-b border-border bg-muted/40 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">

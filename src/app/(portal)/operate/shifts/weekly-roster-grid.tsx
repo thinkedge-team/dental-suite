@@ -159,8 +159,12 @@ export function WeeklyRosterGrid({
         </div>
       )}
 
-      {/* Roster Matrix Table */}
-      <div className="overflow-x-auto rounded-2xl border border-border bg-card shadow-xs">
+      <div className="block sm:hidden text-[11px] text-muted-foreground flex items-center justify-between px-1">
+        <span>Geser horizontal untuk melihat seluruh hari</span>
+        <span className="font-mono text-[10px]">← →</span>
+      </div>
+
+      <div className="overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0 rounded-2xl border border-border bg-card shadow-xs">
         <table className="w-full min-w-[800px] border-collapse text-left text-xs">
           <thead>
             <tr className="border-b border-border bg-muted/40">
