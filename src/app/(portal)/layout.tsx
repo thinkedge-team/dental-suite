@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import { cookies } from "next/headers";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { Sidebar } from "@/components/portal/sidebar";
@@ -14,6 +15,9 @@ export default async function PortalLayout({
   if (!session?.user) {
     redirect("/login");
   }
+
+  const cookieStore = await cookies();
+  const activeBranchCookie = cookieStore.get("portal_branch")?.value;
 
   const branches = await prisma.branch.findMany({
     where: {
@@ -46,6 +50,7 @@ export default async function PortalLayout({
           role={session.user.role}
           userName={session.user.name}
           branches={branches}
+          initialBranchId={activeBranchCookie}
         />
         <div className="flex-1 overflow-y-auto p-4 md:p-8">
           <div className="mx-auto max-w-6xl">{children}</div>

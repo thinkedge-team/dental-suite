@@ -20,6 +20,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { getPortalNotifications, type PortalNotificationItem } from "@/lib/actions/notifications";
+import { setActiveBranch } from "@/lib/branch-context";
 
 interface HeaderProps {
   organizationName: string;
@@ -27,6 +28,7 @@ interface HeaderProps {
   role: string;
   userName?: string | null;
   branches?: Array<{ id: string; name: string }>;
+  initialBranchId?: string | null;
 }
 
 export function PortalHeader({
@@ -35,6 +37,7 @@ export function PortalHeader({
   role,
   userName,
   branches = [],
+  initialBranchId,
 }: HeaderProps) {
   const router = useRouter();
   const pathname = usePathname();
@@ -42,14 +45,15 @@ export function PortalHeader({
 
   const isDirector = role === "DIRECTOR" || role === "SUPER_ADMIN";
   
-  // Resolve active branch from URL search params
-  const currentBranchParam = searchParams.get("branch");
-  const selectedBranchName = useMemo(() => {
-    if (!isDirector) return branchName || "Semua Cabang";
-    if (!currentBranchParam) return "Semua Cabang";
+  const currentBranchParam = searchParams.get("branch") || initialBranchId;
+  const activeBranch = useMemo(() => {
+    if (!isDirector) return { id: undefined, name: branchName || "Cabang Utama" };
+    if (!currentBranchParam || currentBranchParam === "all") return { id: undefined, name: "Semua Cabang (Konsolidasi)" };
     const found = branches.find((b) => b.id === currentBranchParam || b.name === currentBranchParam);
-    return found ? found.name : "Semua Cabang";
+    return found ? found : { id: currentBranchParam, name: "Semua Cabang" };
   }, [isDirector, branchName, currentBranchParam, branches]);
+
+  const selectedBranchName = activeBranch.name;
 
   const [branchDropdownOpen, setBranchDropdownOpen] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
@@ -119,22 +123,18 @@ export function PortalHeader({
     };
   }, []);
 
-  function handleSelectBranch(branch?: { id: string; name: string }) {
+  async function handleSelectBranch(branch?: { id: string; name: string }) {
     setBranchDropdownOpen(false);
+    await setActiveBranch(branch?.id || null);
     const params = new URLSearchParams(searchParams.toString());
     if (!branch) {
       params.delete("branch");
-      if (typeof document !== "undefined") {
-        document.cookie = "portal_branch=; path=/; max-age=0";
-      }
     } else {
       params.set("branch", branch.id);
-      if (typeof document !== "undefined") {
-        document.cookie = `portal_branch=${encodeURIComponent(branch.id)}; path=/; max-age=2592000`;
-      }
     }
     const q = params.toString();
     router.push(`${pathname}${q ? `?${q}` : ""}`);
+    router.refresh();
   }
 
   return (

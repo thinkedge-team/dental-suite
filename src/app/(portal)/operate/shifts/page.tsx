@@ -11,6 +11,7 @@ import {
 
 import { auth } from "@/auth";
 import { getWibTodayIso } from "@/lib/appointments/day-bounds";
+import { getActiveBranchId } from "@/lib/branch-context";
 import { prisma } from "@/lib/prisma";
 import {
   DayColumn,
@@ -175,10 +176,11 @@ export default async function ShiftsPage({ searchParams }: ShiftsPageProps) {
   });
 
   // 3. Resolve active branch
+  const effectiveBranchId = await getActiveBranchId(branch, userBranchId, isDirector);
   let activeBranchId = "";
   if (isDirector) {
-    if (branch && branches.some((b) => b.id === branch)) {
-      activeBranchId = branch;
+    if (effectiveBranchId && branches.some((b) => b.id === effectiveBranchId)) {
+      activeBranchId = effectiveBranchId;
     } else {
       activeBranchId = branches[0]?.id ?? "";
     }

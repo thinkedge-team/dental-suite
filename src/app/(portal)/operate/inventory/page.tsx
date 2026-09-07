@@ -12,6 +12,7 @@ import {
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { getWibDayBounds } from "@/lib/appointments/day-bounds";
+import { getActiveBranchId } from "@/lib/branch-context";
 import {
   InventoryTable,
   InventoryTableRowData,
@@ -92,14 +93,10 @@ export default async function InventoryPage({ searchParams }: InventoryPageProps
   });
 
   // 3. Determine active branch filter
-  const selectedBranchId = branch && branch.length > 0 ? branch : undefined;
-  const activeBranchFilter = isDirector
-    ? selectedBranchId
-      ? { id: selectedBranchId, organizationId, isActive: true }
-      : { organizationId, isActive: true }
-    : userBranchId
-      ? { id: userBranchId, organizationId, isActive: true }
-      : { organizationId, isActive: true };
+  const selectedBranchId = await getActiveBranchId(branch, userBranchId, isDirector);
+  const activeBranchFilter = selectedBranchId
+    ? { id: selectedBranchId, organizationId, isActive: true }
+    : { organizationId, isActive: true };
 
   // 4. Query inventory items with recent logs and branch relation
   const now = new Date();

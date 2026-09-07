@@ -12,6 +12,7 @@ import {
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { getWibMonthStart } from "@/lib/appointments/day-bounds";
+import { getActiveBranchId } from "@/lib/branch-context";
 import { ApprovalTable } from "./approval-table";
 
 interface ApprovalsPageProps {
@@ -88,8 +89,7 @@ export default async function ApprovalsPage({ searchParams }: ApprovalsPageProps
   });
 
   // 3. Resolve branch scoping
-  const selectedBranchId = isDirector && branch && branch.length > 0 ? branch : undefined;
-  const activeBranchId = isDirector ? selectedBranchId : (userBranchId ?? undefined);
+  const activeBranchId = await getActiveBranchId(branch, userBranchId, isDirector);
 
   // 4. Query approval requests with relations
   const approvalWhereClause = {
@@ -183,7 +183,7 @@ export default async function ApprovalsPage({ searchParams }: ApprovalsPageProps
             <Link
               href="/operate/approvals"
               className={`inline-flex items-center gap-1 rounded-lg px-3 py-1.5 text-xs font-medium transition-colors ${
-                !selectedBranchId
+                !activeBranchId
                   ? "bg-primary text-primary-foreground shadow-2xs font-semibold"
                   : "text-muted-foreground hover:bg-muted hover:text-foreground"
               }`}
@@ -192,7 +192,7 @@ export default async function ApprovalsPage({ searchParams }: ApprovalsPageProps
               <span>Semua Cabang</span>
             </Link>
             {branches.map((b) => {
-              const isActive = selectedBranchId === b.id;
+              const isActive = activeBranchId === b.id;
               return (
                 <Link
                   key={b.id}

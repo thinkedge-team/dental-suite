@@ -15,10 +15,11 @@ import {
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import {
-  formatRupiah,
   calculateKpiGrowth,
+  formatRupiah,
   resolveDateRange,
 } from "@/lib/intelligence/analytics";
+import { getActiveBranchId } from "@/lib/branch-context";
 import { TrendChart, TrendChartItem } from "./trend-chart";
 import { DoctorRankingTable, DoctorRankingItem } from "./doctor-ranking-table";
 import { ServiceBreakdown, ServiceBreakdownItem } from "./service-breakdown";
@@ -83,13 +84,7 @@ export default async function AnalyticsPage({ searchParams }: AnalyticsPageProps
   }
 
   // 2. Resolve branch scoping
-  // DIRECTOR and SUPER_ADMIN can filter by query parameter branch or view all branches.
-  // Other roles are locked to session.user.branchId.
-  const effectiveBranchId = isDirector
-    ? branchParam && branchParam !== "ALL"
-      ? branchParam
-      : undefined
-    : userBranchId ?? undefined;
+  const effectiveBranchId = await getActiveBranchId(branchParam, userBranchId, isDirector);
 
   // Query branches for branch filter dropdown (if Director/SuperAdmin)
   const branches = await prisma.branch.findMany({

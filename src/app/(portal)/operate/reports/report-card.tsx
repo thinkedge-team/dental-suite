@@ -26,6 +26,7 @@ interface ReportCardProps {
   isDirectorOrSuperAdmin: boolean;
   userBranchName?: string | null;
   userBranchId?: string | null;
+  initialBranchId?: string | null;
 }
 
 export function ReportCard({
@@ -37,6 +38,7 @@ export function ReportCard({
   isDirectorOrSuperAdmin,
   userBranchName,
   userBranchId,
+  initialBranchId,
 }: ReportCardProps) {
   // Default dates: first day of current WIB month to today
   const getInitialDates = () => {
@@ -55,7 +57,7 @@ export function ReportCard({
   const [startDate, setStartDate] = useState(initialDates.startDateStr);
   const [endDate, setEndDate] = useState(initialDates.endDateStr);
   const [selectedBranchId, setSelectedBranchId] = useState<string>(
-    isDirectorOrSuperAdmin ? "ALL" : userBranchId ?? ""
+    isDirectorOrSuperAdmin ? (initialBranchId || "ALL") : (userBranchId ?? "")
   );
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();

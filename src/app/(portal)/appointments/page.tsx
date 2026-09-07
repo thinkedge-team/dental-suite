@@ -16,6 +16,7 @@ import { AppointmentStatus } from "@/generated/prisma";
 import { STATUS_STYLES } from "@/lib/appointments/status";
 import { prisma } from "@/lib/prisma";
 import { getWibTodayIso, getWibIsoBounds } from "@/lib/appointments/day-bounds";
+import { getActiveBranchId } from "@/lib/branch-context";
 import { AppointmentWaButton } from "@/components/portal/appointment-wa-button";
 
 type SearchParams = {
@@ -104,13 +105,16 @@ export default async function AppointmentsPage({
 
   const { date, status, branch } = await searchParams;
 
+  const isDirector = session.user.role === "DIRECTOR" || session.user.role === "SUPER_ADMIN";
+  const effectiveBranchId = await getActiveBranchId(branch, session.user.branchId, isDirector);
+
   const selectedDate = date && DATE_RE.test(date) ? date : todayIsoDate();
   const { start, end } = dayBounds(selectedDate);
 
   const selectedStatus: AppointmentStatus | undefined =
     status && VALID_STATUSES.has(status) ? (status as AppointmentStatus) : undefined;
 
-  const selectedBranch = branch && branch.length > 0 ? branch : undefined;
+  const selectedBranch = effectiveBranchId;
 
   const appointments = await prisma.appointment.findMany({
     where: {

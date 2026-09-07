@@ -11,6 +11,7 @@ import {
 
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
+import { getActiveBranchId } from "@/lib/branch-context";
 import { ScheduleBlockDrawer } from "./schedule-block-drawer";
 import { DeleteBlockButton } from "./delete-block-button";
 
@@ -36,7 +37,11 @@ function formatDateTimeWib(date: Date): string {
   }).format(d) + " WIB";
 }
 
-export default async function SchedulePage() {
+export default async function SchedulePage({
+  searchParams,
+}: {
+  searchParams?: Promise<{ branch?: string }>;
+}) {
   const session = await auth();
 
   if (!session?.user?.organizationId) {
@@ -44,6 +49,9 @@ export default async function SchedulePage() {
   }
 
   const organizationId = session.user.organizationId;
+  const { branch: branchParam } = (await searchParams) || {};
+  const isDirector = session.user.role === "DIRECTOR" || session.user.role === "SUPER_ADMIN";
+  const effectiveBranchId = await getActiveBranchId(branchParam, session.user.branchId, isDirector);
 
   const [doctors, branches, scheduleBlocks] = await Promise.all([
     prisma.doctor.findMany({
@@ -82,6 +90,7 @@ export default async function SchedulePage() {
         doctor: {
           organizationId,
         },
+        ...(effectiveBranchId ? { branchId: effectiveBranchId } : {}),
       },
       include: {
         doctor: {

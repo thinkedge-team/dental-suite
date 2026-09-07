@@ -4,12 +4,13 @@ import {
   FileSpreadsheet,
   CalendarDays,
   Receipt,
-  Boxes,
+  Package,
   Lock,
 } from "lucide-react";
 
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
+import { getActiveBranchId } from "@/lib/branch-context";
 import { ReportCard } from "./report-card";
 
 export default async function ReportsPage() {
@@ -80,6 +81,8 @@ export default async function ReportsPage() {
     userBranchName = userBranch?.name ?? null;
   }
 
+  const activeBranchId = await getActiveBranchId(undefined, userBranchId, isDirectorOrSuperAdmin);
+
   return (
     <div className="space-y-6">
       <div>
@@ -103,6 +106,7 @@ export default async function ReportsPage() {
           isDirectorOrSuperAdmin={isDirectorOrSuperAdmin}
           userBranchName={userBranchName}
           userBranchId={userBranchId}
+          initialBranchId={activeBranchId}
         />
 
         {/* Report Card 2: Kunjungan & Pendapatan */}
@@ -115,18 +119,20 @@ export default async function ReportsPage() {
           isDirectorOrSuperAdmin={isDirectorOrSuperAdmin}
           userBranchName={userBranchName}
           userBranchId={userBranchId}
+          initialBranchId={activeBranchId}
         />
 
         {/* Report Card 3: Mutasi Inventaris */}
         <ReportCard
           type="inventory"
           title="Laporan Mutasi Inventaris"
-          description="Riwayat pemakaian bahan medis habis pakai, restok barang, stok opname, dan penyesuaian inventaris cabang."
-          icon={Boxes}
+          description="Log pemakaian bahan medis, restok distributor, penyesuaian stok opname, dan histori barang rusak."
+          icon={Package}
           branches={branches}
           isDirectorOrSuperAdmin={isDirectorOrSuperAdmin}
           userBranchName={userBranchName}
           userBranchId={userBranchId}
+          initialBranchId={activeBranchId}
         />
       </div>
     </div>

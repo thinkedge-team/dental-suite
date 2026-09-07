@@ -7,6 +7,7 @@ import { AppointmentStatus } from "@/generated/prisma";
 import Link from "next/link";
 import { STATUS_STYLES } from "@/lib/appointments/status";
 import { getWibDayBounds, getWibMonthStart } from "@/lib/appointments/day-bounds";
+import { getActiveBranchId } from "@/lib/branch-context";
 
 interface MetricCardProps {
   title: string;
@@ -30,7 +31,7 @@ export default async function DashboardPage({
 
   const { branch: branchParam } = (await searchParams) || {};
   const isDirector = session.user.role === "DIRECTOR" || session.user.role === "SUPER_ADMIN";
-  const effectiveBranchId = isDirector ? branchParam : (session.user.branchId || undefined);
+  const effectiveBranchId = await getActiveBranchId(branchParam, session.user.branchId, isDirector);
   const branchFilter = effectiveBranchId ? { branchId: effectiveBranchId } : {};
 
   const now = new Date();

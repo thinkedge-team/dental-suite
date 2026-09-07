@@ -8,6 +8,7 @@ import {
 
 import { auth } from "@/auth";
 import { getWibDayBounds } from "@/lib/appointments/day-bounds";
+import { getActiveBranchId } from "@/lib/branch-context";
 import { prisma } from "@/lib/prisma";
 import {
   AttendanceBoard,
@@ -97,10 +98,11 @@ export default async function AttendancePage({
   });
 
   // 3. Resolve active branch for board view
+  const effectiveBranchId = await getActiveBranchId(branch, userBranchId, isDirector);
   let activeBranchId: string | undefined;
   if (isDirector) {
-    if (branch && branches.some((b) => b.id === branch)) {
-      activeBranchId = branch;
+    if (effectiveBranchId && branches.some((b) => b.id === effectiveBranchId)) {
+      activeBranchId = effectiveBranchId;
     } else {
       activeBranchId = branches[0]?.id;
     }
