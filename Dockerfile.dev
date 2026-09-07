@@ -1,0 +1,24 @@
+FROM node:20-alpine AS dev
+
+WORKDIR /app
+
+# Install dependencies required for node-gyp or alpine builds if needed
+RUN apk add --no-cache libc6-compat openssl
+
+# Copy package files first for cached layer
+COPY package.json package-lock.json ./
+RUN npm ci
+
+# Copy prisma schema to generate client
+COPY prisma ./prisma
+RUN npx prisma generate
+
+# Copy the rest of the application
+COPY . .
+
+EXPOSE 3000
+
+ENV PORT=3000
+ENV HOSTNAME="0.0.0.0"
+
+CMD ["npm", "run", "dev"]

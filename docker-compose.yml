@@ -1,6 +1,30 @@
 services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    container_name: dental-suite-app
+    ports:
+      - "3000:3000"
+    environment:
+      DATABASE_URL: "postgresql://dental:dental@postgres:5432/dental_suite?schema=public"
+      AUTH_SECRET: "dental-suite-dev-auth-secret-key-32chars-minimum"
+      AUTH_TRUST_HOST: "true"
+      NEXT_PUBLIC_APP_URL: "http://localhost:3000"
+      NEXT_PUBLIC_DEFAULT_ORG_SLUG: "senyum-sehat"
+      WATCHPACK_POLLING: "true"
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - /app/.next
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+
   postgres:
     image: postgres:16-alpine
+    container_name: dental-suite-postgres
     environment:
       POSTGRES_USER: dental
       POSTGRES_PASSWORD: dental
@@ -11,13 +35,14 @@ services:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U dental"]
-      interval: 10s
+      interval: 5s
       timeout: 5s
       retries: 5
     restart: unless-stopped
 
   mailhog:
     image: mailhog/mailhog:latest
+    container_name: dental-suite-mailhog
     ports:
       - "1025:1025"  # SMTP
       - "8025:8025"  # Web UI: http://localhost:8025
