@@ -2,14 +2,11 @@
 
 import { useState } from "react";
 import {
-  AlertCircle,
   Clock,
-  DollarSign,
   Filter,
   Pencil,
   Plus,
   Search,
-  Sparkles,
   Stethoscope,
 } from "lucide-react";
 

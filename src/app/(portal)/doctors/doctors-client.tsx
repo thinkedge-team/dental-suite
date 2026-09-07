@@ -3,14 +3,12 @@
 import { useState } from "react";
 import Image from "next/image";
 import {
-  AlertCircle,
   Building2,
   CalendarDays,
   Filter,
   Pencil,
   Plus,
   Search,
-  Sparkles,
   Stethoscope,
   Users,
 } from "lucide-react";

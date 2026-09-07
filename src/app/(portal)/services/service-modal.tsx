@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, useTransition } from "react";
-import { AlertCircle, Clock, DollarSign, FileText, Loader2, Pencil, Plus, X } from "lucide-react";
+import { AlertCircle, Clock, Loader2, Pencil, Plus, X } from "lucide-react";
 
 import { createService, updateService } from "@/lib/actions/services";
 
@@ -48,6 +48,27 @@ export function ServiceModal({
 
   const modalRef = useRef<HTMLDivElement>(null);
 
+  const [prevServiceToEdit, setPrevServiceToEdit] = useState(serviceToEdit);
+  const [prevIsOpen, setPrevIsOpen] = useState(isOpen);
+  if (serviceToEdit !== prevServiceToEdit || isOpen !== prevIsOpen) {
+    setPrevServiceToEdit(serviceToEdit);
+    setPrevIsOpen(isOpen);
+    if (isOpen) {
+      setName(serviceToEdit?.name ?? "");
+      setPrice(
+        serviceToEdit?.price !== undefined ? String(serviceToEdit.price) : "",
+      );
+      setDurationMin(
+        serviceToEdit?.durationMin !== undefined
+          ? String(serviceToEdit.durationMin)
+          : "30",
+      );
+      setDescription(serviceToEdit?.description ?? "");
+      setIsActive(serviceToEdit?.isActive ?? true);
+      setError(null);
+    }
+  }
+
   useEffect(() => {
     if (!isOpen) return;
 
@@ -74,23 +95,6 @@ export function ServiceModal({
       document.removeEventListener("mousedown", handlePointerDown);
     };
   }, [isOpen, onClose]);
-
-  useEffect(() => {
-    if (isOpen) {
-      setName(serviceToEdit?.name ?? "");
-      setPrice(
-        serviceToEdit?.price !== undefined ? String(serviceToEdit.price) : "",
-      );
-      setDurationMin(
-        serviceToEdit?.durationMin !== undefined
-          ? String(serviceToEdit.durationMin)
-          : "30",
-      );
-      setDescription(serviceToEdit?.description ?? "");
-      setIsActive(serviceToEdit?.isActive ?? true);
-      setError(null);
-    }
-  }, [isOpen, serviceToEdit]);
 
   if (!isOpen) return null;
 

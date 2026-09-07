@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, useTransition } from "react";
-import { AlertCircle, Building2, Loader2, Pencil, Plus, Stethoscope, X } from "lucide-react";
+import { AlertCircle, Loader2, Pencil, Plus, X } from "lucide-react";
 
 import { createDoctor, updateDoctor } from "@/lib/actions/doctors";
 
@@ -61,6 +61,30 @@ export function DoctorModal({
 
   const modalRef = useRef<HTMLDivElement>(null);
 
+  const [prevDoctorToEdit, setPrevDoctorToEdit] = useState(doctorToEdit);
+  const [prevIsOpen, setPrevIsOpen] = useState(isOpen);
+  if (doctorToEdit !== prevDoctorToEdit || isOpen !== prevIsOpen) {
+    setPrevDoctorToEdit(doctorToEdit);
+    setPrevIsOpen(isOpen);
+    if (isOpen) {
+      setName(doctorToEdit?.name ?? "");
+      setTitle(doctorToEdit?.title ?? "drg.");
+      setSpecialty(doctorToEdit?.specialty ?? "Dokter Gigi Umum");
+      setSipNumber(doctorToEdit?.sipNumber ?? "");
+      setStrNumber(doctorToEdit?.strNumber ?? "");
+      setYearsExperience(
+        doctorToEdit?.yearsExperience !== null && doctorToEdit?.yearsExperience !== undefined
+          ? String(doctorToEdit.yearsExperience)
+          : "",
+      );
+      setBio(doctorToEdit?.bio ?? "");
+      setPhotoUrl(doctorToEdit?.photoUrl ?? "");
+      setBranchIds(doctorToEdit?.branchIds ?? []);
+      setIsActive(doctorToEdit?.isActive ?? true);
+      setError(null);
+    }
+  }
+
   useEffect(() => {
     if (!isOpen) return;
 
@@ -87,26 +111,6 @@ export function DoctorModal({
       document.removeEventListener("mousedown", handlePointerDown);
     };
   }, [isOpen, onClose]);
-
-  useEffect(() => {
-    if (isOpen) {
-      setName(doctorToEdit?.name ?? "");
-      setTitle(doctorToEdit?.title ?? "drg.");
-      setSpecialty(doctorToEdit?.specialty ?? "Dokter Gigi Umum");
-      setSipNumber(doctorToEdit?.sipNumber ?? "");
-      setStrNumber(doctorToEdit?.strNumber ?? "");
-      setYearsExperience(
-        doctorToEdit?.yearsExperience !== null && doctorToEdit?.yearsExperience !== undefined
-          ? String(doctorToEdit.yearsExperience)
-          : "",
-      );
-      setBio(doctorToEdit?.bio ?? "");
-      setPhotoUrl(doctorToEdit?.photoUrl ?? "");
-      setBranchIds(doctorToEdit?.branchIds ?? []);
-      setIsActive(doctorToEdit?.isActive ?? true);
-      setError(null);
-    }
-  }, [isOpen, doctorToEdit]);
 
   if (!isOpen) return null;
 
