@@ -330,16 +330,6 @@ export default async function ShiftsPage({ searchParams }: ShiftsPageProps) {
     return `/operate/shifts${qs ? `?${qs}` : ""}`;
   }
 
-  // Branch switcher url builder preserving week
-  function buildBranchUrl(targetBranchId: string): string {
-    const params = new URLSearchParams();
-    params.set("branch", targetBranchId);
-    if (week) {
-      params.set("week", week);
-    }
-    return `/operate/shifts?${params.toString()}`;
-  }
-
   return (
     <div className="space-y-6 pb-12">
       {/* Header & Controls */}
@@ -354,26 +344,10 @@ export default async function ShiftsPage({ searchParams }: ShiftsPageProps) {
           </p>
         </div>
 
-        {/* Branch Selector for Director / Super Admin */}
-        {isDirector && branches.length > 1 && (
-          <div className="flex items-center gap-1.5 overflow-x-auto rounded-xl border border-border bg-card p-1 shadow-2xs">
-            {branches.map((b) => {
-              const isActive = activeBranchId === b.id;
-              return (
-                <Link
-                  key={b.id}
-                  href={buildBranchUrl(b.id)}
-                  className={`inline-flex items-center gap-1 rounded-lg px-3 py-1.5 text-xs font-medium transition-colors ${
-                    isActive
-                      ? "bg-primary text-primary-foreground shadow-2xs font-semibold"
-                      : "text-muted-foreground hover:bg-muted hover:text-foreground"
-                  }`}
-                >
-                  <Building2 className="size-3.5" />
-                  <span>{b.name}</span>
-                </Link>
-              );
-            })}
+        {activeBranch && (
+          <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-border bg-card text-xs font-semibold text-foreground">
+            <Building2 className="size-3.5 text-primary" />
+            <span>Cabang {activeBranch.name}</span>
           </div>
         )}
       </div>

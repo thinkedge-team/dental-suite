@@ -402,31 +402,11 @@ export default async function AnalyticsPage({ searchParams }: AnalyticsPageProps
         </div>
 
         <div className="flex flex-wrap items-center gap-2.5">
-          {/* Branch Filter (Director / Super Admin only) */}
-          {isDirector && (
-            <div className="flex items-center gap-1.5 rounded-lg border border-border bg-card px-2.5 py-1 text-xs shadow-xs">
-              <Building2 className="size-3.5 text-muted-foreground" />
-              <form action="/operate/analytics" method="get">
-                <input type="hidden" name="period" value={activePeriod} />
-                <select
-                  name="branch"
-                  defaultValue={effectiveBranchId ?? "ALL"}
-                  // Auto submit on change
-                  className="bg-transparent text-xs font-medium text-foreground focus:outline-none cursor-pointer"
-                >
-                  <option value="ALL">Semua Cabang</option>
-                  {branches.map((b) => (
-                    <option key={b.id} value={b.id}>
-                      {b.name}
-                    </option>
-                  ))}
-                </select>
-                <noscript>
-                  <button type="submit" className="ml-1 text-[10px] underline">
-                    Terapkan
-                  </button>
-                </noscript>
-              </form>
+          {/* Active Branch Badge */}
+          {effectiveBranchId && (
+            <div className="inline-flex items-center gap-1.5 rounded-xl border border-border bg-card px-3 py-1.5 text-xs font-semibold text-foreground shadow-xs">
+              <Building2 className="size-3.5 text-primary" />
+              <span>Cabang {branches.find((b) => b.id === effectiveBranchId)?.name ?? effectiveBranchId}</span>
             </div>
           )}
 

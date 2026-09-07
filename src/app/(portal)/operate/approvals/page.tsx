@@ -177,36 +177,10 @@ export default async function ApprovalsPage({ searchParams }: ApprovalsPageProps
           </p>
         </div>
 
-        {/* Branch Filter for Director / Multi-branch */}
-        {isDirector && branches.length > 1 && (
-          <div className="flex items-center gap-1.5 overflow-x-auto rounded-xl border border-border bg-card p-1 shadow-2xs">
-            <Link
-              href="/operate/approvals"
-              className={`inline-flex items-center gap-1 rounded-lg px-3 py-1.5 text-xs font-medium transition-colors ${
-                !activeBranchId
-                  ? "bg-primary text-primary-foreground shadow-2xs font-semibold"
-                  : "text-muted-foreground hover:bg-muted hover:text-foreground"
-              }`}
-            >
-              <Building2 className="size-3.5" />
-              <span>Semua Cabang</span>
-            </Link>
-            {branches.map((b) => {
-              const isActive = activeBranchId === b.id;
-              return (
-                <Link
-                  key={b.id}
-                  href={`/operate/approvals?branch=${b.id}`}
-                  className={`inline-flex items-center gap-1 rounded-lg px-3 py-1.5 text-xs font-medium transition-colors ${
-                    isActive
-                      ? "bg-primary text-primary-foreground shadow-2xs font-semibold"
-                      : "text-muted-foreground hover:bg-muted hover:text-foreground"
-                  }`}
-                >
-                  <span>{b.name}</span>
-                </Link>
-              );
-            })}
+        {activeBranchId && (
+          <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-border bg-card text-xs font-semibold text-foreground">
+            <Building2 className="size-3.5 text-primary" />
+            <span>Cabang {branches.find((b) => b.id === activeBranchId)?.name ?? activeBranchId}</span>
           </div>
         )}
       </div>

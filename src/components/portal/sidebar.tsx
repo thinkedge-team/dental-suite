@@ -24,6 +24,7 @@ import {
   FileSpreadsheet,
 } from "lucide-react";
 import { useState } from "react";
+import { useBranch } from "./branch-provider";
 
 interface SidebarProps {
   user?: {
@@ -55,6 +56,7 @@ export function Sidebar({ user, modules }: SidebarProps) {
   const pathname = usePathname();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const { selectedBranchId } = useBranch();
 
   const role = user?.role ?? "DIRECTOR";
   const userModules = modules ?? { grow: true, connect: true, operate: false, intelligence: false };
@@ -217,10 +219,15 @@ export function Sidebar({ user, modules }: SidebarProps) {
               : item.href === "/dashboard"
                 ? pathname === "/dashboard"
                 : pathname.startsWith(item.href);
+
+            const targetHref = selectedBranchId && !item.href.startsWith("/settings")
+              ? `${item.href}?branch=${encodeURIComponent(selectedBranchId)}`
+              : item.href;
+
             return (
               <Link
                 key={item.name}
-                href={item.href}
+                href={targetHref}
                 onClick={() => setMobileMenuOpen(false)}
                 title={isCollapsed ? item.name : undefined}
                 className={cn(

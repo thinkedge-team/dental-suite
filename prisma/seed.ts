@@ -378,6 +378,7 @@ async function main() {
         service: 'Pembersihan Gigi',
         status: AppointmentStatus.CONFIRMED,
         doctorId: doctorAndi.id,
+        branchId: branch1.id,
       },
       {
         time: [9, 30] as const,
@@ -386,6 +387,7 @@ async function main() {
         service: 'Konsultasi',
         status: AppointmentStatus.CHECKED_IN,
         doctorId: doctorAndi.id,
+        branchId: branch1.id,
       },
       {
         time: [10, 0] as const,
@@ -394,6 +396,7 @@ async function main() {
         service: 'Penambalan Gigi',
         status: AppointmentStatus.CONFIRMED,
         doctorId: undefined,
+        branchId: branch1.id,
       },
       {
         time: [10, 30] as const,
@@ -402,6 +405,7 @@ async function main() {
         service: 'Cabut Gigi',
         status: AppointmentStatus.CONFIRMED,
         doctorId: undefined,
+        branchId: branch1.id,
       },
       {
         time: [11, 0] as const,
@@ -410,14 +414,25 @@ async function main() {
         service: 'Pemutihan Gigi',
         status: AppointmentStatus.CONFIRMED,
         doctorId: doctorSarah.id,
+        branchId: branch2.id,
       },
       {
         time: [14, 0] as const,
         patientName: 'Michael Tan',
         patientPhone: '08666666666',
         service: 'Konsultasi',
-        status: AppointmentStatus.CANCELLED,
+        status: AppointmentStatus.CONFIRMED,
         doctorId: doctorBudi.id,
+        branchId: branch2.id,
+      },
+      {
+        time: [15, 30] as const,
+        patientName: 'Hendra Gunawan',
+        patientPhone: '08777777777',
+        service: 'Pembersihan Gigi',
+        status: AppointmentStatus.CHECKED_IN,
+        doctorId: doctorSarah.id,
+        branchId: branch2.id,
       },
     ];
 
@@ -440,7 +455,78 @@ async function main() {
       await prisma.appointment.create({
         data: {
           organizationId: org.id,
-          branchId: branch1.id,
+          branchId: item.branchId,
+          patientId: patient.id,
+          patientName: item.patientName,
+          patientPhone: item.patientPhone,
+          service: item.service,
+          status: item.status,
+          doctorId: item.doctorId,
+          scheduledAt: wibToday(item.time[0], item.time[1]),
+        },
+      });
+    }
+  }
+
+  const pluitAptCount = await prisma.appointment.count({
+    where: {
+      organizationId: org.id,
+      branchId: branch2.id,
+      scheduledAt: { gte: startOfToday, lt: endOfToday },
+    },
+  });
+
+  if (pluitAptCount === 0) {
+    const pluitAppointments = [
+      {
+        time: [13, 0] as const,
+        patientName: 'Jessica Wong',
+        patientPhone: '08555555555',
+        service: 'Pemutihan Gigi',
+        status: AppointmentStatus.CONFIRMED,
+        doctorId: doctorSarah.id,
+        branchId: branch2.id,
+      },
+      {
+        time: [15, 0] as const,
+        patientName: 'Michael Tan',
+        patientPhone: '08666666666',
+        service: 'Konsultasi',
+        status: AppointmentStatus.CONFIRMED,
+        doctorId: doctorBudi.id,
+        branchId: branch2.id,
+      },
+      {
+        time: [16, 0] as const,
+        patientName: 'Hendra Gunawan',
+        patientPhone: '08777777777',
+        service: 'Pembersihan Gigi',
+        status: AppointmentStatus.CHECKED_IN,
+        doctorId: doctorSarah.id,
+        branchId: branch2.id,
+      },
+    ];
+
+    for (const item of pluitAppointments) {
+      const patient = await prisma.patient.upsert({
+        where: {
+          organizationId_phone: {
+            organizationId: org.id,
+            phone: item.patientPhone,
+          },
+        },
+        update: { name: item.patientName },
+        create: {
+          organizationId: org.id,
+          name: item.patientName,
+          phone: item.patientPhone,
+        },
+      });
+
+      await prisma.appointment.create({
+        data: {
+          organizationId: org.id,
+          branchId: item.branchId,
           patientId: patient.id,
           patientName: item.patientName,
           patientPhone: item.patientPhone,
@@ -542,6 +628,20 @@ async function main() {
     const i = await prisma.inventoryItem.create({ data: { branchId: bi, name: d.n, sku: d.s, stock: d.st, minStock: d.ms, unit: d.u, category: d.c } });
     await prisma.inventoryLog.create({ data: { type: 'RESTOCK' as const, quantity: d.st, previousStock: 0, currentStock: d.st, itemId: i.id, userId: mu!.id } });
   }
+
+  const bi2 = branch2.id;
+  const pluitItems = [
+    { n: 'Lidocaine HCl 2% + Epinephrine', s: 'MED-LIDO-PLU', st: 18, ms: 15, u: 'ampul', c: 'Anestesi & Farmasi' },
+    { n: 'Composite Resin Filtek Z250 A3', s: 'MAT-COMP-A3', st: 8, ms: 5, u: 'syringe', c: 'Bahan Tambal & Restorasi' },
+    { n: 'Dental Needle 30G Short', s: 'DISP-NDL-PLU', st: 120, ms: 40, u: 'pcs', c: 'Habis Pakai & Sterilisasi' },
+    { n: 'Latex Examination Gloves S', s: 'DISP-GLV-S', st: 4, ms: 10, u: 'box', c: 'Habis Pakai & Sterilisasi' },
+    { n: 'Bracket Metal MBT 0.022 Kit', s: 'ORTH-BRK-PLU', st: 9, ms: 6, u: 'set', c: 'Ortodonti' },
+  ];
+  for (const d of pluitItems) {
+    const i = await prisma.inventoryItem.create({ data: { branchId: bi2, name: d.n, sku: d.s, stock: d.st, minStock: d.ms, unit: d.u, category: d.c } });
+    await prisma.inventoryLog.create({ data: { type: 'RESTOCK' as const, quantity: d.st, previousStock: 0, currentStock: d.st, itemId: i.id, userId: mu!.id } });
+  }
+
   console.log('Inventory seeding complete!');
 
   console.log('Seeding shifts and attendance...');

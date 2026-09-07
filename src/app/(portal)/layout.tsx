@@ -4,6 +4,7 @@ import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { Sidebar } from "@/components/portal/sidebar";
 import { PortalHeader } from "@/components/portal/header";
+import { BranchProvider } from "@/components/portal/branch-provider";
 
 export default async function PortalLayout({
   children,
@@ -18,6 +19,7 @@ export default async function PortalLayout({
 
   const cookieStore = await cookies();
   const activeBranchCookie = cookieStore.get("portal_branch")?.value;
+  const isDirector = session.user.role === "DIRECTOR" || session.user.role === "SUPER_ADMIN";
 
   const branches = await prisma.branch.findMany({
     where: {
@@ -34,29 +36,35 @@ export default async function PortalLayout({
   });
 
   return (
-    <div className="flex h-screen overflow-hidden bg-background font-sans flex-col md:flex-row">
-      <Sidebar 
-        user={{
-          name: session.user.name,
-          role: session.user.role,
-          branchName: session.user.branchName,
-        }}
-        modules={session.user.modules}
-      />
-      <main className="flex-1 flex flex-col min-w-0 h-full overflow-hidden">
-        <PortalHeader
-          organizationName={session.user.organizationName}
-          branchName={session.user.branchName}
-          role={session.user.role}
-          userName={session.user.name}
-          branches={branches}
-          initialBranchId={activeBranchCookie}
+    <BranchProvider
+      branches={branches}
+      initialBranchId={activeBranchCookie}
+      isDirector={isDirector}
+    >
+      <div className="flex h-screen overflow-hidden bg-background font-sans flex-col md:flex-row">
+        <Sidebar 
+          user={{
+            name: session.user.name,
+            role: session.user.role,
+            branchName: session.user.branchName,
+          }}
+          modules={session.user.modules}
         />
-        <div className="flex-1 overflow-y-auto p-4 md:p-8">
-          <div className="mx-auto max-w-6xl">{children}</div>
-        </div>
-      </main>
-    </div>
+        <main className="flex-1 flex flex-col min-w-0 h-full overflow-hidden">
+          <PortalHeader
+            organizationName={session.user.organizationName}
+            branchName={session.user.branchName}
+            role={session.user.role}
+            userName={session.user.name}
+            branches={branches}
+            initialBranchId={activeBranchCookie}
+          />
+          <div className="flex-1 overflow-y-auto p-4 md:p-8">
+            <div className="mx-auto max-w-6xl">{children}</div>
+          </div>
+        </main>
+      </div>
+    </BranchProvider>
   );
 }
 

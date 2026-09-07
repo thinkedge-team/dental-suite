@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useRef, useEffect, useMemo } from "react";
+import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
-import { useRouter, usePathname, useSearchParams } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { signOut } from "next-auth/react";
 import { 
   LogOut, 
@@ -20,7 +20,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { getPortalNotifications, type PortalNotificationItem } from "@/lib/actions/notifications";
-import { setActiveBranch } from "@/lib/branch-context";
+import { useBranch } from "./branch-provider";
 
 interface HeaderProps {
   organizationName: string;
@@ -37,23 +37,24 @@ export function PortalHeader({
   role,
   userName,
   branches = [],
-  initialBranchId,
 }: HeaderProps) {
-  const router = useRouter();
   const pathname = usePathname();
-  const searchParams = useSearchParams();
 
-  const isDirector = role === "DIRECTOR" || role === "SUPER_ADMIN";
-  
-  const currentBranchParam = searchParams.get("branch") || initialBranchId;
-  const activeBranch = useMemo(() => {
-    if (!isDirector) return { id: undefined, name: branchName || "Cabang Utama" };
-    if (!currentBranchParam || currentBranchParam === "all") return { id: undefined, name: "Semua Cabang (Konsolidasi)" };
-    const found = branches.find((b) => b.id === currentBranchParam || b.name === currentBranchParam);
-    return found ? found : { id: currentBranchParam, name: "Semua Cabang" };
-  }, [isDirector, branchName, currentBranchParam, branches]);
+  const {
+    branches: contextBranches,
+    selectedBranchId,
+    selectedBranch,
+    selectBranch,
+    isDirector,
+    isPending: isBranchSwitching,
+  } = useBranch();
 
-  const selectedBranchName = activeBranch.name;
+  const activeBranches = contextBranches.length > 0 ? contextBranches : branches;
+  const selectedBranchName = isDirector
+    ? selectedBranch
+      ? `Cabang ${selectedBranch.name}`
+      : "Semua Cabang (Konsolidasi)"
+    : branchName || "Cabang Utama";
 
   const [branchDropdownOpen, setBranchDropdownOpen] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
@@ -91,7 +92,7 @@ export function PortalHeader({
     return () => {
       mounted = false;
     };
-  }, [pathname, currentBranchParam]);
+  }, [pathname, selectedBranchId]);
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -123,18 +124,9 @@ export function PortalHeader({
     };
   }, []);
 
-  async function handleSelectBranch(branch?: { id: string; name: string }) {
+  function handleSelectBranch(branch?: { id: string; name: string }) {
     setBranchDropdownOpen(false);
-    await setActiveBranch(branch?.id || null);
-    const params = new URLSearchParams(searchParams.toString());
-    if (!branch) {
-      params.delete("branch");
-    } else {
-      params.set("branch", branch.id);
-    }
-    const q = params.toString();
-    router.push(`${pathname}${q ? `?${q}` : ""}`);
-    router.refresh();
+    selectBranch(branch?.id || null);
   }
 
   return (
@@ -150,45 +142,47 @@ export function PortalHeader({
         <div ref={branchRef} className="relative">
           <button
             type="button"
-            onClick={() => isDirector && branches.length > 0 && setBranchDropdownOpen(!branchDropdownOpen)}
+            onClick={() => isDirector && activeBranches.length > 0 && setBranchDropdownOpen(!branchDropdownOpen)}
             className={cn(
               "flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all border",
-              isDirector && branches.length > 0
+              isDirector && activeBranches.length > 0
                 ? "bg-muted/40 hover:bg-muted border-border/70 text-foreground cursor-pointer"
                 : "bg-muted/20 border-transparent text-muted-foreground cursor-default"
             )}
             title={isDirector ? "Ganti cabang aktif operasional" : undefined}
           >
             <Building2 className="w-3.5 h-3.5 text-primary shrink-0" />
-            <span className="truncate max-w-[140px]">{selectedBranchName}</span>
-            {isDirector && branches.length > 0 && (
+            <span className="truncate max-w-[150px]">{selectedBranchName}</span>
+            {isBranchSwitching ? (
+              <span className="w-2 h-2 rounded-full bg-primary animate-ping shrink-0" />
+            ) : isDirector && activeBranches.length > 0 ? (
               <ChevronDown className={cn("w-3.5 h-3.5 text-muted-foreground transition-transform", branchDropdownOpen && "rotate-180")} />
-            )}
+            ) : null}
           </button>
 
           {branchDropdownOpen && (
-            <div className="absolute left-0 mt-2 w-56 rounded-xl bg-card border border-border shadow-xl py-1.5 z-50 animate-in fade-in-0 zoom-in-95">
+            <div className="absolute left-0 mt-2 w-60 rounded-xl bg-card border border-border shadow-xl py-1.5 z-50 animate-in fade-in-0 zoom-in-95">
               <div className="px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-muted-foreground border-b border-border/50">
                 Pilih Cabang Operasional
               </div>
               <button
                 type="button"
                 onClick={() => handleSelectBranch(undefined)}
-                className="w-full flex items-center justify-between px-3 py-2 text-xs font-medium hover:bg-muted/60 text-left transition-colors"
+                className="w-full flex items-center justify-between px-3 py-2 text-xs font-medium hover:bg-muted/60 text-left transition-colors cursor-pointer"
               >
-                <span className={!currentBranchParam ? "text-primary font-semibold" : "text-foreground"}>
+                <span className={!selectedBranchId ? "text-primary font-semibold" : "text-foreground"}>
                   Semua Cabang (Konsolidasi)
                 </span>
-                {!currentBranchParam && <Check className="w-3.5 h-3.5 text-primary" />}
+                {!selectedBranchId && <Check className="w-3.5 h-3.5 text-primary" />}
               </button>
-              {branches.map((b) => {
-                const isSelected = currentBranchParam === b.id || currentBranchParam === b.name;
+              {activeBranches.map((b) => {
+                const isSelected = selectedBranchId === b.id;
                 return (
                   <button
                     key={b.id}
                     type="button"
                     onClick={() => handleSelectBranch(b)}
-                    className="w-full flex items-center justify-between px-3 py-2 text-xs font-medium hover:bg-muted/60 text-left transition-colors"
+                    className="w-full flex items-center justify-between px-3 py-2 text-xs font-medium hover:bg-muted/60 text-left transition-colors cursor-pointer"
                   >
                     <span className={isSelected ? "text-primary font-semibold" : "text-foreground"}>
                       Cabang {b.name}
