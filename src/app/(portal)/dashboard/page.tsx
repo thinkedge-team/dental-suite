@@ -17,12 +17,21 @@ interface MetricCardProps {
   positive?: boolean;
 }
 
-export default async function DashboardPage() {
+export default async function DashboardPage({
+  searchParams,
+}: {
+  searchParams?: Promise<{ branch?: string }>;
+}) {
   const session = await auth();
   if (!session?.user) redirect("/login");
 
   const orgId = session.user.organizationId;
   const userName = session.user.name ?? "Staf";
+
+  const { branch: branchParam } = (await searchParams) || {};
+  const isDirector = session.user.role === "DIRECTOR" || session.user.role === "SUPER_ADMIN";
+  const effectiveBranchId = isDirector ? branchParam : (session.user.branchId || undefined);
+  const branchFilter = effectiveBranchId ? { branchId: effectiveBranchId } : {};
 
   const now = new Date();
   const { start: startOfToday, end: endOfToday } = getWibDayBounds(now);
@@ -37,20 +46,21 @@ export default async function DashboardPage() {
     allInventoryItems,
   ] = await Promise.all([
     prisma.appointment.count({
-      where: { organizationId: orgId, scheduledAt: { gte: startOfToday, lte: endOfToday } },
+      where: { organizationId: orgId, ...branchFilter, scheduledAt: { gte: startOfToday, lte: endOfToday } },
     }),
     prisma.appointment.count({
-      where: { organizationId: orgId, status: { in: [AppointmentStatus.CHECKED_IN, AppointmentStatus.COMPLETED] }, scheduledAt: { gte: startOfToday, lte: endOfToday } },
+      where: { organizationId: orgId, ...branchFilter, status: { in: [AppointmentStatus.CHECKED_IN, AppointmentStatus.COMPLETED] }, scheduledAt: { gte: startOfToday, lte: endOfToday } },
     }),
     prisma.patient.count({
       where: { organizationId: orgId, deletedAt: null, createdAt: { gte: startOfMonth } },
     }),
     prisma.appointment.count({
-      where: { organizationId: orgId, status: AppointmentStatus.COMPLETED, scheduledAt: { gte: startOfMonth } },
+      where: { organizationId: orgId, ...branchFilter, status: AppointmentStatus.COMPLETED, scheduledAt: { gte: startOfMonth } },
     }),
     prisma.appointment.findMany({
       where: {
         organizationId: orgId,
+        ...branchFilter,
         scheduledAt: { gte: now, lte: endOfToday },
         status: { not: AppointmentStatus.CANCELLED },
       },
@@ -65,20 +75,13 @@ export default async function DashboardPage() {
       where: {
         branch: {
           organizationId: orgId,
+          ...(effectiveBranchId ? { id: effectiveBranchId } : {}),
           isActive: true,
         },
       },
-      include: {
-        branch: {
-          select: {
-            name: true,
-          },
-        },
-      },
-      orderBy: [
-        { stock: "asc" },
-        { name: "asc" },
-      ],
+      include: { branch: { select: { name: true } } },
+      orderBy: { stock: "asc" },
+      take: 20,
     }),
   ]);
 

@@ -17,26 +17,32 @@ export function SettingsNav({ isDirector }: SettingsNavProps) {
     {
       href: "/settings/profile",
       label: "Profil Saya",
+      badge: "Akun",
       icon: User,
       visible: true,
     },
     {
       href: "/settings/security",
       label: "Keamanan Akun",
+      badge: "Sandi & Auth",
       icon: ShieldCheck,
       visible: true,
     },
     {
       href: "/settings/organization",
       label: "Klinik & Lisensi",
+      badge: "Enterprise",
       icon: Building2,
       visible: isDirector,
     },
   ];
 
   return (
-    <div className="border-b border-border/80">
-      <nav className="-mb-px flex space-x-6" aria-label="Tabs Pengaturan">
+    <div className="w-full">
+      <nav 
+        className="inline-flex p-1.5 rounded-2xl bg-muted/60 border border-border/80 shadow-xs gap-1.5 flex-wrap sm:flex-nowrap"
+        aria-label="Tabs Pengaturan"
+      >
         {navItems
           .filter((item) => item.visible)
           .map((item) => {
@@ -48,15 +54,25 @@ export function SettingsNav({ isDirector }: SettingsNavProps) {
                 key={item.href}
                 href={item.href}
                 className={cn(
-                  "inline-flex items-center gap-2 py-3 px-1 border-b-2 text-sm font-medium transition-colors",
+                  "flex items-center gap-2.5 px-4 py-2.5 rounded-xl text-xs font-semibold transition-all duration-200 select-none relative group",
                   isActive
-                    ? "border-primary text-primary font-semibold"
-                    : "border-transparent text-muted-foreground hover:text-foreground hover:border-border"
+                    ? "bg-card text-foreground shadow-sm shadow-black/5 border border-border/80 ring-1 ring-black/[0.03]"
+                    : "text-muted-foreground hover:text-foreground hover:bg-card/50"
                 )}
                 aria-current={isActive ? "page" : undefined}
               >
-                <Icon className={cn("w-4 h-4", isActive ? "text-primary" : "text-muted-foreground")} />
+                <div
+                  className={cn(
+                    "p-1.5 rounded-lg transition-colors",
+                    isActive ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground group-hover:text-foreground"
+                  )}
+                >
+                  <Icon className="w-4 h-4 shrink-0" />
+                </div>
                 <span>{item.label}</span>
+                {isActive && (
+                  <span className="w-1.5 h-1.5 rounded-full bg-primary shrink-0" />
+                )}
               </Link>
             );
           })}

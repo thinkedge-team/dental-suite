@@ -1,4 +1,6 @@
 import { redirect } from "next/navigation";
+import { Sparkles } from "lucide-react";
+
 import { auth } from "@/auth";
 import { SettingsNav } from "./settings-nav";
 
@@ -16,25 +18,36 @@ export default async function SettingsLayout({ children }: SettingsLayoutProps) 
   const isDirector = session.user.role === "DIRECTOR" || session.user.role === "SUPER_ADMIN";
 
   return (
-    <div className="space-y-6">
-      {/* Page Header */}
-      <div className="space-y-1">
-        <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-xs font-semibold bg-primary/10 text-primary border border-primary/20 w-fit">
-          Pusat Kontrol
+    <div className="space-y-8 max-w-6xl pb-12">
+      {/* Editorial Luxury Header Banner */}
+      <div className="relative overflow-hidden rounded-3xl border border-border/80 bg-card p-6 sm:p-8 shadow-xs">
+        {/* Subtle Ambient Light Glow */}
+        <div className="absolute -top-24 -right-24 w-72 h-72 rounded-full bg-primary/10 blur-3xl pointer-events-none" />
+        <div className="absolute -bottom-24 -left-24 w-72 h-72 rounded-full bg-primary/5 blur-3xl pointer-events-none" />
+
+        <div className="relative z-10 flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+          <div className="space-y-2 max-w-xl">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest bg-primary/10 text-primary border border-primary/20">
+              <Sparkles className="w-3 h-3 text-primary" />
+              Pusat Kontrol & Preferensi
+            </div>
+            <h1 className="text-2xl sm:text-3xl font-light tracking-tight text-foreground">
+              Pengaturan <span className="font-bold">Sistem & Akun</span>
+            </h1>
+            <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
+              Kelola identitas akun staf, otentikasi keamanan sandi, dan status lisensi modul operasional klinik Anda.
+            </p>
+          </div>
+
+          {/* Sub Navigation Segmented Tabs */}
+          <div className="shrink-0">
+            <SettingsNav isDirector={isDirector} />
+          </div>
         </div>
-        <h1 className="text-2xl font-bold tracking-tight text-foreground">
-          Pengaturan & Preferensi
-        </h1>
-        <p className="text-sm text-muted-foreground">
-          Kelola identitas profil staf, keamanan akun login, dan profil operasional klinik.
-        </p>
       </div>
 
-      {/* Sub Navigation */}
-      <SettingsNav isDirector={isDirector} />
-
-      {/* Content */}
-      <div className="pt-2">
+      {/* Content Area */}
+      <div className="min-w-0">
         {children}
       </div>
     </div>

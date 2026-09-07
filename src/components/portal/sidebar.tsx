@@ -135,9 +135,9 @@ export function Sidebar({ user, modules }: SidebarProps) {
     },
     { 
       name: "Pengaturan", 
-      href: "/settings/organization", 
+      href: role === "DIRECTOR" || role === "SUPER_ADMIN" ? "/settings/organization" : "/settings/profile", 
       icon: Settings, 
-      show: role === "DIRECTOR" || role === "SUPER_ADMIN" 
+      show: true,
     },
   ].filter((item) => item.show);
 
@@ -212,7 +212,11 @@ export function Sidebar({ user, modules }: SidebarProps) {
 
         <nav className="flex flex-col gap-1 p-2.5 flex-1 overflow-y-auto overflow-x-hidden">
           {navigation.map((item) => {
-            const isActive = pathname.startsWith(item.href);
+            const isActive = item.href.startsWith("/settings")
+              ? pathname.startsWith("/settings")
+              : item.href === "/dashboard"
+                ? pathname === "/dashboard"
+                : pathname.startsWith(item.href);
             return (
               <Link
                 key={item.name}
