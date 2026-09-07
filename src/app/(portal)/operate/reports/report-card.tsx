@@ -8,6 +8,9 @@ import {
   Building2,
   AlertCircle,
   LucideIcon,
+  CalendarDays,
+  Receipt,
+  Package,
 } from "lucide-react";
 import {
   exportAppointmentsCsv,
@@ -17,11 +20,17 @@ import {
 
 export type ReportType = "appointments" | "visits" | "inventory";
 
+const ICON_MAP: Record<ReportType, LucideIcon> = {
+  appointments: CalendarDays,
+  visits: Receipt,
+  inventory: Package,
+};
+
 interface ReportCardProps {
   type: ReportType;
   title: string;
   description: string;
-  icon: LucideIcon;
+  icon?: LucideIcon;
   branches: { id: string; name: string }[];
   isDirectorOrSuperAdmin: boolean;
   userBranchName?: string | null;
@@ -33,13 +42,14 @@ export function ReportCard({
   type,
   title,
   description,
-  icon: Icon,
+  icon,
   branches,
   isDirectorOrSuperAdmin,
   userBranchName,
   userBranchId,
   initialBranchId,
 }: ReportCardProps) {
+  const Icon = icon ?? ICON_MAP[type];
   // Default dates: first day of current WIB month to today
   const getInitialDates = () => {
     const now = new Date();

@@ -2,9 +2,6 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import {
   FileSpreadsheet,
-  CalendarDays,
-  Receipt,
-  Package,
   Lock,
 } from "lucide-react";
 
@@ -101,7 +98,6 @@ export default async function ReportsPage() {
           type="appointments"
           title="Laporan Janji Temu Pasien"
           description="Reservasi, status kehadiran, dokter penanggung jawab, jadwal praktik, dan catatan janji temu pasien."
-          icon={CalendarDays}
           branches={branches}
           isDirectorOrSuperAdmin={isDirectorOrSuperAdmin}
           userBranchName={userBranchName}
@@ -114,7 +110,6 @@ export default async function ReportsPage() {
           type="visits"
           title="Laporan Kunjungan & Pendapatan"
           description="Data transaksi billing, metode pembayaran, omzet tindakan medis per layanan, dan rekam tindakan dokter."
-          icon={Receipt}
           branches={branches}
           isDirectorOrSuperAdmin={isDirectorOrSuperAdmin}
           userBranchName={userBranchName}
@@ -127,7 +122,6 @@ export default async function ReportsPage() {
           type="inventory"
           title="Laporan Mutasi Inventaris"
           description="Log pemakaian bahan medis, restok distributor, penyesuaian stok opname, dan histori barang rusak."
-          icon={Package}
           branches={branches}
           isDirectorOrSuperAdmin={isDirectorOrSuperAdmin}
           userBranchName={userBranchName}
