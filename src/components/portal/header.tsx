@@ -231,7 +231,7 @@ export function PortalHeader({
 
               <div className="py-1.5 px-1.5 space-y-0.5">
                 <Link
-                  href="/dashboard"
+                  href="/settings/profile"
                   onClick={() => setUserDropdownOpen(false)}
                   className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-medium text-foreground hover:bg-muted/70 transition-colors"
                 >
@@ -250,14 +250,14 @@ export function PortalHeader({
                   </Link>
                 )}
 
-                <a
-                  href="#keamanan"
-                  onClick={(e) => { e.preventDefault(); setUserDropdownOpen(false); }}
+                <Link
+                  href="/settings/security"
+                  onClick={() => setUserDropdownOpen(false)}
                   className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-medium text-foreground hover:bg-muted/70 transition-colors"
                 >
                   <ShieldCheck className="w-4 h-4 text-muted-foreground" />
                   <span>Keamanan Akun</span>
-                </a>
+                </Link>
               </div>
 
               <div className="border-t border-border/60 pt-1.5 px-1.5">
