@@ -1,15 +1,36 @@
 import { Zap, Building2, CreditCard } from "lucide-react";
-import { mockInsurances, type MockInsurance } from "@/data/mock-grow";
 
-interface InsuranceGridProps {
-  insurances?: MockInsurance[];
+export interface InsurancePartnerData {
+  id: string;
+  name: string;
+  slug?: string;
+  type?: "CASHLESS" | "REIMBURSEMENT";
+  logoText?: string | null;
+  logoUrl?: string | null;
+  coverageDetails?: string | null;
+  claimProcess?: string | null;
+  supportedBranches?: string[];
 }
 
-export function InsuranceGrid({ insurances = mockInsurances }: InsuranceGridProps) {
+interface InsuranceGridProps {
+  insurances: InsurancePartnerData[];
+}
+
+export function InsuranceGrid({ insurances }: InsuranceGridProps) {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 font-sans">
       {insurances.map((partner) => {
-        const isCashless = partner.type === "CASHLESS";
+        const isCashless = (partner.type ?? "CASHLESS") === "CASHLESS";
+        const logoCode =
+          partner.logoText ??
+          partner.slug?.toUpperCase() ??
+          partner.name.slice(0, 4).toUpperCase();
+        const branches = partner.supportedBranches ?? ["Kelapa Gading", "Pluit"];
+        const claimSpeedText =
+          partner.claimProcess ??
+          (isCashless
+            ? "Verifikasi instan via EDC / Portal Asuransi"
+            : "Penyelesaian berkas medis & kuitansi di hari yang sama");
 
         return (
           <article
@@ -43,18 +64,14 @@ export function InsuranceGrid({ insurances = mockInsurances }: InsuranceGridProp
                   {partner.name}
                 </h3>
                 <span className="text-[11px] font-mono font-semibold text-muted-foreground tracking-wide">
-                  ID KODE: {partner.logoText}
+                  ID KODE: {logoCode}
                 </span>
               </div>
 
               {/* Claim Processing Speed Indicator */}
               <div className="flex items-center gap-2 text-xs text-muted-foreground pt-1">
                 <Zap className="w-3.5 h-3.5 text-amber-500 shrink-0" />
-                <span>
-                  {isCashless
-                    ? "Verifikasi instan via EDC / Portal Asuransi"
-                    : "Penyelesaian berkas medis & kuitansi di hari yang sama"}
-                </span>
+                <span>{claimSpeedText}</span>
               </div>
             </div>
 
@@ -65,7 +82,7 @@ export function InsuranceGrid({ insurances = mockInsurances }: InsuranceGridProp
                 Cabang yang Didukung:
               </span>
               <div className="flex flex-wrap gap-1.5">
-                {partner.supportedBranches.map((branch) => (
+                {branches.map((branch) => (
                   <span
                     key={branch}
                     className="inline-flex items-center rounded-md bg-muted px-2 py-0.5 text-xs text-foreground/85 font-medium"

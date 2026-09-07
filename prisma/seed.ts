@@ -1,4 +1,4 @@
-import { AttendanceStatus, AppointmentStatus, InventoryLogType, PrismaClient, Role, ApprovalType, ApprovalStatus } from '../src/generated/prisma';
+import { AttendanceStatus, AppointmentStatus, PrismaClient, Role, ApprovalType, ApprovalStatus } from '../src/generated/prisma';
 import * as bcrypt from 'bcryptjs';
 
 const prisma = new PrismaClient();
@@ -30,30 +30,80 @@ async function main() {
   // 2. Branches
   const branch1 = await prisma.branch.upsert({
     where: { organizationId_slug: { organizationId: org.id, slug: 'kelapa-gading' } },
-    update: {},
+    update: {
+      name: 'Kelapa Gading',
+      address: 'Jl. Boulevard Raya No. 123, Kelapa Gading, Jakarta Utara',
+      city: 'Jakarta Utara',
+      province: 'DKI Jakarta',
+      postalCode: '14240',
+      whatsapp: '6281234567890',
+      photoUrls: ['/images/branch-kelapa-gading.jpg', '/images/clinic-room.jpg'],
+      openingHours: {
+        weekday: '09:00 - 21:00',
+        saturday: '09:00 - 18:00',
+        sunday: '10:00 - 15:00',
+      },
+      parkingInfo: 'Tersedia parkir kendaraan roda empat dan dua luas dengan keamanan 24 jam.',
+      googleMapsUrl: 'https://maps.google.com/?q=Kelapa+Gading+Dental+Clinic',
+      isActive: true,
+    },
     create: {
       organizationId: org.id,
       name: 'Kelapa Gading',
       slug: 'kelapa-gading',
       address: 'Jl. Boulevard Raya No. 123, Kelapa Gading, Jakarta Utara',
-      city: 'Jakarta',
+      city: 'Jakarta Utara',
       province: 'DKI Jakarta',
+      postalCode: '14240',
       whatsapp: '6281234567890',
+      photoUrls: ['/images/branch-kelapa-gading.jpg', '/images/clinic-room.jpg'],
+      openingHours: {
+        weekday: '09:00 - 21:00',
+        saturday: '09:00 - 18:00',
+        sunday: '10:00 - 15:00',
+      },
+      parkingInfo: 'Tersedia parkir kendaraan roda empat dan dua luas dengan keamanan 24 jam.',
+      googleMapsUrl: 'https://maps.google.com/?q=Kelapa+Gading+Dental+Clinic',
       isActive: true,
     },
   });
 
   const branch2 = await prisma.branch.upsert({
     where: { organizationId_slug: { organizationId: org.id, slug: 'pluit' } },
-    update: {},
+    update: {
+      name: 'Pluit',
+      address: 'Jl. Pluit Indah No. 45, Pluit, Jakarta Utara',
+      city: 'Jakarta Utara',
+      province: 'DKI Jakarta',
+      postalCode: '14450',
+      whatsapp: '6281234567891',
+      photoUrls: ['/images/branch-pluit.jpg', '/images/clinic-room.jpg'],
+      openingHours: {
+        weekday: '09:00 - 21:00',
+        saturday: '09:00 - 18:00',
+        sunday: '10:00 - 15:00',
+      },
+      parkingInfo: 'Fasilitas valet dan parkir reserved khusus pasien di area lobi.',
+      googleMapsUrl: 'https://maps.google.com/?q=Pluit+Dental+Clinic',
+      isActive: true,
+    },
     create: {
       organizationId: org.id,
       name: 'Pluit',
       slug: 'pluit',
       address: 'Jl. Pluit Indah No. 45, Pluit, Jakarta Utara',
-      city: 'Jakarta',
+      city: 'Jakarta Utara',
       province: 'DKI Jakarta',
+      postalCode: '14450',
       whatsapp: '6281234567891',
+      photoUrls: ['/images/branch-pluit.jpg', '/images/clinic-room.jpg'],
+      openingHours: {
+        weekday: '09:00 - 21:00',
+        saturday: '09:00 - 18:00',
+        sunday: '10:00 - 15:00',
+      },
+      parkingInfo: 'Fasilitas valet dan parkir reserved khusus pasien di area lobi.',
+      googleMapsUrl: 'https://maps.google.com/?q=Pluit+Dental+Clinic',
       isActive: true,
     },
   });
@@ -105,56 +155,99 @@ async function main() {
   // 4. Doctors
   const doctorAndi = await prisma.doctor.upsert({
     where: { organizationId_slug: { organizationId: org.id, slug: 'dr-andi-pratama' } },
-    update: {},
+    update: {
+      name: 'Andi Pratama',
+      title: 'drg.',
+      specialty: 'Dokter Gigi Umum',
+      photoUrl: '/images/doctor-sarah.jpg',
+      sipNumber: '503/SIP.012/DPMPTSP/2022',
+      strNumber: '31.1.1.100.2.18.123456',
+      yearsExperience: 7,
+      bio: 'Berpengalaman dalam perawatan gigi preventif, penambalan estetis, dan edukasi kesehatan gigi keluarga.',
+      isActive: true,
+    },
     create: {
       organizationId: org.id,
       name: 'Andi Pratama',
       slug: 'dr-andi-pratama',
       title: 'drg.',
       specialty: 'Dokter Gigi Umum',
-      bio: 'Dokter gigi berpengalaman 5 tahun.',
+      photoUrl: '/images/doctor-sarah.jpg',
+      sipNumber: '503/SIP.012/DPMPTSP/2022',
+      strNumber: '31.1.1.100.2.18.123456',
+      yearsExperience: 7,
+      bio: 'Berpengalaman dalam perawatan gigi preventif, penambalan estetis, dan edukasi kesehatan gigi keluarga.',
       isActive: true,
     },
   });
 
   const doctorSarah = await prisma.doctor.upsert({
     where: { organizationId_slug: { organizationId: org.id, slug: 'dr-sarah-amanda' } },
-    update: {},
+    update: {
+      name: 'Sarah Amanda',
+      title: 'drg.',
+      specialty: 'Sp.KG',
+      photoUrl: '/images/doctor-jessica.jpg',
+      sipNumber: '503/SIP.045/DPMPTSP/2023',
+      strNumber: '31.2.1.200.3.19.654321',
+      yearsExperience: 9,
+      bio: 'Spesialis Konservasi Gigi fokus pada perawatan saluran akar mikroskopis dan restorasi estetik kompleks.',
+      isActive: true,
+    },
     create: {
       organizationId: org.id,
       name: 'Sarah Amanda',
       slug: 'dr-sarah-amanda',
       title: 'drg.',
       specialty: 'Sp.KG',
-      bio: 'Spesialis Konservasi Gigi.',
+      photoUrl: '/images/doctor-jessica.jpg',
+      sipNumber: '503/SIP.045/DPMPTSP/2023',
+      strNumber: '31.2.1.200.3.19.654321',
+      yearsExperience: 9,
+      bio: 'Spesialis Konservasi Gigi fokus pada perawatan saluran akar mikroskopis dan restorasi estetik kompleks.',
       isActive: true,
     },
   });
 
   const doctorBudi = await prisma.doctor.upsert({
     where: { organizationId_slug: { organizationId: org.id, slug: 'dr-budi-hartono' } },
-    update: {},
+    update: {
+      name: 'Budi Hartono',
+      title: 'drg.',
+      specialty: 'Sp.BM',
+      photoUrl: '/images/doctor-budi.jpg',
+      sipNumber: '503/SIP.078/DPMPTSP/2021',
+      strNumber: '31.1.1.300.1.17.789012',
+      yearsExperience: 12,
+      bio: 'Spesialis Bedah Mulut dan Maksilofasial dengan keahlian odontektomi impaksi gigi bungsu dan implan dental.',
+      isActive: true,
+    },
     create: {
       organizationId: org.id,
       name: 'Budi Hartono',
       slug: 'dr-budi-hartono',
       title: 'drg.',
       specialty: 'Sp.BM',
-      bio: 'Spesialis Bedah Mulut.',
+      photoUrl: '/images/doctor-budi.jpg',
+      sipNumber: '503/SIP.078/DPMPTSP/2021',
+      strNumber: '31.1.1.300.1.17.789012',
+      yearsExperience: 12,
+      bio: 'Spesialis Bedah Mulut dan Maksilofasial dengan keahlian odontektomi impaksi gigi bungsu dan implan dental.',
       isActive: true,
     },
   });
 
-  // Assign doctors to branch1 and create weekly schedules (Mon–Fri)
   const allDoctors = [doctorAndi, doctorSarah, doctorBudi];
   for (const doc of allDoctors) {
-    await prisma.branchDoctor.upsert({
-      where: { branchId_doctorId: { branchId: branch1.id, doctorId: doc.id } },
-      update: {},
-      create: { branchId: branch1.id, doctorId: doc.id },
-    });
+    for (const b of [branch1, branch2]) {
+      await prisma.branchDoctor.upsert({
+        where: { branchId_doctorId: { branchId: b.id, doctorId: doc.id } },
+        update: {},
+        create: { branchId: b.id, doctorId: doc.id },
+      });
+    }
 
-    for (const day of [1, 2, 3, 4, 5]) {
+    for (const day of [1, 3, 5]) {
       await prisma.schedule.upsert({
         where: { doctorId_branchId_dayOfWeek: { doctorId: doc.id, branchId: branch1.id, dayOfWeek: day } },
         update: {},
@@ -169,21 +262,98 @@ async function main() {
         },
       });
     }
+
+    for (const day of [2, 4, 6]) {
+      await prisma.schedule.upsert({
+        where: { doctorId_branchId_dayOfWeek: { doctorId: doc.id, branchId: branch2.id, dayOfWeek: day } },
+        update: {},
+        create: {
+          doctorId: doc.id,
+          branchId: branch2.id,
+          dayOfWeek: day,
+          startTime: '10:00',
+          endTime: '18:00',
+          slotMinutes: 30,
+          isActive: true,
+        },
+      });
+    }
   }
 
   // 5. Services
   const services = [
-    { name: 'Pembersihan Gigi', slug: 'pembersihan-gigi', price: 250000, durationMin: 45 },
-    { name: 'Penambalan Gigi', slug: 'penambalan-gigi', price: 400000, durationMin: 60 },
-    { name: 'Pemutihan Gigi', slug: 'pemutihan-gigi', price: 800000, durationMin: 90 },
-    { name: 'Cabut Gigi', slug: 'cabut-gigi', price: 300000, durationMin: 30 },
-    { name: 'Konsultasi', slug: 'konsultasi', price: 150000, durationMin: 20 },
+    {
+      name: 'Pembersihan Gigi (Scaling Ultrasonic)',
+      slug: 'pembersihan-gigi',
+      description: 'Perawatan pembersihan karang gigi dan plak membandel dengan teknologi piezo-ultrasonic bebas ngilu untuk menjaga gusi sehat dan nafas segar.',
+      imageUrl: '/images/service-scaling.jpg',
+      price: 350000,
+      durationMin: 45,
+      sortOrder: 1,
+      seoTitle: 'Pencegahan',
+      seoDescription: 'Pembersihan karang gigi ultrasonik bebas ngilu untuk menjaga gusi sehat dan nafas segar.',
+    },
+    {
+      name: 'Penambalan Gigi Estetis Komposit',
+      slug: 'penambalan-gigi',
+      description: 'Restorasi gigi berlubang atau patah menggunakan material nano-hybrid komposit buatan Jerman sewarna gigi asli untuk kekuatan dan estetika maksimal.',
+      imageUrl: '/images/clinic-room.jpg',
+      price: 550000,
+      durationMin: 60,
+      sortOrder: 2,
+      seoTitle: 'Restorasi',
+      seoDescription: 'Tambal gigi berlubang sewarna gigi asli dengan komposit nano-hybrid tahan lama.',
+    },
+    {
+      name: 'Pemutihan Gigi Profesional (Bleaching)',
+      slug: 'pemutihan-gigi',
+      description: 'Prosedur pemutihan gigi in-office dengan teknologi cold-light LED untuk mencerahkan warna gigi hingga 6-8 tingkat dalam satu sesi 60 menit.',
+      imageUrl: '/images/service-bleaching.jpg',
+      price: 1800000,
+      durationMin: 60,
+      sortOrder: 3,
+      seoTitle: 'Estetika',
+      seoDescription: 'Pemutihan gigi profesional hingga 8 tingkat lebih cerah dalam satu kunjungan 60 menit.',
+    },
+    {
+      name: 'Cabut Gigi & Odontektomi Gigi Bungsu',
+      slug: 'cabut-gigi',
+      description: 'Pencabutan gigi serta operasi minor gigi bungsu impaksi oleh dokter spesialis bedah mulut dengan teknik minimal invasif dan anestesi lokal aman.',
+      imageUrl: '/images/promo-implant.jpg',
+      price: 750000,
+      durationMin: 45,
+      sortOrder: 4,
+      seoTitle: 'Bedah Mulut',
+      seoDescription: 'Operasi minor pencabutan gigi bungsu impaksi oleh Spesialis Bedah Mulut berpengalaman.',
+    },
+    {
+      name: 'Konsultasi & Pemeriksaan Gigi',
+      slug: 'konsultasi',
+      description: 'Pemeriksaan rongga mulut menyeluruh menggunakan kamera intraoral beresolusi tinggi disertai konsultasi mendalam bersama dokter spesialis.',
+      imageUrl: '/images/promo-whitening.jpg',
+      price: 150000,
+      durationMin: 30,
+      sortOrder: 5,
+      seoTitle: 'Pencegahan',
+      seoDescription: 'Pemeriksaan komprehensif rongga mulut dan perumusan rencana perawatan gigi personal.',
+    },
+    {
+      name: 'Implan Gigi Titanium Presisi',
+      slug: 'implan-gigi',
+      description: 'Pemasangan implan dental titanium biokompatibel untuk menggantikan akar gigi yang hilang dengan stabilitas jangka panjang dan penampilan alami.',
+      imageUrl: '/images/promo-implant.jpg',
+      price: 12000000,
+      durationMin: 90,
+      sortOrder: 6,
+      seoTitle: 'Bedah Mulut',
+      seoDescription: 'Solusi permanen penggantian gigi hilang dengan implan titanium grade medis internasional.',
+    },
   ];
 
   for (const service of services) {
     await prisma.service.upsert({
       where: { organizationId_slug: { organizationId: org.id, slug: service.slug } },
-      update: {},
+      update: { ...service, isActive: true },
       create: { organizationId: org.id, ...service, isActive: true },
     });
   }
@@ -285,24 +455,49 @@ async function main() {
 
   // 7. Insurance Partners
   const insurers = [
-    { name: 'BPJS Kesehatan', slug: 'bpjs' },
-    { name: 'Allianz', slug: 'allianz' },
-    { name: 'Prudential', slug: 'prudential' },
+    {
+      name: 'AdMedika',
+      slug: 'admedika',
+      coverageDetails: 'Klaim rawat jalan gigi cashless dan reimbursement terintegrasi jaringan Third Party Administrator AdMedika.',
+      claimProcess: 'Tunjukkan kartu fisik atau e-card AdMedika di meja resepsionis untuk verifikasi instan via web portal.',
+    },
+    {
+      name: 'Prudential',
+      slug: 'prudential',
+      coverageDetails: 'Perlindungan rawat jalan gigi dan tindakan bedah mulut sesuai plafon polis PRUHospital & Surgical.',
+      claimProcess: 'Swipe kartu asuransi Prudential di mesin EDC kasir klinik untuk pemrosesan cashless langsung.',
+    },
+    {
+      name: 'BCA Life',
+      slug: 'bca-life',
+      coverageDetails: 'Cakupan perawatan gigi preventif, penambalan komposit, dan pembersihan karang gigi berkala.',
+      claimProcess: 'Verifikasi nomor kepesertaan BCA Life di kasir dengan menunjukkan kartu identitas resmi.',
+    },
+    {
+      name: 'Mandiri Inhealth',
+      slug: 'mandiri-inhealth',
+      coverageDetails: 'Fasilitas cashless perawatan gigi bagi pemegang kartu Mandiri Inhealth Silver, Gold, dan Platinum.',
+      claimProcess: 'Gesek kartu Mandiri Inhealth pada terminal EDC atau konfirmasi digital via aplikasi.',
+    },
+    {
+      name: 'Sinarmas',
+      slug: 'sinarmas',
+      coverageDetails: 'Jaminan menyeluruh rawat jalan gigi dan perawatan darurat untuk pemegang polis Simas Sehat.',
+      claimProcess: 'Tunjukkan kartu kepesertaan Sinarmas MSIG untuk cetak surat jaminan perawatan instan.',
+    },
   ];
 
   for (const insurer of insurers) {
     await prisma.insurancePartner.upsert({
       where: { organizationId_slug: { organizationId: org.id, slug: insurer.slug } },
-      update: {},
+      update: { ...insurer, isActive: true },
       create: { organizationId: org.id, ...insurer, isActive: true },
     });
   }
 
-  const du = await prisma.user.findUnique({ where: { email: 'director@demo.com' } });
   const mu = await prisma.user.findUnique({ where: { email: 'manager@demo.com' } });
   const bu = await prisma.user.findUnique({ where: { email: 'staff@demo.com' } });
   const bi = branch1.id;
-  const b2 = branch2.id;
   const af1 = [
     { n: 'Lidocaine HCl 2% + Epinephrine', s: 'MED-LIDO-01', st: 8, ms: 20, u: 'ampul', c: 'Anestesi & Farmasi' },
     { n: 'Mepivacaine 3% Non-Vasoconstrictor', s: 'MED-MEPI-02', st: 25, ms: 15, u: 'ampul', c: 'Anestesi & Farmasi' },

@@ -10,13 +10,15 @@ import {
   MessageCircle,
   Sparkles,
 } from "lucide-react";
-import { mockInsurances } from "@/data/mock-grow";
+import { prisma } from "@/lib/prisma";
 import { InsuranceGrid } from "@/components/grow/insurance-grid";
+
+export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "Mitra Asuransi & Pembayaran | Klinik Gigi Senyum Sehat",
   description:
-    "Klaim asuransi gigi cashless dan reimbursement mudah di Klinik Gigi Senyum Sehat. Mitra resmi Prudential, Allianz, Mandiri Inhealth, Sinarmas, BPJS Kesehatan, dan FWD.",
+    "Klaim asuransi gigi cashless dan reimbursement mudah di Klinik Gigi Senyum Sehat. Mitra resmi AdMedika, Prudential, BCA Life, Mandiri Inhealth, dan Sinarmas.",
 };
 
 const CLAIM_STEPS = [
@@ -62,11 +64,33 @@ const INSURANCE_FAQS = [
   },
   {
     q: "Apakah asuransi perusahaan / corporate insurance dapat digunakan?",
-    a: "Tentu. Kami bermitra dengan asuransi korporasi terkemuka dan Third Party Administrator (TPA) seperti AdMedika, Fullerton Health, dan Medilink. Silakan konsultasikan kepesertaan Anda ke tim WhatsApp kami.",
+    a: "Tentu. Kami bermitra dengan asuransi korporasi terkemuka dan Third Party Administrator (TPA) seperti AdMedika, Prudential, BCA Life, Mandiri Inhealth, dan Sinarmas. Silakan konsultasikan kepesertaan Anda ke tim WhatsApp kami.",
   },
 ];
 
-export default function InsurancePage() {
+export default async function InsurancePage() {
+  const partners = await prisma.insurancePartner.findMany({
+    where: {
+      organization: { slug: "senyum-sehat" },
+      isActive: true,
+    },
+    orderBy: {
+      name: "asc",
+    },
+  });
+
+  const mappedPartners = partners.map((p) => ({
+    id: p.id,
+    name: p.name,
+    slug: p.slug,
+    type: "CASHLESS" as const,
+    logoText: p.slug.toUpperCase(),
+    logoUrl: p.logoUrl,
+    coverageDetails: p.coverageDetails,
+    claimProcess: p.claimProcess,
+    supportedBranches: ["Kelapa Gading", "Pluit"],
+  }));
+
   return (
     <div className="py-12 md:py-20 max-w-[1440px] mx-auto px-6 sm:px-8 lg:px-12 font-sans">
       {/* Hero Header Section */}
@@ -100,7 +124,7 @@ export default function InsurancePage() {
           </span>
         </div>
 
-        <InsuranceGrid insurances={mockInsurances} />
+        <InsuranceGrid insurances={mappedPartners} />
       </section>
 
       {/* 3-Step Illustrated Guide for Claiming */}
@@ -155,31 +179,28 @@ export default function InsurancePage() {
         </div>
       </section>
 
-      {/* Insurance FAQ Section */}
-      <section className="mb-20 space-y-8">
-        <div className="text-center max-w-2xl mx-auto space-y-3">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-semibold">
-            <HelpCircle className="w-3.5 h-3.5" /> Pusat Bantuan
-          </div>
+      {/* FAQ Section Regarding Insurance Claims */}
+      <section className="mb-20 max-w-4xl mx-auto space-y-6">
+        <div className="text-center space-y-2 mb-8">
+          <span className="text-xs font-semibold text-primary uppercase tracking-wider block">
+            Bantuan Klaim
+          </span>
           <h2 className="text-2xl md:text-3xl font-bold tracking-tight text-foreground">
-            Pertanyaan Umum Seputar Asuransi
+            Pertanyaan Seputar Asuransi & Pembayaran
           </h2>
-          <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
-            Hal yang sering ditanyakan mengenai penggunaan asuransi kesehatan swasta
-            dan BPJS di Klinik Gigi Senyum Sehat.
-          </p>
         </div>
 
-        <div className="max-w-3xl mx-auto space-y-4">
+        <div className="space-y-4">
           {INSURANCE_FAQS.map((faq, index) => (
             <div
               key={index}
               className="rounded-2xl bg-card border border-border/70 p-6 shadow-xs space-y-2"
             >
-              <h3 className="text-sm sm:text-base font-bold text-foreground">
-                {faq.q}
+              <h3 className="text-base font-semibold text-foreground flex items-start gap-2.5">
+                <HelpCircle className="w-4 h-4 text-primary shrink-0 mt-1" />
+                <span>{faq.q}</span>
               </h3>
-              <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
+              <p className="text-xs sm:text-sm text-muted-foreground pl-6 leading-relaxed">
                 {faq.a}
               </p>
             </div>
@@ -187,7 +208,7 @@ export default function InsurancePage() {
         </div>
       </section>
 
-      {/* WhatsApp Help CTA Banner */}
+      {/* Bottom Consultation Banner */}
       <div className="rounded-3xl bg-foreground text-background p-8 md:p-12 relative overflow-hidden shadow-lg border border-border/30">
         <div
           className="absolute inset-0 opacity-10 mix-blend-luminosity pointer-events-none"
@@ -200,33 +221,32 @@ export default function InsurancePage() {
         <div className="relative z-10 flex flex-col lg:flex-row items-center justify-between gap-8 text-center lg:text-left">
           <div className="space-y-3 max-w-xl">
             <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/20 text-primary text-xs font-bold uppercase tracking-wider">
-              <Sparkles className="w-3.5 h-3.5" /> Cek Manfaat Asuransi
+              <Sparkles className="w-3.5 h-3.5" /> Verifikasi Polis Cepat
             </span>
             <h2 className="text-2xl md:text-3xl font-light tracking-tight text-white">
-              Ingin Memastikan <span className="font-bold">Plafon Asuransi Anda?</span>
+              Cek Plafon & Manfaat Asuransi <span className="font-bold">Sebelum Tindakan</span>
             </h2>
             <p className="text-white/70 text-sm leading-relaxed">
-              Kirimkan foto kartu asuransi Anda melalui WhatsApp. Tim kami akan
-              membantu verifikasi manfaat dan limit pertanggungan tindakan gigi Anda
-              sebelum kedatangan.
+              Kirimkan foto kartu asuransi Anda ke WhatsApp front office kami untuk
+              pengecekan limit plafon dan eligibilitas tindakan tanpa biaya.
             </p>
           </div>
 
           <div className="flex flex-col sm:flex-row items-center gap-4 shrink-0">
             <a
-              href="https://wa.me/6281234567890?text=Halo%20Admin%20Klinik%20Senyum%20Sehat,%20saya%20ingin%20cek%20apakah%20asuransi%20saya%20bisa%20digunakan%20dan%20dicover%20cashless."
+              href="https://wa.me/6281234567890?text=Halo%20Admin%20Klinik%20Senyum%20Sehat,%20saya%20ingin%20cek%20eligibilitas%20asuransi%20saya%20sebelum%20tindakan."
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center justify-center gap-2.5 rounded-full bg-primary hover:bg-primary/90 text-primary-foreground font-semibold px-6 py-3.5 text-sm transition-all shadow-md hover:shadow-primary/30"
             >
               <MessageCircle className="w-4 h-4" />
-              <span>Verifikasi via WhatsApp</span>
+              <span>Verifikasi Polis via WhatsApp</span>
             </a>
             <Link
               href="/layanan"
               className="inline-flex items-center justify-center rounded-full border border-white/20 hover:bg-white/10 text-white font-medium px-6 py-3.5 text-sm transition-colors"
             >
-              Lihat Layanan & Biaya
+              Katalog Layanan
             </Link>
           </div>
         </div>

@@ -11,7 +11,9 @@ import {
   HelpCircle,
   CalendarCheck,
 } from "lucide-react";
-import { mockServices } from "@/data/mock-grow";
+import { prisma } from "@/lib/prisma";
+
+export const dynamic = "force-dynamic";
 
 interface ServiceDetailPageProps {
   params: Promise<{ slug: string }>;
@@ -22,21 +24,63 @@ export default async function ServiceDetailPage({
 }: ServiceDetailPageProps) {
   const { slug } = await params;
 
-  const service = mockServices.find((s) => s.slug === slug);
+  const service = await prisma.service.findFirst({
+    where: {
+      slug,
+      organization: { slug: "senyum-sehat" },
+      isActive: true,
+    },
+  });
 
   if (!service) {
     notFound();
   }
 
-  const formattedPrice = new Intl.NumberFormat("id-ID", {
-    style: "currency",
-    currency: "IDR",
-    maximumFractionDigits: 0,
-  }).format(service.basePrice);
+  const basePriceNum = service.price ? Number(service.price) : 0;
+  const formattedPrice =
+    basePriceNum > 0
+      ? new Intl.NumberFormat("id-ID", {
+          style: "currency",
+          currency: "IDR",
+          maximumFractionDigits: 0,
+        }).format(basePriceNum)
+      : "Hubungi Klinik";
+
+  const duration = service.durationMin ?? 45;
+  const categoryLabel = service.seoTitle ?? "Perawatan Gigi";
+  const shortDescription = service.seoDescription ?? service.description ?? "";
 
   const whatsappMessage = encodeURIComponent(
     `Halo Admin Klinik Senyum Sehat, saya ingin reservasi/konsultasi untuk perawatan: ${service.name}. Mohon informasi jadwal yang tersedia.`
   );
+
+  const defaultIndications = [
+    "Pemeriksaan rutin kesehatan rongga mulut dan gigi berkala",
+    "Keluhan rasa tidak nyaman, ngilu, atau estetika gigi",
+    "Rekomendasi dokter spesialis untuk fungsi kunyah optimal",
+  ];
+
+  const defaultSteps = [
+    "Pemeriksaan intraoral digital dan pemetaan kondisi klinis gigi",
+    "Penjelasan rencana perawatan komprehensif dan rincian biaya",
+    "Tindakan medis presisi dengan instrumen steril autoklaf kelas B",
+    "Polesing akhir dan edukasi pemeliharaan kebersihan di rumah",
+  ];
+
+  const defaultFaqs = [
+    {
+      question: "Apakah tindakan ini memerlukan persiapan khusus?",
+      answer: "Tidak ada persiapan rumit, cukup menyikat gigi sebelum kunjungan dan menginformasikan riwayat alergi obat atau kondisi medis umum kepada dokter kami.",
+    },
+    {
+      question: "Apakah prosedur ini menimbulkan rasa ngilu atau sakit?",
+      answer: "Teknologi medis modern dan anestesi lokal terkalibrasi memastikan seluruh tahapan berlangsung minim rasa sakit dan sangat nyaman bagi pasien.",
+    },
+    {
+      question: "Apakah biaya perawatan didukung asuransi rekanan?",
+      answer: "Klinik kami memfasilitasi klaim cashless dengan mitra asuransi swasta terkemuka serta penerbitan kuitansi resmi untuk skema reimbursement.",
+    },
+  ];
 
   return (
     <div className="py-10 md:py-16 max-w-[1440px] mx-auto px-6 sm:px-8 lg:px-12 font-sans">
@@ -75,14 +119,12 @@ export default async function ServiceDetailPage({
       <div className="border-b border-border/70 pb-8 mb-10">
         <div className="flex flex-wrap items-center gap-2.5 mb-3">
           <span className="inline-flex items-center rounded-full bg-primary/10 text-primary border border-primary/20 px-3 py-1 text-xs font-semibold">
-            {service.categoryLabel}
+            {categoryLabel}
           </span>
-          {service.insuranceCovered && (
-            <span className="inline-flex items-center gap-1 text-xs font-medium text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200/60 dark:border-emerald-800/50 px-2.5 py-0.5 rounded-full">
-              <ShieldCheck className="w-3.5 h-3.5" />
-              <span>Didukung Asuransi & BPJS</span>
-            </span>
-          )}
+          <span className="inline-flex items-center gap-1 text-xs font-medium text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200/60 dark:border-emerald-800/50 px-2.5 py-0.5 rounded-full">
+            <ShieldCheck className="w-3.5 h-3.5" />
+            <span>Didukung Asuransi & Cashless</span>
+          </span>
         </div>
 
         <h1 className="text-3xl md:text-5xl font-light tracking-tight text-foreground leading-[1.2] max-w-3xl">
@@ -90,13 +132,13 @@ export default async function ServiceDetailPage({
         </h1>
 
         <p className="mt-4 text-base md:text-lg text-muted-foreground leading-relaxed max-w-2xl">
-          {service.shortDesc}
+          {shortDescription}
         </p>
 
         <div className="mt-6 flex flex-wrap items-center gap-6 text-sm text-foreground/80">
           <div className="flex items-center gap-2">
             <Clock className="w-4 h-4 text-primary" />
-            <span>Durasi: <strong>{service.durationMinutes} Menit</strong></span>
+            <span>Durasi: <strong>{duration} Menit</strong></span>
           </div>
           <div className="flex items-center gap-2">
             <span className="text-muted-foreground">Mulai Dari:</span>
@@ -129,85 +171,79 @@ export default async function ServiceDetailPage({
             )}
 
             <div className="rounded-2xl bg-card border border-border/70 p-6 shadow-xs leading-relaxed text-muted-foreground text-sm md:text-base space-y-3">
-              <p>{service.description}</p>
+              <p>{service.description ?? "Perawatan gigi berkualitas dengan dokter spesialis berpengalaman dan peralatan modern."}</p>
             </div>
           </section>
 
           {/* Indikasi Perawatan */}
-          {service.indications && service.indications.length > 0 && (
-            <section className="space-y-4">
-              <h2 className="text-xl font-semibold text-foreground tracking-tight flex items-center gap-2">
-                Indikasi Perawatan
-              </h2>
-              <p className="text-xs text-muted-foreground">
-                Tindakan ini sangat direkomendasikan jika Anda mengalami salah satu kondisi berikut:
-              </p>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                {service.indications.map((indication, idx) => (
-                  <div
-                    key={idx}
-                    className="flex items-start gap-3 p-4 rounded-xl bg-card border border-border/70 shadow-xs"
-                  >
-                    <CheckCircle2 className="w-5 h-5 text-primary shrink-0 mt-0.5" />
-                    <span className="text-sm font-medium text-foreground">
-                      {indication}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </section>
-          )}
+          <section className="space-y-4">
+            <h2 className="text-xl font-semibold text-foreground tracking-tight flex items-center gap-2">
+              Indikasi Perawatan
+            </h2>
+            <p className="text-xs text-muted-foreground">
+              Tindakan ini sangat direkomendasikan jika Anda mengalami salah satu kondisi berikut:
+            </p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {defaultIndications.map((indication, idx) => (
+                <div
+                  key={idx}
+                  className="flex items-start gap-3 p-4 rounded-xl bg-card border border-border/70 shadow-xs"
+                >
+                  <CheckCircle2 className="w-5 h-5 text-primary shrink-0 mt-0.5" />
+                  <span className="text-sm font-medium text-foreground">
+                    {indication}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </section>
 
           {/* Tahapan Tindakan */}
-          {service.steps && service.steps.length > 0 && (
-            <section className="space-y-4">
-              <h2 className="text-xl font-semibold text-foreground tracking-tight flex items-center gap-2">
-                Tahapan Tindakan
-              </h2>
-              <div className="space-y-3">
-                {service.steps.map((step, idx) => (
-                  <div
-                    key={idx}
-                    className="flex items-start gap-4 p-4 rounded-xl bg-card border border-border/70 shadow-xs"
-                  >
-                    <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary text-xs font-bold border border-primary/20">
-                      {idx + 1}
-                    </div>
-                    <div>
-                      <p className="text-sm font-medium text-foreground leading-relaxed">
-                        {step}
-                      </p>
-                    </div>
+          <section className="space-y-4">
+            <h2 className="text-xl font-semibold text-foreground tracking-tight flex items-center gap-2">
+              Tahapan Tindakan
+            </h2>
+            <div className="space-y-3">
+              {defaultSteps.map((step, idx) => (
+                <div
+                  key={idx}
+                  className="flex items-start gap-4 p-4 rounded-xl bg-card border border-border/70 shadow-xs"
+                >
+                  <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary text-xs font-bold border border-primary/20">
+                    {idx + 1}
                   </div>
-                ))}
-              </div>
-            </section>
-          )}
-
-          {/* Pertanyaan Umum (FAQ) */}
-          {service.faqs && service.faqs.length > 0 && (
-            <section className="space-y-4">
-              <h2 className="text-xl font-semibold text-foreground tracking-tight flex items-center gap-2">
-                Pertanyaan Umum (FAQ)
-              </h2>
-              <div className="space-y-3">
-                {service.faqs.map((faq, idx) => (
-                  <div
-                    key={idx}
-                    className="rounded-xl bg-card border border-border/70 p-5 shadow-xs space-y-2"
-                  >
-                    <h3 className="text-sm font-semibold text-foreground flex items-start gap-2">
-                      <HelpCircle className="w-4 h-4 text-primary shrink-0 mt-0.5" />
-                      <span>{faq.question}</span>
-                    </h3>
-                    <p className="text-xs sm:text-sm text-muted-foreground pl-6 leading-relaxed">
-                      {faq.answer}
+                  <div>
+                    <p className="text-sm font-medium text-foreground leading-relaxed">
+                      {step}
                     </p>
                   </div>
-                ))}
-              </div>
-            </section>
-          )}
+                </div>
+              ))}
+            </div>
+          </section>
+
+          {/* Pertanyaan Umum (FAQ) */}
+          <section className="space-y-4">
+            <h2 className="text-xl font-semibold text-foreground tracking-tight flex items-center gap-2">
+              Pertanyaan Umum (FAQ)
+            </h2>
+            <div className="space-y-3">
+              {defaultFaqs.map((faq, idx) => (
+                <div
+                  key={idx}
+                  className="rounded-xl bg-card border border-border/70 p-5 shadow-xs space-y-2"
+                >
+                  <h3 className="text-sm font-semibold text-foreground flex items-start gap-2">
+                    <HelpCircle className="w-4 h-4 text-primary shrink-0 mt-0.5" />
+                    <span>{faq.question}</span>
+                  </h3>
+                  <p className="text-xs sm:text-sm text-muted-foreground pl-6 leading-relaxed">
+                    {faq.answer}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </section>
         </div>
 
         {/* Right Column: Sticky Booking Card */}
@@ -234,7 +270,7 @@ export default async function ServiceDetailPage({
                   <Clock className="w-3.5 h-3.5" /> Waktu Layanan
                 </span>
                 <span className="font-semibold text-foreground">
-                  ~{service.durationMinutes} Menit
+                  ~{duration} Menit
                 </span>
               </div>
               <div className="flex items-center justify-between">
@@ -242,7 +278,7 @@ export default async function ServiceDetailPage({
                   <ShieldCheck className="w-3.5 h-3.5" /> Status Asuransi
                 </span>
                 <span className="font-semibold text-foreground">
-                  {service.insuranceCovered ? "Mendukung Cashless" : "Privat / Umum"}
+                  Mendukung Cashless & Reimburse
                 </span>
               </div>
               <div className="flex items-center justify-between">

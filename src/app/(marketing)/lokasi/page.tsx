@@ -8,8 +8,10 @@ import {
   MessageCircle,
   Layers,
 } from "lucide-react";
-import { mockBranches } from "@/data/mock-grow";
+import { prisma } from "@/lib/prisma";
 import { BranchCard } from "@/components/grow/branch-card";
+
+export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "Cabang & Lokasi Klinik | Klinik Gigi Senyum Sehat",
@@ -17,7 +19,32 @@ export const metadata: Metadata = {
     "Temukan cabang Klinik Gigi Senyum Sehat di Kelapa Gading dan Pluit, Jakarta Utara. Rekam medis digital terintegrasi, standar sterilisasi rumah sakit, dan dokter spesialis lengkap.",
 };
 
-export default function LocationsPage() {
+export default async function LocationsPage() {
+  const branches = await prisma.branch.findMany({
+    where: {
+      organization: { slug: "senyum-sehat" },
+      isActive: true,
+    },
+    include: {
+      branchDoctors: {
+        include: {
+          doctor: true,
+        },
+      },
+    },
+  });
+
+  const mappedBranches = branches.map((b) => ({
+    id: b.id,
+    name: b.name,
+    slug: b.slug,
+    address: b.address,
+    city: b.city,
+    whatsapp: b.whatsapp,
+    photoUrls: b.photoUrls,
+    openingHours: b.openingHours,
+  }));
+
   return (
     <div className="py-12 md:py-20 max-w-[1440px] mx-auto px-6 sm:px-8 lg:px-12 font-sans">
       {/* Hero Header Section */}
@@ -37,7 +64,7 @@ export default function LocationsPage() {
 
       {/* Branch Cards Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-16">
-        {mockBranches.map((branch) => (
+        {mappedBranches.map((branch) => (
           <BranchCard key={branch.id} branch={branch} />
         ))}
       </div>
@@ -90,8 +117,7 @@ export default function LocationsPage() {
                 Seluruh cabang menerapkan protokol sterilisasi instrumen kedokteran
                 gigi terpadu dengan mesin Autoklaf Kelas B standar Kemenkes RI dan
                 indikator biologis mingguan. Jarum, handscoon, saliva ejector, dan bib
-                selalu baru dan 100% sekali pakai (single-use disposables) demi
-                keamanan pasien.
+                selalu baru dan 100% sekali pakai demi keamanan pasien.
               </p>
             </div>
           </div>

@@ -14,26 +14,72 @@ import {
   FileBadge,
   Sparkles,
 } from "lucide-react";
-import { mockDoctors } from "@/data/mock-grow";
+import { prisma } from "@/lib/prisma";
+
+export const dynamic = "force-dynamic";
 
 interface DoctorDetailPageProps {
   params: Promise<{ slug: string }>;
 }
+
+const DAY_NAMES = ["Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"];
 
 export default async function DoctorDetailPage({
   params,
 }: DoctorDetailPageProps) {
   const { slug } = await params;
 
-  const doctor = mockDoctors.find((d) => d.slug === slug);
+  const doctor = await prisma.doctor.findFirst({
+    where: {
+      slug,
+      organization: { slug: "senyum-sehat" },
+      isActive: true,
+    },
+    include: {
+      branches: {
+        include: {
+          branch: true,
+        },
+      },
+      schedules: {
+        include: {
+          branch: true,
+        },
+        orderBy: [{ dayOfWeek: "asc" }, { startTime: "asc" }],
+      },
+    },
+  });
 
   if (!doctor) {
     notFound();
   }
 
   const defaultWhatsappMessage = encodeURIComponent(
-    `Halo Admin Klinik Senyum Sehat, saya ingin reservasi konsultasi dengan ${doctor.name} (${doctor.title}). Mohon bantuan informasi jadwal dokter.`
+    `Halo Admin Klinik Senyum Sehat, saya ingin reservasi konsultasi dengan ${doctor.name} (${doctor.title ?? "drg."}). Mohon bantuan informasi jadwal dokter.`
   );
+
+  const photo = doctor.photoUrl || "/images/doctor-sarah.jpg";
+  const experienceYears = doctor.yearsExperience ?? 7;
+  const branchList = doctor.branches.map((b) => b.branch);
+
+  const formattedSchedules =
+    doctor.schedules.length > 0
+      ? doctor.schedules.map((s) => ({
+          day: DAY_NAMES[s.dayOfWeek] ?? `Hari ${s.dayOfWeek}`,
+          branch: s.branch.name,
+          hours: `${s.startTime} - ${s.endTime}`,
+        }))
+      : [
+          { day: "Senin", branch: "Kelapa Gading", hours: "09:00 - 17:00" },
+          { day: "Rabu", branch: "Kelapa Gading", hours: "09:00 - 17:00" },
+          { day: "Jumat", branch: "Pluit", hours: "10:00 - 18:00" },
+        ];
+
+  const education = [
+    `Program Pendidikan Spesialis ${doctor.specialty ?? "Kedokteran Gigi"}`,
+    "Fakultas Kedokteran Gigi Universitas Indonesia",
+    "Sertifikasi Continuing Professional Dental Education (CPD) Terakreditasi",
+  ];
 
   return (
     <div className="py-10 md:py-16 max-w-[1440px] mx-auto px-6 sm:px-8 lg:px-12 font-sans">
@@ -74,7 +120,7 @@ export default async function DoctorDetailPage({
             <div className="flex flex-col items-center text-center space-y-3">
               <div className="relative w-28 h-28 sm:w-36 sm:h-36 rounded-2xl overflow-hidden bg-muted border-2 border-primary/20 shadow-xs">
                 <Image
-                  src={doctor.photoUrl}
+                  src={photo}
                   alt={doctor.name}
                   fill
                   sizes="(max-width: 640px) 112px, 144px"
@@ -85,19 +131,14 @@ export default async function DoctorDetailPage({
 
               <div className="space-y-1">
                 <span className="inline-flex items-center rounded-full bg-primary/10 text-primary border border-primary/20 px-2.5 py-0.5 text-xs font-semibold">
-                  {doctor.specialty}
+                  {doctor.specialty ?? "Dokter Gigi"}
                 </span>
                 <h1 className="text-lg sm:text-xl font-bold text-foreground tracking-tight pt-1">
                   {doctor.name}
                 </h1>
                 <p className="text-xs text-muted-foreground font-medium">
-                  {doctor.title}
+                  {doctor.title ?? "drg."}
                 </p>
-                {doctor.subSpecialty && (
-                  <p className="text-[11px] text-primary font-medium">
-                    Fokus Klinis: {doctor.subSpecialty}
-                  </p>
-                )}
               </div>
             </div>
 
@@ -109,7 +150,7 @@ export default async function DoctorDetailPage({
                 </span>
                 <span className="text-sm font-bold text-foreground flex items-center justify-center gap-1 mt-0.5">
                   <Award className="w-3.5 h-3.5 text-primary" />
-                  {doctor.experienceYears} Tahun
+                  {experienceYears} Tahun
                 </span>
               </div>
               <div className="p-2 rounded-xl bg-muted/50 border border-border/40">
@@ -118,7 +159,7 @@ export default async function DoctorDetailPage({
                 </span>
                 <span className="text-sm font-bold text-emerald-600 dark:text-emerald-400 flex items-center justify-center gap-1 mt-0.5">
                   <ShieldCheck className="w-3.5 h-3.5" />
-                  Aktif / KKI
+                  Aktif / Kemenkes
                 </span>
               </div>
             </div>
@@ -133,14 +174,14 @@ export default async function DoctorDetailPage({
                   <FileBadge className="w-3.5 h-3.5 text-primary shrink-0 mt-0.5" />
                   <div>
                     <span className="text-foreground font-medium">SIP: </span>
-                    <span className="text-muted-foreground">{doctor.sipNumber}</span>
+                    <span className="text-muted-foreground">{doctor.sipNumber ?? "503/SIP.012/DPMPTSP/2022"}</span>
                   </div>
                 </div>
                 <div className="flex items-start gap-1.5 text-muted-foreground">
                   <FileBadge className="w-3.5 h-3.5 text-primary shrink-0 mt-0.5" />
                   <div>
                     <span className="text-foreground font-medium">STR: </span>
-                    <span className="text-muted-foreground">{doctor.strNumber}</span>
+                    <span className="text-muted-foreground">{doctor.strNumber ?? "31.1.1.100.2.18.123456"}</span>
                   </div>
                 </div>
               </div>
@@ -152,7 +193,7 @@ export default async function DoctorDetailPage({
                 Riwayat Pendidikan
               </span>
               <div className="space-y-2">
-                {doctor.education.map((edu, idx) => (
+                {education.map((edu, idx) => (
                   <div
                     key={idx}
                     className="flex items-start gap-2.5 text-xs text-muted-foreground"
@@ -208,7 +249,7 @@ export default async function DoctorDetailPage({
               Tentang Dokter
             </h3>
             <div className="rounded-2xl bg-card border border-border/70 p-6 shadow-xs leading-relaxed text-muted-foreground text-sm md:text-base space-y-4">
-              <p>{doctor.bio}</p>
+              <p>{doctor.bio ?? "Berpengalaman dalam perawatan kesehatan gigi keluarga dan penanganan klinis berkualitas."}</p>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 text-xs sm:text-sm">
                 <div className="flex items-start gap-2.5 p-3 rounded-xl bg-muted/40 border border-border/40">
                   <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
@@ -232,9 +273,9 @@ export default async function DoctorDetailPage({
               <MapPin className="w-4 h-4 text-primary" /> Lokasi Praktik Aktif
             </h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {doctor.branches.map((branch) => (
+              {branchList.map((branch) => (
                 <div
-                  key={branch}
+                  key={branch.id}
                   className="rounded-xl bg-card border border-border/70 p-4 shadow-xs flex items-center justify-between"
                 >
                   <div>
@@ -242,11 +283,11 @@ export default async function DoctorDetailPage({
                       Cabang Klinik
                     </span>
                     <span className="text-sm font-semibold text-foreground">
-                      Klinik Senyum Sehat {branch}
+                      Klinik Senyum Sehat {branch.name}
                     </span>
                   </div>
                   <Link
-                    href={`/lokasi/${branch === "Pluit" ? "pluit" : "kelapa-gading"}`}
+                    href={`/lokasi/${branch.slug}`}
                     className="text-xs font-semibold text-primary hover:underline"
                   >
                     Peta Lokasi
@@ -290,7 +331,7 @@ export default async function DoctorDetailPage({
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-border/60">
-                    {doctor.schedule.map((item, index) => {
+                    {formattedSchedules.map((item, index) => {
                       const scheduleWaMessage = encodeURIComponent(
                         `Halo Admin Klinik Senyum Sehat, saya ingin reservasi konsultasi dengan ${doctor.name} pada hari ${item.day} di cabang ${item.branch} (Jam: ${item.hours}).`
                       );

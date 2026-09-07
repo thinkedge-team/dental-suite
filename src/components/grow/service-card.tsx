@@ -1,18 +1,48 @@
 import Link from "next/link";
 import Image from "next/image";
 import { Clock, ShieldCheck, ArrowRight } from "lucide-react";
-import type { MockService } from "@/data/mock-grow";
+
+export interface ServiceCardData {
+  id: string;
+  name: string;
+  slug: string;
+  categoryLabel?: string | null;
+  shortDesc?: string | null;
+  description?: string | null;
+  durationMinutes?: number | null;
+  durationMin?: number | null;
+  basePrice?: number | null;
+  price?: number | string | null;
+  insuranceCovered?: boolean | null;
+  imageUrl?: string | null;
+}
 
 interface ServiceCardProps {
-  service: MockService;
+  service: ServiceCardData;
 }
 
 export function ServiceCard({ service }: ServiceCardProps) {
-  const formattedPrice = new Intl.NumberFormat("id-ID", {
-    style: "currency",
-    currency: "IDR",
-    maximumFractionDigits: 0,
-  }).format(service.basePrice);
+  const priceValue =
+    typeof service.basePrice === "number"
+      ? service.basePrice
+      : typeof service.price === "number"
+      ? service.price
+      : service.price
+      ? Number(service.price)
+      : 0;
+
+  const formattedPrice =
+    priceValue > 0
+      ? new Intl.NumberFormat("id-ID", {
+          style: "currency",
+          currency: "IDR",
+          maximumFractionDigits: 0,
+        }).format(priceValue)
+      : "Hubungi Klinik";
+
+  const duration = service.durationMinutes ?? service.durationMin ?? 45;
+  const shortDescription = service.shortDesc ?? service.description ?? "";
+  const categoryLabel = service.categoryLabel ?? "Perawatan Gigi";
 
   return (
     <article className="group relative flex flex-col justify-between rounded-2xl bg-card border border-border/70 overflow-hidden shadow-xs hover:shadow-md hover:border-primary/40 transition-all duration-300 font-sans">
@@ -31,7 +61,7 @@ export function ServiceCard({ service }: ServiceCardProps) {
           {/* Category Badge overlay */}
           <div className="absolute top-3 left-3">
             <span className="inline-flex items-center rounded-full bg-card/90 backdrop-blur-md text-foreground border border-border/60 px-2.5 py-0.5 text-xs font-semibold shadow-xs">
-              {service.categoryLabel}
+              {categoryLabel}
             </span>
           </div>
 
@@ -52,7 +82,7 @@ export function ServiceCard({ service }: ServiceCardProps) {
           {!service.imageUrl && (
             <div className="flex items-center justify-between gap-2">
               <span className="inline-flex items-center rounded-full bg-primary/10 text-primary border border-primary/20 px-2.5 py-0.5 text-xs font-semibold">
-                {service.categoryLabel}
+                {categoryLabel}
               </span>
 
               {service.insuranceCovered && (
@@ -76,14 +106,14 @@ export function ServiceCard({ service }: ServiceCardProps) {
               </Link>
             </h3>
             <p className="mt-1.5 text-xs sm:text-sm text-muted-foreground leading-relaxed line-clamp-2">
-              {service.shortDesc}
+              {shortDescription}
             </p>
           </div>
 
           {/* Duration */}
           <div className="flex items-center gap-1.5 text-xs text-muted-foreground pt-1">
             <Clock className="w-3.5 h-3.5 text-muted-foreground/80" />
-            <span>Estimasi pengerjaan: {service.durationMinutes} menit</span>
+            <span>Estimasi pengerjaan: {duration} menit</span>
           </div>
         </div>
 

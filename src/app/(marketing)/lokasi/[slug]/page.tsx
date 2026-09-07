@@ -14,8 +14,10 @@ import {
   CheckCircle2,
   Users,
 } from "lucide-react";
-import { mockBranches, mockDoctors } from "@/data/mock-grow";
+import { prisma } from "@/lib/prisma";
 import { DoctorCard } from "@/components/grow/doctor-card";
+
+export const dynamic = "force-dynamic";
 
 interface BranchDetailPageProps {
   params: Promise<{ slug: string }>;
@@ -26,26 +28,84 @@ export default async function BranchDetailPage({
 }: BranchDetailPageProps) {
   const { slug } = await params;
 
-  const branch = mockBranches.find((b) => b.slug === slug);
+  const branch = await prisma.branch.findFirst({
+    where: {
+      slug,
+      organization: { slug: "senyum-sehat" },
+      isActive: true,
+    },
+    include: {
+      branchDoctors: {
+        include: {
+          doctor: {
+            include: {
+              branches: {
+                include: {
+                  branch: true,
+                },
+              },
+              schedules: true,
+            },
+          },
+        },
+      },
+    },
+  });
 
   if (!branch) {
     notFound();
   }
 
-  // Branch simplified name for doctor matching (e.g. "Cabang Kelapa Gading" -> "Kelapa Gading")
-  const branchSimpleName = branch.name.replace("Cabang ", "").trim();
+  const assignedDoctors = branch.branchDoctors
+    .filter((bd) => bd.doctor.isActive)
+    .map((bd) => ({
+      id: bd.doctor.id,
+      name: bd.doctor.name,
+      slug: bd.doctor.slug,
+      title: bd.doctor.title,
+      specialty: bd.doctor.specialty,
+      bio: bd.doctor.bio,
+      photoUrl: bd.doctor.photoUrl,
+      sipNumber: bd.doctor.sipNumber,
+      strNumber: bd.doctor.strNumber,
+      experienceYears: bd.doctor.yearsExperience ?? 5,
+      yearsExperience: bd.doctor.yearsExperience ?? 5,
+      branches: bd.doctor.branches.map((b) => b.branch.name),
+    }));
 
-  // Find all doctors practicing at this branch
-  const branchDoctors = mockDoctors.filter((doctor) =>
-    doctor.branches.some(
-      (b) =>
-        b.toLowerCase() === branchSimpleName.toLowerCase() ||
-        branch.name.toLowerCase().includes(b.toLowerCase())
-    )
-  );
+  const imageUrl =
+    branch.photoUrls.length > 0
+      ? branch.photoUrls[0]
+      : "/images/clinic-room.jpg";
+
+  const whatsappNumber = branch.whatsapp ?? "6281234567890";
+  const phoneDisplay = `+${whatsappNumber}`;
+
+  let hoursDisplay = "Senin - Sabtu: 09:00 - 21:00";
+  if (branch.openingHours && typeof branch.openingHours === "object") {
+    const oh = branch.openingHours as Record<string, string>;
+    if (oh.weekday) {
+      hoursDisplay = `Senin - Jumat: ${oh.weekday} · Sabtu: ${oh.saturday ?? "09:00 - 18:00"}`;
+    }
+  }
+
+  const mapUrl =
+    branch.googleMapsUrl ??
+    `https://maps.google.com/?q=${encodeURIComponent(
+      `Klinik Gigi Senyum Sehat ${branch.name} ${branch.address ?? ""}`
+    )}`;
+
+  const facilities = [
+    "Autoklaf Vakum Kelas B Standar Rumah Sakit",
+    "Rontgen Panoramik Digital Dosis Rendah",
+    "Dental Unit Ergonomis Steril",
+    "Satu Rekam Medis Cloud Dua Cabang",
+    "Lounge Pasien Nyaman & Wi-Fi",
+    "Parkir Kendaraan Luas & Aman",
+  ];
 
   const defaultWhatsappMessage = encodeURIComponent(
-    `Halo Admin ${branch.name}, saya ingin konsultasi atau reservasi jadwal dokter gigi di cabang ini.`
+    `Halo Admin Klinik Gigi Senyum Sehat ${branch.name}, saya ingin konsultasi atau reservasi jadwal dokter gigi di cabang ini.`
   );
 
   return (
@@ -82,28 +142,26 @@ export default async function BranchDetailPage({
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start mb-16">
         {/* Left Column: Branch Information Card */}
         <div className="lg:col-span-7 space-y-6">
-          {branch.imageUrl && (
-            <div className="relative w-full h-64 sm:h-80 rounded-2xl overflow-hidden bg-muted border border-border/70 shadow-xs">
-              <Image
-                src={branch.imageUrl}
-                alt={branch.name}
-                fill
-                priority
-                sizes="(max-width: 1024px) 100vw, 700px"
-                className="object-cover"
-              />
-            </div>
-          )}
+          <div className="relative w-full h-64 sm:h-80 rounded-2xl overflow-hidden bg-muted border border-border/70 shadow-xs">
+            <Image
+              src={imageUrl}
+              alt={branch.name}
+              fill
+              priority
+              sizes="(max-width: 1024px) 100vw, 700px"
+              className="object-cover"
+            />
+          </div>
 
           <div className="space-y-3">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-semibold">
               <Building2 className="w-3.5 h-3.5" /> Cabang Resmi Klinik
             </div>
             <h1 className="text-2xl sm:text-4xl font-light tracking-tight text-foreground">
-              {branch.name}
+              Klinik Gigi Senyum Sehat {branch.name}
             </h1>
             <p className="text-muted-foreground text-sm sm:text-base leading-relaxed">
-              Fasilitas kedokteran gigi modern di {branch.city} dengan standar
+              Fasilitas kedokteran gigi modern di {branch.city ?? "Jakarta Utara"} dengan standar
               pelayanan prima, kenyamanan lounge pasien, dan dokter gigi spesialis
               terlengkap.
             </p>
@@ -132,7 +190,7 @@ export default async function BranchDetailPage({
                   <span className="text-foreground font-semibold block">
                     Jam Operasional:
                   </span>
-                  <span className="text-muted-foreground">{branch.hours}</span>
+                  <span className="text-muted-foreground">{hoursDisplay}</span>
                 </div>
               </div>
 
@@ -143,10 +201,10 @@ export default async function BranchDetailPage({
                     Telepon Langsung:
                   </span>
                   <a
-                    href={`tel:${branch.phone.replace(/[^0-9+]/g, "")}`}
+                    href={`tel:${phoneDisplay.replace(/[^0-9+]/g, "")}`}
                     className="text-primary hover:underline font-mono"
                   >
-                    {branch.phone}
+                    {phoneDisplay}
                   </a>
                 </div>
               </div>
@@ -155,7 +213,7 @@ export default async function BranchDetailPage({
             {/* Quick Action CTA Buttons */}
             <div className="pt-3 border-t border-border/60 flex flex-col sm:flex-row items-center gap-3">
               <a
-                href={`https://wa.me/${branch.whatsapp}?text=${defaultWhatsappMessage}`}
+                href={`https://wa.me/${whatsappNumber}?text=${defaultWhatsappMessage}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-full sm:w-auto flex-1 inline-flex items-center justify-center gap-2 rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground font-semibold px-5 py-3 text-xs sm:text-sm transition-all shadow-xs"
@@ -165,7 +223,7 @@ export default async function BranchDetailPage({
               </a>
 
               <a
-                href={branch.mapEmbedUrl}
+                href={mapUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-xl border border-border/80 hover:bg-muted text-foreground font-semibold px-5 py-3 text-xs sm:text-sm transition-colors"
@@ -184,7 +242,7 @@ export default async function BranchDetailPage({
               Fasilitas & Sarana Medis Tersedia
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              {branch.facilities.map((facility) => (
+              {facilities.map((facility) => (
                 <div
                   key={facility}
                   className="flex items-start gap-2.5 p-3 rounded-xl bg-muted/40 border border-border/50 text-xs sm:text-sm"
@@ -224,7 +282,7 @@ export default async function BranchDetailPage({
                 </span>
               </div>
               <a
-                href={branch.mapEmbedUrl}
+                href={mapUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="mt-2 inline-flex items-center gap-1.5 text-xs font-semibold text-primary hover:underline"
@@ -236,9 +294,8 @@ export default async function BranchDetailPage({
 
             <div className="space-y-2 text-xs text-muted-foreground leading-relaxed pt-1">
               <p>
-                *Parkir mobil dan motor tersedia di area klinik. Untuk pasien lansia
-                atau berkebutuhan khusus, tim sekuriti siap membantu akses ramp kursi
-                roda.
+                {branch.parkingInfo ??
+                  "*Parkir mobil dan motor luas gratis dengan penjagaan keamanan 24 jam."}
               </p>
             </div>
           </div>
@@ -270,9 +327,9 @@ export default async function BranchDetailPage({
           </Link>
         </div>
 
-        {branchDoctors.length > 0 ? (
+        {assignedDoctors.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {branchDoctors.map((doctor) => (
+            {assignedDoctors.map((doctor) => (
               <DoctorCard key={doctor.id} doctor={doctor} />
             ))}
           </div>
