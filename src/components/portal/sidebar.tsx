@@ -86,6 +86,12 @@ export function Sidebar({ user, modules }: SidebarProps) {
       show: userModules.connect 
     },
     { 
+      name: "Layanan Gigi", 
+      href: "/services", 
+      icon: Stethoscope, 
+      show: userModules.grow 
+    },
+    { 
       name: "Inventaris Medis", 
       href: "/operate/inventory", 
       icon: Package, 
