@@ -11,6 +11,7 @@ export interface Doctor {
   readonly specialty: string | null;
   readonly photoUrl: string | null;
   readonly branches: { readonly branchId: string }[];
+  readonly schedules?: { readonly dayOfWeek: number; readonly isActive: boolean }[];
 }
 
 export interface Service {

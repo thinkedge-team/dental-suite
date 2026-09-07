@@ -26,6 +26,7 @@ export default async function BookingPage() {
             specialty: true,
             photoUrl: true,
             branches: { select: { branchId: true } },
+            schedules: { select: { dayOfWeek: true, isActive: true } },
           },
           orderBy: { name: "asc" },
         }),
