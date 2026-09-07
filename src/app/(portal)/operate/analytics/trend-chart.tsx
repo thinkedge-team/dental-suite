@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { generateSvgPath, formatRupiah } from "@/lib/intelligence/analytics";
+import { formatRupiah } from "@/lib/intelligence/analytics";
 
 export interface TrendChartItem {
   date: string;

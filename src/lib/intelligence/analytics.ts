@@ -10,38 +10,8 @@
 
 const WIB_OFFSET_HOURS = 7;
 
-/** Shift a Date so its calendar appears in WIB (UTC+7). */
 const toWib = (date: Date): Date => new Date(date.getTime() + WIB_OFFSET_HOURS * 60 * 60 * 1000);
 
-/** Start-of-day (00:00) in WIB for a given Date. */
-const startOfDayWib = (date: Date): Date => {
-  const w = toWib(date);
-  w.setUTCHours(0, 0, 0, 0);
-  return w;
-};
-
-/** End-of-day (23:59:59.999) in WIB for a given Date. */
-const endOfDayWib = (date: Date): Date => {
-  const w = toWib(date);
-  w.setUTCHours(23, 59, 59, 999);
-  return w;
-};
-
-/**
- * Number of whole days between two Dates (absolute).
- * Used for period arithmetic.
- */
-const dayDiff = (a: Date, b: Date): number =>
-  Math.floor((b.getTime() - a.getTime()) / (24 * 60 * 60 * 1000));
-
-// ---------------------------------------------------------------------------
-// formatRupiah
-// ---------------------------------------------------------------------------
-
-/**
- * Format a number as Indonesian Rupiah.
- * "Rp" + amount rounded, locale-id-ID grouping.
- */
 export function formatRupiah(amount: number): string {
   const rounded = Math.round(amount);
   return 'Rp' + rounded.toLocaleString('id-ID');
