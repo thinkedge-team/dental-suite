@@ -23,7 +23,7 @@ async function main() {
       moduleGrow: true,
       moduleConnect: true,
       moduleOperate: true,
-      moduleIntelligence: false,
+      moduleIntelligence: true,
     },
   });
 
@@ -504,6 +504,195 @@ async function main() {
     });
   }
   console.log('Approval requests seeding complete!');
+
+  const existingVisitsCount = await prisma.visit.count({
+    where: { organizationId: org.id },
+  });
+
+  if (existingVisitsCount === 0) {
+    console.log('Seeding historical visits for INTELLIGENCE module...');
+    const allServices = await prisma.service.findMany({
+      where: { organizationId: org.id },
+    });
+    const sPembersihan = allServices.find((s) => s.slug === 'pembersihan-gigi');
+    const sPenambalan = allServices.find((s) => s.slug === 'penambalan-gigi');
+    const sPemutihan = allServices.find((s) => s.slug === 'pemutihan-gigi');
+    const sCabut = allServices.find((s) => s.slug === 'cabut-gigi');
+    const sKonsultasi = allServices.find((s) => s.slug === 'konsultasi');
+
+    const historicalPatients = [
+      { name: 'Dewi Lestari', phone: '08123456701' },
+      { name: 'Agus Setiawan', phone: '08123456702' },
+      { name: 'Maya Anggraini', phone: '08123456703' },
+      { name: 'Hendro Kusumo', phone: '08123456704' },
+      { name: 'Ratna Paramita', phone: '08123456705' },
+      { name: 'Bambang Soediro', phone: '08123456706' },
+      { name: 'Farah Quinn', phone: '08123456707' },
+      { name: 'Doni Pratama', phone: '08123456708' },
+      { name: 'Linda Kurnia', phone: '08123456709' },
+      { name: 'Rudy Hartono', phone: '08123456710' },
+      { name: 'Siti Rahma', phone: '08123456711' },
+      { name: 'Yusuf Mansur', phone: '08123456712' },
+    ];
+
+    const visitTemplates = [
+      {
+        daysAgo: 28,
+        patientIdx: 0,
+        doctor: doctorAndi,
+        branch: branch1,
+        service: sPembersihan,
+        amount: 250000,
+        method: 'QRIS',
+        notes: 'Pembersihan karang gigi regio anterior dan posterior.',
+      },
+      {
+        daysAgo: 25,
+        patientIdx: 1,
+        doctor: doctorSarah,
+        branch: branch1,
+        service: sPenambalan,
+        amount: 450000,
+        method: 'DEBIT',
+        notes: 'Tambal komposit gigi 36.',
+      },
+      {
+        daysAgo: 22,
+        patientIdx: 2,
+        doctor: doctorBudi,
+        branch: branch2,
+        service: sPemutihan,
+        amount: 800000,
+        method: 'QRIS',
+        notes: 'Scaling dan bleaching in-office estetika.',
+      },
+      {
+        daysAgo: 19,
+        patientIdx: 3,
+        doctor: doctorAndi,
+        branch: branch1,
+        service: sCabut,
+        amount: 450000,
+        method: 'CASH',
+        notes: 'Ekstraksi gigi molar 3 bungsu persistensi.',
+      },
+      {
+        daysAgo: 16,
+        patientIdx: 4,
+        doctor: doctorSarah,
+        branch: branch2,
+        service: sPenambalan,
+        amount: 800000,
+        method: 'INSURANCE',
+        notes: 'Tambal kelas II MO gigi 46 dan aplikasi fluoride.',
+      },
+      {
+        daysAgo: 13,
+        patientIdx: 5,
+        doctor: doctorBudi,
+        branch: branch1,
+        service: sPembersihan,
+        amount: 250000,
+        method: 'QRIS',
+        notes: 'Scaling dan polishing tuntas tanpa komplikasi.',
+      },
+      {
+        daysAgo: 10,
+        patientIdx: 6,
+        doctor: doctorSarah,
+        branch: branch1,
+        service: sPemutihan,
+        amount: 1500000,
+        method: 'DEBIT',
+        notes: 'Paket whitening komprehensif dua rahang.',
+      },
+      {
+        daysAgo: 8,
+        patientIdx: 7,
+        doctor: doctorAndi,
+        branch: branch2,
+        service: sPenambalan,
+        amount: 450000,
+        method: 'QRIS',
+        notes: 'Tambal komposit estetik insisivus atas.',
+      },
+      {
+        daysAgo: 5,
+        patientIdx: 8,
+        doctor: doctorBudi,
+        branch: branch1,
+        service: sCabut,
+        amount: 300000,
+        method: 'CASH',
+        notes: 'Pencabutan akar gigi gangren radiks.',
+      },
+      {
+        daysAgo: 4,
+        patientIdx: 9,
+        doctor: doctorSarah,
+        branch: branch1,
+        service: sPembersihan,
+        amount: 250000,
+        method: 'QRIS',
+        notes: 'Scaling profilaksis berkala enam bulanan.',
+      },
+      {
+        daysAgo: 2,
+        patientIdx: 10,
+        doctor: doctorAndi,
+        branch: branch2,
+        service: sPemutihan,
+        amount: 2500000,
+        method: 'INSURANCE',
+        notes: 'Restorasi veneer komposit direct 4 gigi anterior.',
+      },
+      {
+        daysAgo: 1,
+        patientIdx: 11,
+        doctor: doctorSarah,
+        branch: branch1,
+        service: sKonsultasi,
+        amount: 250000,
+        method: 'DEBIT',
+        notes: 'Konsultasi rencana ortodonti dan rontgen panoramik.',
+      },
+    ];
+
+    for (const v of visitTemplates) {
+      const pData = historicalPatients[v.patientIdx];
+      const patient = await prisma.patient.upsert({
+        where: {
+          organizationId_phone: {
+            organizationId: org.id,
+            phone: pData.phone,
+          },
+        },
+        update: { name: pData.name },
+        create: {
+          organizationId: org.id,
+          name: pData.name,
+          phone: pData.phone,
+        },
+      });
+
+      const createdAt = new Date(Date.now() - v.daysAgo * 86_400_000);
+
+      await prisma.visit.create({
+        data: {
+          organizationId: org.id,
+          branchId: v.branch.id,
+          patientId: patient.id,
+          doctorId: v.doctor.id,
+          serviceId: v.service?.id,
+          paymentAmount: v.amount,
+          paymentMethod: v.method,
+          notes: v.notes,
+          createdAt,
+        },
+      });
+    }
+    console.log('Historical visits seeding complete!');
+  }
 
   console.log('\nDemo accounts:');
   console.log('  Director: director@demo.com / demo123456');
