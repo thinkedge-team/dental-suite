@@ -45,6 +45,7 @@ function parseWibDayBounds(startDateStr: string, endDateStr: string): { start: D
 type ActionContext = {
   session: {
     user: {
+      id?: string;
       organizationId: string;
       role: "SUPER_ADMIN" | "DIRECTOR" | "MANAGER" | "STAFF" | "DOCTOR";
       branchId?: string | null;
