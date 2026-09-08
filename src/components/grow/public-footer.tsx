@@ -156,6 +156,10 @@ export function PublicFooter() {
         <div className="mt-12 pt-6 border-t border-border/60 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-muted-foreground">
           <p>© 2026 Klinik Gigi Senyum Sehat. Powered by Think Edge Dental Suite.</p>
           <div className="flex items-center gap-4 text-[11px]">
+            <Link href="/tentang" className="hover:text-foreground transition-colors">
+              Tentang Kami
+            </Link>
+            <span>•</span>
             <Link href="/asuransi" className="hover:text-foreground transition-colors">
               Mitra Asuransi
             </Link>

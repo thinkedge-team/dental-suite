@@ -11,6 +11,7 @@ const NAV_LINKS = [
   { href: "/dokter", label: "Dokter" },
   { href: "/lokasi", label: "Cabang & Lokasi" },
   { href: "/asuransi", label: "Mitra Asuransi" },
+  { href: "/tentang", label: "Tentang Kami" },
 ];
 
 export function PublicHeader() {
