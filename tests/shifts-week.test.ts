@@ -1,5 +1,3 @@
-/// <reference types="vitest" />
-
 import { describe, it, expect } from "vitest";
 
 const WIB_OFFSET_HOURS = 7;

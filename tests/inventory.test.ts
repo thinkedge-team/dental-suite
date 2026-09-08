@@ -1,5 +1,3 @@
-/// <reference types="vitest" />
-
 import { describe, it, expect, vi } from "vitest";
 
 vi.mock("@/auth", () => ({

@@ -229,8 +229,7 @@ async function main() {
   console.log('Seeding users across all roles...');
   const hashedPassword = await bcrypt.hash('demo123456', 12);
 
-  // SUPER_ADMIN
-  const superAdmin = await prisma.user.upsert({
+  await prisma.user.upsert({
     where: { email: 'superadmin@demo.com' },
     update: { organizationId: org.id, role: Role.SUPER_ADMIN, isActive: true },
     create: {
@@ -243,8 +242,7 @@ async function main() {
     },
   });
 
-  // DIRECTOR
-  const director = await prisma.user.upsert({
+  await prisma.user.upsert({
     where: { email: 'director@demo.com' },
     update: { organizationId: org.id, role: Role.DIRECTOR, isActive: true },
     create: {
@@ -356,8 +354,7 @@ async function main() {
     },
   });
 
-  // DOCTOR USERS
-  const docUser1 = await prisma.user.upsert({
+  await prisma.user.upsert({
     where: { email: 'doctor.andi@demo.com' },
     update: { organizationId: org.id, branchId: branch1.id, role: Role.DOCTOR, isActive: true },
     create: {
@@ -371,7 +368,7 @@ async function main() {
     },
   });
 
-  const docUser2 = await prisma.user.upsert({
+  await prisma.user.upsert({
     where: { email: 'doctor.sarah@demo.com' },
     update: { organizationId: org.id, branchId: branch2.id, role: Role.DOCTOR, isActive: true },
     create: {
@@ -385,7 +382,7 @@ async function main() {
     },
   });
 
-  const docUser3 = await prisma.user.upsert({
+  await prisma.user.upsert({
     where: { email: 'doctor.budi@demo.com' },
     update: { organizationId: org.id, branchId: branch3.id, role: Role.DOCTOR, isActive: true },
     create: {
@@ -399,7 +396,7 @@ async function main() {
     },
   });
 
-  const docUser4 = await prisma.user.upsert({
+  await prisma.user.upsert({
     where: { email: 'doctor.clara@demo.com' },
     update: { organizationId: org.id, branchId: branch3.id, role: Role.DOCTOR, isActive: true },
     create: {
@@ -739,7 +736,7 @@ async function main() {
     },
   ];
 
-  const serviceMap = new Map<string, any>();
+  const serviceMap = new Map<string, { id: string; name: string; slug: string }>();
   for (const s of servicesData) {
     const created = await prisma.service.upsert({
       where: { organizationId_slug: { organizationId: org.id, slug: s.slug } },
@@ -797,7 +794,7 @@ async function main() {
     },
   ];
 
-  const insurerMap = new Map<string, any>();
+  const insurerMap = new Map<string, { id: string; name: string; slug: string }>();
   for (const ins of insurersData) {
     const created = await prisma.insurancePartner.upsert({
       where: { organizationId_slug: { organizationId: org.id, slug: ins.slug } },
@@ -829,7 +826,7 @@ async function main() {
     { name: 'Pasien Berhenti Berlangganan', phone: '08199999992', email: 'deleted@example.com', dob: new Date('1980-01-01'), notes: 'Akun pasien ditutup atas permintaan PDP.', deletedAt: new Date(Date.now() - 7 * 86_400_000) },
   ];
 
-  const patientMap = new Map<string, any>();
+  const patientMap = new Map<string, { id: string; name: string; phone: string }>();
   for (const p of patientPool) {
     const created = await prisma.patient.upsert({
       where: { organizationId_phone: { organizationId: org.id, phone: p.phone } },
@@ -857,17 +854,35 @@ async function main() {
     patientMap.set(p.phone, created);
   }
 
+  function getPatient(phone: string): { id: string; name: string; phone: string } {
+    const p = patientMap.get(phone);
+    if (!p) throw new Error(`Missing patient with phone ${phone}`);
+    return p;
+  }
+
+  function getService(slug: string): { id: string; name: string; slug: string } {
+    const s = serviceMap.get(slug);
+    if (!s) throw new Error(`Missing service with slug ${slug}`);
+    return s;
+  }
+
+  function getInsurer(slug: string): { id: string; name: string; slug: string } {
+    const i = insurerMap.get(slug);
+    if (!i) throw new Error(`Missing insurer with slug ${slug}`);
+    return i;
+  }
+
   // ─── 8. APPOINTMENTS (ALL 5 AppointmentStatus VALUES + VARIATIONS) ───────────
   console.log('Seeding appointments across all 5 statuses (CONFIRMED, CHECKED_IN, COMPLETED, CANCELLED, NO_SHOW)...');
 
   // Today Appointments (Kelapa Gading - Branch 1)
   // Ensure the earliest appointment is CONFIRMED for E2E Receptionist check-in / complete workflow
-  const aptTodayConfirmed1 = await prisma.appointment.create({
+  await prisma.appointment.create({
     data: {
       organizationId: org.id,
       branchId: branch1.id,
       doctorId: doctorAndi.id,
-      patientId: patientMap.get('08111111111').id,
+      patientId: getPatient('08111111111')!.id,
       patientName: 'Sarah Wijaya',
       patientPhone: '08111111111',
       service: 'Pembersihan Gigi (Scaling Ultrasonic)',
@@ -881,12 +896,12 @@ async function main() {
     },
   });
 
-  const aptTodayCheckedIn1 = await prisma.appointment.create({
+  await prisma.appointment.create({
     data: {
       organizationId: org.id,
       branchId: branch1.id,
       doctorId: doctorAndi.id,
-      patientId: patientMap.get('08222222222').id,
+      patientId: getPatient('08222222222')!.id,
       patientName: 'Budi Santoso',
       patientPhone: '08222222222',
       service: 'Konsultasi & Pemeriksaan Gigi',
@@ -904,7 +919,7 @@ async function main() {
       organizationId: org.id,
       branchId: branch1.id,
       doctorId: doctorAndi.id,
-      patientId: patientMap.get('08333333333').id,
+      patientId: getPatient('08333333333').id,
       patientName: 'Rina Kartika',
       patientPhone: '08333333333',
       service: 'Penambalan Gigi Estetis Komposit',
@@ -923,9 +938,9 @@ async function main() {
       organizationId: org.id,
       branchId: branch1.id,
       doctorId: doctorAndi.id,
-      patientId: patientMap.get('08333333333').id,
+      patientId: getPatient('08333333333').id,
       appointmentId: aptTodayCompleted1.id,
-      serviceId: serviceMap.get('penambalan-gigi').id,
+      serviceId: getService('penambalan-gigi').id,
       paymentAmount: 550000,
       paymentMethod: 'QRIS',
       notes: 'Penambalan kelas I komposit pada gigi 46 tuntas tanpa komplikasi.',
@@ -939,7 +954,7 @@ async function main() {
       organizationId: org.id,
       branchId: branch1.id,
       doctorId: doctorBudi.id,
-      patientId: patientMap.get('08444444444').id,
+      patientId: getPatient('08444444444').id,
       patientName: 'Anton Prabowo',
       patientPhone: '08444444444',
       service: 'Cabut Gigi & Odontektomi Gigi Bungsu',
@@ -958,7 +973,7 @@ async function main() {
       organizationId: org.id,
       branchId: branch1.id,
       doctorId: doctorClara.id,
-      patientId: patientMap.get('08555555555').id,
+      patientId: getPatient('08555555555').id,
       patientName: 'Jessica Wong',
       patientPhone: '08555555555',
       service: 'Pasang Kawat Gigi Ortodonti Metal',
@@ -976,12 +991,12 @@ async function main() {
       organizationId: org.id,
       branchId: branch1.id,
       doctorId: doctorAndi.id,
-      patientId: patientMap.get('08199999991').id,
+      patientId: getPatient('08199999991').id,
       patientName: 'Pasien Walk-in Anonim',
       patientPhone: '08199999991',
       service: 'Pembersihan Gigi (Scaling Ultrasonic)',
       reasonForVisit: 'Pembersihan karang gigi darurat.',
-      insurancePartnerId: insurerMap.get('admedika').id,
+      insurancePartnerId: getInsurer('admedika').id,
       status: AppointmentStatus.CONFIRMED,
       scheduledAt: wibDate(0, 14, 0),
       walkin: true,
@@ -994,14 +1009,14 @@ async function main() {
       organizationId: org.id,
       branchId: branch2.id,
       doctorId: doctorSarah.id,
-      patientId: patientMap.get('08666666666').id,
+      patientId: getPatient('08666666666').id,
       patientName: 'Michael Tan',
       patientPhone: '08666666666',
       service: 'Pemutihan Gigi Profesional (Bleaching)',
       status: AppointmentStatus.CONFIRMED,
       scheduledAt: wibDate(0, 11, 0),
       walkin: false,
-      insurancePartnerId: insurerMap.get('prudential').id,
+      insurancePartnerId: getInsurer('prudential').id,
       cancelToken: 'token-cancel-michael-6',
     },
   });
@@ -1011,7 +1026,7 @@ async function main() {
       organizationId: org.id,
       branchId: branch2.id,
       doctorId: doctorSarah.id,
-      patientId: patientMap.get('08777777777').id,
+      patientId: getPatient('08777777777').id,
       patientName: 'Hendra Gunawan',
       patientPhone: '08777777777',
       service: 'Pembersihan Gigi (Scaling Ultrasonic)',
@@ -1028,7 +1043,7 @@ async function main() {
       organizationId: org.id,
       branchId: branch2.id,
       doctorId: doctorBudi.id,
-      patientId: patientMap.get('08123456701').id,
+      patientId: getPatient('08123456701').id,
       patientName: 'Dewi Lestari',
       patientPhone: '08123456701',
       service: 'Cabut Gigi & Odontektomi Gigi Bungsu',
@@ -1045,7 +1060,7 @@ async function main() {
       organizationId: org.id,
       branchId: branch2.id,
       doctorId: doctorSarah.id,
-      patientId: patientMap.get('08123456706').id,
+      patientId: getPatient('08123456706').id,
       patientName: 'Bambang Soediro',
       patientPhone: '08123456706',
       service: 'Pemutihan Gigi Profesional (Bleaching)',
@@ -1063,7 +1078,7 @@ async function main() {
       organizationId: org.id,
       branchId: branch2.id,
       doctorId: doctorSarah.id,
-      patientId: patientMap.get('08123456705').id,
+      patientId: getPatient('08123456705').id,
       patientName: 'Ratna Paramita',
       patientPhone: '08123456705',
       service: 'Penambalan Gigi Estetis Komposit',
@@ -1079,12 +1094,12 @@ async function main() {
       organizationId: org.id,
       branchId: branch2.id,
       doctorId: doctorBudi.id,
-      patientId: patientMap.get('08199999991').id,
+      patientId: getPatient('08199999991').id,
       patientName: 'Pasien Walk-in Pluit',
       patientPhone: '08199999991',
       service: 'Cabut Gigi & Odontektomi Gigi Bungsu',
       reasonForVisit: 'Sakit gigi bungsu akut datang langsung.',
-      insurancePartnerId: insurerMap.get('mandiri-inhealth').id,
+      insurancePartnerId: getInsurer('mandiri-inhealth').id,
       status: AppointmentStatus.CONFIRMED,
       scheduledAt: wibDate(0, 16, 30),
       walkin: true,
@@ -1096,7 +1111,7 @@ async function main() {
       organizationId: org.id,
       branchId: branch3.id,
       doctorId: doctorClara.id,
-      patientId: patientMap.get('08123456707').id,
+      patientId: getPatient('08123456707').id,
       patientName: 'Farah Quinn',
       patientPhone: '08123456707',
       service: 'Pemutihan Gigi Profesional (Bleaching)',
@@ -1113,9 +1128,9 @@ async function main() {
       organizationId: org.id,
       branchId: branch3.id,
       doctorId: doctorClara.id,
-      patientId: patientMap.get('08123456707').id,
+      patientId: getPatient('08123456707').id,
       appointmentId: aptSenopatiCompleted.id,
-      serviceId: serviceMap.get('pemutihan-gigi').id,
+      serviceId: getService('pemutihan-gigi').id,
       paymentAmount: 1800000,
       paymentMethod: 'DEBIT',
       notes: 'In-office whitening treatment di Senopati tuntas dan memuaskan.',
@@ -1128,7 +1143,7 @@ async function main() {
       organizationId: org.id,
       branchId: branch3.id,
       doctorId: doctorBudi.id,
-      patientId: patientMap.get('08123456702').id,
+      patientId: getPatient('08123456702').id,
       patientName: 'Agus Setiawan',
       patientPhone: '08123456702',
       service: 'Implan Gigi Titanium Presisi',
@@ -1145,7 +1160,7 @@ async function main() {
       organizationId: org.id,
       branchId: branch3.id,
       doctorId: doctorClara.id,
-      patientId: patientMap.get('08123456703').id,
+      patientId: getPatient('08123456703').id,
       patientName: 'Maya Anggraini',
       patientPhone: '08123456703',
       service: 'Pasang Kawat Gigi Ortodonti Metal',
@@ -1162,7 +1177,7 @@ async function main() {
       organizationId: org.id,
       branchId: branch3.id,
       doctorId: doctorClara.id,
-      patientId: patientMap.get('08123456704').id,
+      patientId: getPatient('08123456704').id,
       patientName: 'Hendro Kusumo',
       patientPhone: '08123456704',
       service: 'Konsultasi & Pemeriksaan Gigi',
@@ -1179,7 +1194,7 @@ async function main() {
       organizationId: org.id,
       branchId: branch3.id,
       doctorId: doctorBudi.id,
-      patientId: patientMap.get('08444444444').id,
+      patientId: getPatient('08444444444').id,
       patientName: 'Anton Prabowo',
       patientPhone: '08444444444',
       service: 'Cabut Gigi & Odontektomi Gigi Bungsu',
@@ -1195,12 +1210,12 @@ async function main() {
       organizationId: org.id,
       branchId: branch3.id,
       doctorId: doctorClara.id,
-      patientId: patientMap.get('08199999991').id,
+      patientId: getPatient('08199999991').id,
       patientName: 'Pasien Walk-in Senopati',
       patientPhone: '08199999991',
       service: 'Pembersihan Gigi (Scaling Ultrasonic)',
       reasonForVisit: 'Pembersihan karang gigi darurat sebelum tugas kantor.',
-      insurancePartnerId: insurerMap.get('bca-life').id,
+      insurancePartnerId: getInsurer('bca-life').id,
       status: AppointmentStatus.CONFIRMED,
       scheduledAt: wibDate(0, 17, 0),
       walkin: true,
@@ -1213,7 +1228,7 @@ async function main() {
       organizationId: org.id,
       branchId: branch1.id,
       doctorId: doctorAndi.id,
-      patientId: patientMap.get('08123456702').id,
+      patientId: getPatient('08123456702').id,
       patientName: 'Agus Setiawan',
       patientPhone: '08123456702',
       service: 'Penambalan Gigi Estetis Komposit',
@@ -1229,7 +1244,7 @@ async function main() {
       organizationId: org.id,
       branchId: branch2.id,
       doctorId: doctorSarah.id,
-      patientId: patientMap.get('08123456703').id,
+      patientId: getPatient('08123456703').id,
       patientName: 'Maya Anggraini',
       patientPhone: '08123456703',
       service: 'Perawatan Saluran Akar (Endodontik)',
@@ -1248,7 +1263,7 @@ async function main() {
         organizationId: org.id,
         branchId: d % 2 === 0 ? branch1.id : branch2.id,
         doctorId: d % 2 === 0 ? doctorAndi.id : doctorSarah.id,
-        patientId: patientMap.get('08123456704').id,
+        patientId: getPatient('08123456704').id,
         patientName: 'Hendro Kusumo',
         patientPhone: '08123456704',
         service: 'Pembersihan Gigi (Scaling Ultrasonic)',
@@ -1264,9 +1279,9 @@ async function main() {
         organizationId: org.id,
         branchId: d % 2 === 0 ? branch1.id : branch2.id,
         doctorId: d % 2 === 0 ? doctorAndi.id : doctorSarah.id,
-        patientId: patientMap.get('08123456704').id,
+        patientId: getPatient('08123456704').id,
         appointmentId: pastCompletedApt.id,
-        serviceId: serviceMap.get('pembersihan-gigi').id,
+        serviceId: getService('pembersihan-gigi').id,
         paymentAmount: 350000,
         paymentMethod: d % 3 === 0 ? 'INSURANCE' : d % 2 === 0 ? 'QRIS' : 'DEBIT',
         notes: 'Pembersihan karang gigi rutin berkala tuntas.',
@@ -1281,7 +1296,7 @@ async function main() {
           organizationId: org.id,
           branchId: branch1.id,
           doctorId: doctorBudi.id,
-          patientId: patientMap.get('08123456705').id,
+          patientId: getPatient('08123456705').id,
           patientName: 'Ratna Paramita',
           patientPhone: '08123456705',
           service: 'Konsultasi & Pemeriksaan Gigi',
@@ -1299,7 +1314,7 @@ async function main() {
           organizationId: org.id,
           branchId: branch2.id,
           doctorId: doctorSarah.id,
-          patientId: patientMap.get('08123456706').id,
+          patientId: getPatient('08123456706').id,
           patientName: 'Bambang Soediro',
           patientPhone: '08123456706',
           service: 'Pemutihan Gigi Profesional (Bleaching)',
@@ -2028,7 +2043,6 @@ async function main() {
   // ─── 14. VISITS (INTELLIGENCE MODULE & REVENUE ANALYTICS) ────────────────────
   console.log('Seeding rich historical visits across all payment methods (QRIS, CASH, DEBIT, INSURANCE)...');
 
-  const paymentMethods = ['QRIS', 'CASH', 'DEBIT', 'INSURANCE'];
   const historicalVisitsData = [
     { daysAgo: 58, patIdx: '08123456701', doc: doctorAndi, branch: branch1, serv: 'pembersihan-gigi', amt: 350000, meth: 'QRIS', notes: 'Scaling rutin rahang atas dan bawah.' },
     { daysAgo: 54, patIdx: '08123456702', doc: doctorSarah, branch: branch1, serv: 'penambalan-gigi', amt: 550000, meth: 'DEBIT', notes: 'Tambal komposit gigi 36.' },
@@ -2059,8 +2073,8 @@ async function main() {
   ];
 
   for (const v of historicalVisitsData) {
-    const patient = patientMap.get(v.patIdx);
-    const service = serviceMap.get(v.serv);
+    const patient = getPatient(v.patIdx);
+    const service = getService(v.serv);
     const visitDate = wibDate(-v.daysAgo, 11, 30);
 
     await prisma.visit.create({
@@ -2085,8 +2099,8 @@ async function main() {
       organizationId: org.id,
       branchId: branch1.id,
       doctorId: doctorAndi.id,
-      patientId: patientMap.get('08111111111').id,
-      serviceId: serviceMap.get('konsultasi').id,
+      patientId: getPatient('08111111111').id,
+      serviceId: getService('konsultasi').id,
       paymentAmount: 150000,
       paymentMethod: 'CASH',
       notes: 'Kunjungan dibatalkan dan direvisi karena kesalahan billing.',
