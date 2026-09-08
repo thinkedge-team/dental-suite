@@ -57,6 +57,21 @@ export function StepPatient({
             value={form.notes} onChange={(e) => updateField("notes", e.target.value)}
             className={`${inputCls} resize-none`} />
         </div>
+
+        <div className="pt-1">
+          <label htmlFor="patient-consent" className="flex items-start gap-3 cursor-pointer select-none">
+            <input
+              id="patient-consent"
+              type="checkbox"
+              checked={form.consent}
+              onChange={(e) => updateField("consent", e.target.checked)}
+              className="mt-0.5 size-4 rounded border-border text-primary focus:ring-primary/30 cursor-pointer"
+            />
+            <span className="text-xs text-muted-foreground leading-relaxed">
+              Saya menyetujui pemrosesan data pribadi dan riwayat kunjungan untuk keperluan reservasi janji temu klinis sesuai ketentuan UU Pelindungan Data Pribadi (UU PDP No. 27/2022). <span className="text-primary font-bold">*</span>
+            </span>
+          </label>
+        </div>
       </div>
 
       <div className="rounded-xl border border-border/50 bg-muted/30 p-5 space-y-2.5 text-sm">

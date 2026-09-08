@@ -21,6 +21,7 @@ export function BookingWizard({ org, branches, doctors, services }: Props) {
     branchId: "", serviceId: "", doctorId: "",
     date: "", time: "",
     patientName: "", patientPhone: "", patientEmail: "", notes: "",
+    consent: true,
   });
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
@@ -64,6 +65,7 @@ export function BookingWizard({ org, branches, doctors, services }: Props) {
           patientPhone: form.patientPhone.trim(),
           patientEmail: form.patientEmail.trim() || undefined,
           notes: form.notes.trim() || undefined,
+          consent: form.consent,
         }),
       });
       if (res.status === 201) {
@@ -170,7 +172,7 @@ export function BookingWizard({ org, branches, doctors, services }: Props) {
             updateField={updateField}
             submitting={submitting}
             submitError={submitError}
-            canSubmit={form.patientName.trim().length > 0 && form.patientPhone.trim().length >= 8}
+            canSubmit={form.patientName.trim().length > 0 && form.patientPhone.trim().length >= 8 && form.consent}
             onSubmit={handleSubmit}
             onBack={goBack}
           />

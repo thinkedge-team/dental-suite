@@ -47,6 +47,12 @@ test.describe("Patient Booking and Self-Service Cancellation Journey", () => {
     await page.fill("#patient-name", patientName);
     await page.fill("#patient-phone", patientPhone);
     await page.fill("#patient-notes", notes);
+    const consentCheckbox = page.locator("#patient-consent");
+    if (await consentCheckbox.isVisible()) {
+      if (!(await consentCheckbox.isChecked())) {
+        await consentCheckbox.check();
+      }
+    }
 
     const submitBookingButton = page.locator('button:has-text("Konfirmasi Janji"), button:has-text("Kirim Reservasi Janji Temu")');
     await expect(submitBookingButton).toBeEnabled();

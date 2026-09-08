@@ -104,6 +104,7 @@ interface BookingBody {
   readonly patientPhone: string;
   readonly patientEmail?: string;
   readonly notes?: string;
+  readonly consent?: boolean;
 }
 
 type ParseResult =
@@ -125,6 +126,7 @@ function parseBookingBody(body: unknown): ParseResult {
   const serviceId = fields.get("serviceId");
   const patientEmail = fields.get("patientEmail");
   const notes = fields.get("notes");
+  const consent = fields.get("consent");
 
   if (
     typeof orgSlug !== "string" ||
@@ -149,9 +151,10 @@ function parseBookingBody(body: unknown): ParseResult {
     (doctorId !== undefined && typeof doctorId !== "string") ||
     (serviceId !== undefined && typeof serviceId !== "string") ||
     (patientEmail !== undefined && typeof patientEmail !== "string") ||
-    (notes !== undefined && typeof notes !== "string")
+    (notes !== undefined && typeof notes !== "string") ||
+    (consent !== undefined && typeof consent !== "boolean")
   ) {
-    return { ok: false, error: "Optional fields must be strings" };
+    return { ok: false, error: "Invalid optional field types" };
   }
 
   return {
@@ -166,6 +169,7 @@ function parseBookingBody(body: unknown): ParseResult {
       serviceId,
       patientEmail,
       notes,
+      consent,
     },
   };
 }
@@ -199,7 +203,15 @@ export async function POST(request: Request): Promise<Response> {
     patientPhone,
     patientEmail,
     notes,
+    consent,
   } = parsed.value;
+
+  if (consent === false) {
+    return Response.json(
+      { error: "Persetujuan pemrosesan data pribadi (UU PDP) wajib disetujui" },
+      { status: 400 },
+    );
+  }
 
   const trimmedName = patientName.trim();
   if (trimmedName.length < 2 || trimmedName.length > 100) {
@@ -319,6 +331,7 @@ export async function POST(request: Request): Promise<Response> {
       }
     }
 
+    const now = new Date();
     const patient = await prisma.patient.upsert({
       where: {
         organizationId_phone: {
@@ -326,12 +339,19 @@ export async function POST(request: Request): Promise<Response> {
           phone: cleanPhone,
         },
       },
-      update: {},
+      update: {
+        name: trimmedName,
+        email: patientEmail?.trim() || undefined,
+        consentedAt: now,
+        consentIp: ip,
+      },
       create: {
         organizationId: org.id,
         name: trimmedName,
         phone: cleanPhone,
         email: patientEmail?.trim() || null,
+        consentedAt: now,
+        consentIp: ip,
       },
     });
 

@@ -36,6 +36,7 @@ export interface BookingForm {
   patientPhone: string;
   patientEmail: string;
   notes: string;
+  consent: boolean;
 }
 
 export type Step = 0 | 1 | 2;
