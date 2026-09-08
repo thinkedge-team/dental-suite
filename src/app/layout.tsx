@@ -15,7 +15,11 @@ export const metadata: Metadata = {
     "Satu platform digital untuk jaringan klinik gigi: GROW, CONNECT, OPERATE, INTELLIGENCE.",
 };
 
-export default function RootLayout({ children }: LayoutProps<"/">) {
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
     <html
       lang="id"
