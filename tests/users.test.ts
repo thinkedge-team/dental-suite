@@ -112,7 +112,7 @@ describe("User Management Actions", () => {
     it("rejects existing email", async () => {
       vi.mocked(prisma.user.findUnique).mockResolvedValueOnce({
         id: "existing-u",
-      } as unknown as ReturnType<typeof prisma.user.findUnique>);
+      } as unknown as Awaited<ReturnType<typeof prisma.user.findUnique>>);
 
       const res = await createUser(
         {
@@ -129,8 +129,8 @@ describe("User Management Actions", () => {
 
     it("creates staff user successfully as Director", async () => {
       vi.mocked(prisma.user.findUnique).mockResolvedValueOnce(null);
-      vi.mocked(prisma.branch.findFirst).mockResolvedValueOnce({ id: "b-1" } as unknown as ReturnType<typeof prisma.branch.findFirst>);
-      vi.mocked(prisma.user.create).mockResolvedValueOnce({ id: "new-user-id" } as unknown as ReturnType<typeof prisma.user.create>);
+      vi.mocked(prisma.branch.findFirst).mockResolvedValueOnce({ id: "b-1" } as unknown as Awaited<ReturnType<typeof prisma.branch.findFirst>>);
+      vi.mocked(prisma.user.create).mockResolvedValueOnce({ id: "new-user-id" } as unknown as Awaited<ReturnType<typeof prisma.user.create>>);
 
       const res = await createUser(
         {
@@ -154,7 +154,7 @@ describe("User Management Actions", () => {
         role: Role.DIRECTOR,
         branchId: null,
         isActive: true,
-      } as unknown as ReturnType<typeof prisma.user.findFirst>);
+      } as unknown as Awaited<ReturnType<typeof prisma.user.findFirst>>);
 
       const res = await updateUser(
         "u1",
@@ -171,7 +171,7 @@ describe("User Management Actions", () => {
         role: Role.DIRECTOR,
         branchId: null,
         isActive: true,
-      } as unknown as ReturnType<typeof prisma.user.findFirst>);
+      } as unknown as Awaited<ReturnType<typeof prisma.user.findFirst>>);
 
       vi.mocked(prisma.user.count).mockResolvedValueOnce(1);
 
@@ -190,9 +190,9 @@ describe("User Management Actions", () => {
         role: Role.STAFF,
         branchId: "b-1",
         isActive: true,
-      } as unknown as ReturnType<typeof prisma.user.findFirst>);
+      } as unknown as Awaited<ReturnType<typeof prisma.user.findFirst>>);
 
-      vi.mocked(prisma.user.update).mockResolvedValueOnce({ id: "u-staff" } as unknown as ReturnType<typeof prisma.user.update>);
+      vi.mocked(prisma.user.update).mockResolvedValueOnce({ id: "u-staff" } as unknown as Awaited<ReturnType<typeof prisma.user.update>>);
 
       const res = await updateUser(
         "u-staff",
@@ -208,16 +208,16 @@ describe("User Management Actions", () => {
       vi.mocked(prisma.user.findFirst).mockResolvedValueOnce({
         id: "u-target",
         isActive: true,
-      } as unknown as ReturnType<typeof prisma.user.findFirst>);
+      } as unknown as Awaited<ReturnType<typeof prisma.user.findFirst>>);
 
       vi.mocked(prisma.user.findFirst).mockResolvedValueOnce({
         id: "u-target",
         role: Role.STAFF,
         branchId: "b-1",
         isActive: true,
-      } as unknown as ReturnType<typeof prisma.user.findFirst>);
+      } as unknown as Awaited<ReturnType<typeof prisma.user.findFirst>>);
 
-      vi.mocked(prisma.user.update).mockResolvedValueOnce({ id: "u-target" } as unknown as ReturnType<typeof prisma.user.update>);
+      vi.mocked(prisma.user.update).mockResolvedValueOnce({ id: "u-target" } as unknown as Awaited<ReturnType<typeof prisma.user.update>>);
 
       const res = await toggleUserActive("u-target", {
         session: { user: { id: "dir-1", organizationId: "org-1", role: "DIRECTOR" } },

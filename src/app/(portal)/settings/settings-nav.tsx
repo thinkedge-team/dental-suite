@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { User, ShieldCheck, Building2 } from "lucide-react";
+import { User, ShieldCheck, Building2, Users } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 
@@ -33,6 +33,13 @@ export function SettingsNav({ isDirector }: SettingsNavProps) {
       label: "Klinik & Lisensi",
       badge: "Enterprise",
       icon: Building2,
+      visible: isDirector,
+    },
+    {
+      href: "/settings/users",
+      label: "Staf & Akses",
+      badge: "Tim",
+      icon: Users,
       visible: isDirector,
     },
   ];
