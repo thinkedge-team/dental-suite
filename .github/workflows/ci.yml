@@ -29,6 +29,7 @@ jobs:
 
     env:
       DATABASE_URL: postgresql://dental:dental@localhost:5432/dental_suite_test
+      DIRECT_URL: postgresql://dental:dental@localhost:5432/dental_suite_test
       AUTH_SECRET: ci-secret-32-chars-minimum-length-ok-x
       NEXTAUTH_URL: http://localhost:3000
       SKIP_ENV_VALIDATION: true
