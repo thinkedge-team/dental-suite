@@ -32,10 +32,10 @@ test.describe("Patient Booking and Self-Service Cancellation Journey", () => {
 
     await page.click('button:has-text("Lanjutkan")');
 
-    // 3. Step 2: Select an available date card from the 14-day carousel and a time slot chip
     const dateCarouselButtons = page.locator('div:has-text("Pilih Tanggal Kunjungan") + div button:not([disabled])');
     await expect(dateCarouselButtons.first()).toBeVisible();
-    await dateCarouselButtons.first().click();
+    const futureDateButton = (await dateCarouselButtons.count()) > 1 ? dateCarouselButtons.nth(1) : dateCarouselButtons.first();
+    await futureDateButton.click();
 
     const timeSlotChip = page.locator('button:has-text(":")').first();
     await expect(timeSlotChip).toBeVisible();

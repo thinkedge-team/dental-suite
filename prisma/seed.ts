@@ -257,7 +257,6 @@ async function main() {
     },
   });
 
-  // MANAGERS (Branch Kelapa Gading and Branch Pluit)
   const manager1 = await prisma.user.upsert({
     where: { email: 'manager@demo.com' },
     update: { organizationId: org.id, branchId: branch1.id, role: Role.MANAGER, isActive: true },
@@ -286,7 +285,20 @@ async function main() {
     },
   });
 
-  // STAFF (Branch Kelapa Gading and Branch Pluit)
+  const manager3 = await prisma.user.upsert({
+    where: { email: 'manager.senopati@demo.com' },
+    update: { organizationId: org.id, branchId: branch3.id, role: Role.MANAGER, isActive: true },
+    create: {
+      organizationId: org.id,
+      branchId: branch3.id,
+      name: 'Indra Pratama',
+      email: 'manager.senopati@demo.com',
+      passwordHash: hashedPassword,
+      role: Role.MANAGER,
+      isActive: true,
+    },
+  });
+
   const staff1 = await prisma.user.upsert({
     where: { email: 'staff@demo.com' },
     update: { organizationId: org.id, branchId: branch1.id, role: Role.STAFF, isActive: true },
@@ -309,6 +321,20 @@ async function main() {
       branchId: branch2.id,
       name: 'Maya Dian',
       email: 'staff.pluit@demo.com',
+      passwordHash: hashedPassword,
+      role: Role.STAFF,
+      isActive: true,
+    },
+  });
+
+  const staff3 = await prisma.user.upsert({
+    where: { email: 'staff.senopati@demo.com' },
+    update: { organizationId: org.id, branchId: branch3.id, role: Role.STAFF, isActive: true },
+    create: {
+      organizationId: org.id,
+      branchId: branch3.id,
+      name: 'Nadia Putri',
+      email: 'staff.senopati@demo.com',
       passwordHash: hashedPassword,
       role: Role.STAFF,
       isActive: true,
@@ -353,6 +379,34 @@ async function main() {
       branchId: branch2.id,
       name: 'drg. Sarah Amanda',
       email: 'doctor.sarah@demo.com',
+      passwordHash: hashedPassword,
+      role: Role.DOCTOR,
+      isActive: true,
+    },
+  });
+
+  const docUser3 = await prisma.user.upsert({
+    where: { email: 'doctor.budi@demo.com' },
+    update: { organizationId: org.id, branchId: branch3.id, role: Role.DOCTOR, isActive: true },
+    create: {
+      organizationId: org.id,
+      branchId: branch3.id,
+      name: 'drg. Budi Hartono',
+      email: 'doctor.budi@demo.com',
+      passwordHash: hashedPassword,
+      role: Role.DOCTOR,
+      isActive: true,
+    },
+  });
+
+  const docUser4 = await prisma.user.upsert({
+    where: { email: 'doctor.clara@demo.com' },
+    update: { organizationId: org.id, branchId: branch3.id, role: Role.DOCTOR, isActive: true },
+    create: {
+      organizationId: org.id,
+      branchId: branch3.id,
+      name: 'drg. Clara Shinta',
+      email: 'doctor.clara@demo.com',
       passwordHash: hashedPassword,
       role: Role.DOCTOR,
       isActive: true,
@@ -507,7 +561,6 @@ async function main() {
       });
     }
 
-    // Branch 1 (Kelapa Gading): Mon, Wed, Fri
     for (const day of [1, 3, 5]) {
       await prisma.schedule.create({
         data: {
@@ -522,7 +575,6 @@ async function main() {
       });
     }
 
-    // Branch 2 (Pluit): Tue, Thu, Sat
     for (const day of [2, 4, 6]) {
       await prisma.schedule.create({
         data: {
@@ -537,18 +589,19 @@ async function main() {
       });
     }
 
-    // Branch 3 (Senopati): Sun
-    await prisma.schedule.create({
-      data: {
-        doctorId: doc.id,
-        branchId: branch3.id,
-        dayOfWeek: 0,
-        startTime: '10:00',
-        endTime: '16:00',
-        slotMinutes: 30,
-        isActive: true,
-      },
-    });
+    for (const day of [0, 1, 4, 6]) {
+      await prisma.schedule.create({
+        data: {
+          doctorId: doc.id,
+          branchId: branch3.id,
+          dayOfWeek: day,
+          startTime: '10:00',
+          endTime: '18:00',
+          slotMinutes: 30,
+          isActive: true,
+        },
+      });
+    }
   }
 
   // Schedule Blocks (Doctor Leave & Clinic Maintenance)
@@ -987,6 +1040,173 @@ async function main() {
     },
   });
 
+  await prisma.appointment.create({
+    data: {
+      organizationId: org.id,
+      branchId: branch2.id,
+      doctorId: doctorSarah.id,
+      patientId: patientMap.get('08123456706').id,
+      patientName: 'Bambang Soediro',
+      patientPhone: '08123456706',
+      service: 'Pemutihan Gigi Profesional (Bleaching)',
+      reasonForVisit: 'Ingin menjadwalkan ulang minggu depan.',
+      status: AppointmentStatus.CANCELLED,
+      scheduledAt: wibDate(0, 10, 0),
+      cancelledAt: wibDate(0, 8, 0),
+      cancelToken: 'token-cancel-pluit-bambang',
+      walkin: false,
+    },
+  });
+
+  await prisma.appointment.create({
+    data: {
+      organizationId: org.id,
+      branchId: branch2.id,
+      doctorId: doctorSarah.id,
+      patientId: patientMap.get('08123456705').id,
+      patientName: 'Ratna Paramita',
+      patientPhone: '08123456705',
+      service: 'Penambalan Gigi Estetis Komposit',
+      status: AppointmentStatus.NO_SHOW,
+      scheduledAt: wibDate(0, 13, 0),
+      walkin: false,
+      cancelToken: 'token-cancel-pluit-ratna',
+    },
+  });
+
+  await prisma.appointment.create({
+    data: {
+      organizationId: org.id,
+      branchId: branch2.id,
+      doctorId: doctorBudi.id,
+      patientId: patientMap.get('08199999991').id,
+      patientName: 'Pasien Walk-in Pluit',
+      patientPhone: '08199999991',
+      service: 'Cabut Gigi & Odontektomi Gigi Bungsu',
+      reasonForVisit: 'Sakit gigi bungsu akut datang langsung.',
+      insurancePartnerId: insurerMap.get('mandiri-inhealth').id,
+      status: AppointmentStatus.CONFIRMED,
+      scheduledAt: wibDate(0, 16, 30),
+      walkin: true,
+    },
+  });
+
+  const aptSenopatiCompleted = await prisma.appointment.create({
+    data: {
+      organizationId: org.id,
+      branchId: branch3.id,
+      doctorId: doctorClara.id,
+      patientId: patientMap.get('08123456707').id,
+      patientName: 'Farah Quinn',
+      patientPhone: '08123456707',
+      service: 'Pemutihan Gigi Profesional (Bleaching)',
+      status: AppointmentStatus.COMPLETED,
+      scheduledAt: wibDate(0, 10, 0),
+      checkInAt: wibDate(0, 9, 50),
+      walkin: false,
+      cancelToken: 'token-cancel-senopati-farah',
+    },
+  });
+
+  await prisma.visit.create({
+    data: {
+      organizationId: org.id,
+      branchId: branch3.id,
+      doctorId: doctorClara.id,
+      patientId: patientMap.get('08123456707').id,
+      appointmentId: aptSenopatiCompleted.id,
+      serviceId: serviceMap.get('pemutihan-gigi').id,
+      paymentAmount: 1800000,
+      paymentMethod: 'DEBIT',
+      notes: 'In-office whitening treatment di Senopati tuntas dan memuaskan.',
+      createdAt: wibDate(0, 10, 50),
+    },
+  });
+
+  await prisma.appointment.create({
+    data: {
+      organizationId: org.id,
+      branchId: branch3.id,
+      doctorId: doctorBudi.id,
+      patientId: patientMap.get('08123456702').id,
+      patientName: 'Agus Setiawan',
+      patientPhone: '08123456702',
+      service: 'Implan Gigi Titanium Presisi',
+      reasonForVisit: 'Konsultasi implant fixture tahap kedua.',
+      status: AppointmentStatus.CONFIRMED,
+      scheduledAt: wibDate(0, 11, 30),
+      walkin: false,
+      cancelToken: 'token-cancel-senopati-agus',
+    },
+  });
+
+  await prisma.appointment.create({
+    data: {
+      organizationId: org.id,
+      branchId: branch3.id,
+      doctorId: doctorClara.id,
+      patientId: patientMap.get('08123456703').id,
+      patientName: 'Maya Anggraini',
+      patientPhone: '08123456703',
+      service: 'Pasang Kawat Gigi Ortodonti Metal',
+      status: AppointmentStatus.CHECKED_IN,
+      scheduledAt: wibDate(0, 14, 0),
+      checkInAt: wibDate(0, 13, 45),
+      walkin: false,
+      cancelToken: 'token-cancel-senopati-maya',
+    },
+  });
+
+  await prisma.appointment.create({
+    data: {
+      organizationId: org.id,
+      branchId: branch3.id,
+      doctorId: doctorClara.id,
+      patientId: patientMap.get('08123456704').id,
+      patientName: 'Hendro Kusumo',
+      patientPhone: '08123456704',
+      service: 'Konsultasi & Pemeriksaan Gigi',
+      status: AppointmentStatus.CANCELLED,
+      scheduledAt: wibDate(0, 15, 0),
+      cancelledAt: wibDate(0, 9, 0),
+      cancelToken: 'token-cancel-senopati-hendro',
+      walkin: false,
+    },
+  });
+
+  await prisma.appointment.create({
+    data: {
+      organizationId: org.id,
+      branchId: branch3.id,
+      doctorId: doctorBudi.id,
+      patientId: patientMap.get('08444444444').id,
+      patientName: 'Anton Prabowo',
+      patientPhone: '08444444444',
+      service: 'Cabut Gigi & Odontektomi Gigi Bungsu',
+      status: AppointmentStatus.NO_SHOW,
+      scheduledAt: wibDate(0, 16, 0),
+      walkin: false,
+      cancelToken: 'token-cancel-senopati-anton',
+    },
+  });
+
+  await prisma.appointment.create({
+    data: {
+      organizationId: org.id,
+      branchId: branch3.id,
+      doctorId: doctorClara.id,
+      patientId: patientMap.get('08199999991').id,
+      patientName: 'Pasien Walk-in Senopati',
+      patientPhone: '08199999991',
+      service: 'Pembersihan Gigi (Scaling Ultrasonic)',
+      reasonForVisit: 'Pembersihan karang gigi darurat sebelum tugas kantor.',
+      insurancePartnerId: insurerMap.get('bca-life').id,
+      status: AppointmentStatus.CONFIRMED,
+      scheduledAt: wibDate(0, 17, 0),
+      walkin: true,
+    },
+  });
+
   // Future Appointments (Tomorrow & 2 Days Ahead)
   await prisma.appointment.create({
     data: {
@@ -1129,9 +1349,20 @@ async function main() {
       },
     });
 
-    // Staff 2 (Pluit) - FULLDAY (09:00 - 20:00 on Weekends) or CUSTOM (10:00 - 16:00 on Weekdays)
+    const m2Shift = await prisma.shift.create({
+      data: {
+        branchId: branch2.id,
+        userId: manager2.id,
+        date: shiftDate,
+        startTime: '09:00',
+        endTime: '17:00',
+        shiftType: 'PAGI',
+        notes: 'Shift Pagi Manager Pluit',
+      },
+    });
+
     const isWeekend = i >= 5;
-    await prisma.shift.create({
+    const s2Shift = await prisma.shift.create({
       data: {
         branchId: branch2.id,
         userId: staff2.id,
@@ -1143,23 +1374,32 @@ async function main() {
       },
     });
 
-    // ─── 10. ATTENDANCE (ALL 4 AttendanceStatus: ON_TIME, LATE, EARLY_LEAVE, PRESENT)
-    // If today: seed live attendance records
-    if (i === daysSinceMonday) {
-      // Manager 1: ON_TIME (Clocked in early at 07:55 for 08:00 shift)
-      await prisma.attendanceRecord.create({
-        data: {
-          branchId: branch1.id,
-          userId: manager1.id,
-          shiftId: mShift.id,
-          date: shiftDate,
-          clockInAt: wibDate(0, 7, 55),
-          status: AttendanceStatus.ON_TIME,
-          notes: 'Hadir tepat waktu sebelum briefing pagi.',
-        },
-      });
+    const m3Shift = await prisma.shift.create({
+      data: {
+        branchId: branch3.id,
+        userId: manager3.id,
+        date: shiftDate,
+        startTime: '10:00',
+        endTime: '18:00',
+        shiftType: 'PAGI',
+        notes: 'Shift Pagi Manager Senopati',
+      },
+    });
 
-      // Staff 1: PRESENT (Clocked in at 13:58 for 14:00 shift, currently on duty)
+    const s3Shift = await prisma.shift.create({
+      data: {
+        branchId: branch3.id,
+        userId: staff3.id,
+        date: shiftDate,
+        startTime: '12:00',
+        endTime: '20:00',
+        shiftType: 'SIANG',
+        notes: 'Shift Siang Estetika Senopati',
+      },
+    });
+
+    // ─── 10. ATTENDANCE (ALL 4 AttendanceStatus: ON_TIME, LATE, EARLY_LEAVE, PRESENT)
+    if (i === daysSinceMonday) {
       await prisma.attendanceRecord.create({
         data: {
           branchId: branch1.id,
@@ -1171,9 +1411,55 @@ async function main() {
           notes: 'Sedang bertugas di meja resepsionis.',
         },
       });
+
+      await prisma.attendanceRecord.create({
+        data: {
+          branchId: branch2.id,
+          userId: manager2.id,
+          shiftId: m2Shift.id,
+          date: shiftDate,
+          clockInAt: wibDate(0, 8, 50),
+          status: AttendanceStatus.ON_TIME,
+          notes: 'Hadir tepat waktu di Cabang Pluit.',
+        },
+      });
+
+      await prisma.attendanceRecord.create({
+        data: {
+          branchId: branch2.id,
+          userId: staff2.id,
+          shiftId: s2Shift.id,
+          date: shiftDate,
+          clockInAt: wibDate(0, 10, 22),
+          status: AttendanceStatus.LATE,
+          notes: 'Terlambat kendala hujan deras dan banjir lokal.',
+        },
+      });
+
+      await prisma.attendanceRecord.create({
+        data: {
+          branchId: branch3.id,
+          userId: manager3.id,
+          shiftId: m3Shift.id,
+          date: shiftDate,
+          clockInAt: wibDate(0, 9, 58),
+          status: AttendanceStatus.PRESENT,
+          notes: 'Sedang mengawasi operasional cabang Senopati.',
+        },
+      });
+
+      await prisma.attendanceRecord.create({
+        data: {
+          branchId: branch3.id,
+          userId: staff3.id,
+          shiftId: s3Shift.id,
+          date: shiftDate,
+          clockInAt: wibDate(0, 11, 52),
+          status: AttendanceStatus.ON_TIME,
+          notes: 'Hadir persiapan jadwal perawatan estetika siang.',
+        },
+      });
     } else if (i < daysSinceMonday) {
-      // Past days in current week:
-      // Day 0: LATE (Clocked in at 08:24 for 08:00 shift)
       if (i === 0) {
         await prisma.attendanceRecord.create({
           data: {
@@ -1187,9 +1473,7 @@ async function main() {
             notes: 'Terlambat akibat kendala kemacetan jalan tol.',
           },
         });
-      }
-      // Day 1: EARLY_LEAVE (Clocked in on time, clocked out at 13:30 due to headache)
-      else if (i === 1) {
+      } else if (i === 1) {
         await prisma.attendanceRecord.create({
           data: {
             branchId: branch1.id,
@@ -1203,7 +1487,6 @@ async function main() {
           },
         });
       } else {
-        // Standard ON_TIME
         await prisma.attendanceRecord.create({
           data: {
             branchId: branch1.id,
@@ -1350,17 +1633,21 @@ async function main() {
     });
   }
 
-  // Pluit Branch Inventory Items
   const pluitInventory = [
     { n: 'Lidocaine HCl 2% + Epinephrine', s: 'MED-LIDO-PLU', st: 18, ms: 15, u: 'ampul', c: 'Anestesi & Farmasi' },
     { n: 'Composite Resin Filtek Z250 A3', s: 'MAT-COMP-A3', st: 8, ms: 5, u: 'syringe', c: 'Bahan Tambal & Restorasi' },
     { n: 'Dental Needle 30G Short', s: 'DISP-NDL-PLU', st: 120, ms: 40, u: 'pcs', c: 'Habis Pakai & Sterilisasi' },
-    { n: 'Latex Examination Gloves S', s: 'DISP-GLV-S-PLU', st: 3, ms: 10, u: 'box', c: 'Habis Pakai & Sterilisasi' }, // Low stock
-    { n: 'Etching Gel 37%', s: 'MAT-ETCH-PLU', st: 0, ms: 5, u: 'syringe', c: 'Bahan Tambal & Restorasi' }, // Out of stock
+    { n: 'Latex Examination Gloves S', s: 'DISP-GLV-S-PLU', st: 3, ms: 10, u: 'box', c: 'Habis Pakai & Sterilisasi' },
+    { n: 'Etching Gel 37%', s: 'MAT-ETCH-PLU', st: 0, ms: 5, u: 'syringe', c: 'Bahan Tambal & Restorasi' },
     { n: 'Bracket Metal MBT 0.022 Kit', s: 'ORTH-BRK-PLU', st: 9, ms: 6, u: 'set', c: 'Ortodonti' },
+    { n: 'Amoxicillin 500mg Kaplet', s: 'MED-AMOX-PLU', st: 40, ms: 20, u: 'strip', c: 'Anestesi & Farmasi' },
+    { n: 'Blade Bisturi No. 15', s: 'SURG-BLD-PLU', st: 20, ms: 15, u: 'pcs', c: 'Instrumen Bedah' },
+    { n: 'Pouch Sterilisasi Autoclave', s: 'STER-PCH-PLU', st: 50, ms: 25, u: 'pcs', c: 'Habis Pakai & Sterilisasi' },
+    { n: 'Saliva Ejector Disposable', s: 'ACC-SAL-PLU', st: 150, ms: 40, u: 'pcs', c: 'Peralatan & Aksesoris' },
   ];
 
-  for (const d of pluitInventory) {
+  for (let idx = 0; idx < pluitInventory.length; idx++) {
+    const d = pluitInventory[idx];
     const item = await prisma.inventoryItem.create({
       data: {
         branchId: branch2.id,
@@ -1378,13 +1665,132 @@ async function main() {
         itemId: item.id,
         userId: manager2.id,
         type: InventoryLogType.RESTOCK,
-        quantity: d.st,
+        quantity: d.st + (idx === 0 ? 5 : 0),
         previousStock: 0,
-        currentStock: d.st,
-        notes: 'Pengiriman stok dari gudang logistik pusat.',
-        createdAt: wibDate(-1, 10, 0),
+        currentStock: d.st + (idx === 0 ? 5 : 0),
+        notes: 'Penerimaan stok logistik cabang Pluit.',
+        createdAt: wibDate(-2, 10, 0),
       },
     });
+
+    if (idx === 0) {
+      await prisma.inventoryLog.create({
+        data: {
+          itemId: item.id,
+          userId: staff2.id,
+          type: InventoryLogType.USAGE,
+          quantity: 3,
+          previousStock: d.st + 5,
+          currentStock: d.st + 2,
+          notes: 'Pemakaian tindakan pencabutan gigi.',
+          createdAt: wibDate(-1, 14, 0),
+        },
+      });
+      await prisma.inventoryLog.create({
+        data: {
+          itemId: item.id,
+          userId: manager2.id,
+          type: InventoryLogType.DAMAGED,
+          quantity: 2,
+          previousStock: d.st + 2,
+          currentStock: d.st,
+          notes: 'Kerusakan ampul akibat suhu penyimpanan.',
+          createdAt: wibDate(0, 8, 30),
+        },
+      });
+      await prisma.inventoryLog.create({
+        data: {
+          itemId: item.id,
+          userId: manager2.id,
+          type: InventoryLogType.ADJUSTMENT,
+          quantity: 0,
+          previousStock: d.st,
+          currentStock: d.st,
+          notes: 'Stock opname harian Pluit cocok.',
+          createdAt: wibDate(0, 11, 0),
+        },
+      });
+    }
+  }
+
+  const senopatiInventory = [
+    { n: 'Ceramic Bracket Roth 0.022 Kit', s: 'ORTH-BRK-SENO', st: 12, ms: 5, u: 'set', c: 'Ortodonti' },
+    { n: 'Opalescence Boost Whitening 40%', s: 'MAT-WHT-SENO', st: 5, ms: 8, u: 'kit', c: 'Bahan Tambal & Restorasi' },
+    { n: 'Titanium Dental Implant Fixture 4.0mm', s: 'SURG-IMP-SENO', st: 8, ms: 4, u: 'pack', c: 'Instrumen Bedah' },
+    { n: 'Lidocaine HCl 2% + Epinephrine', s: 'MED-LIDO-SENO', st: 30, ms: 15, u: 'ampul', c: 'Anestesi & Farmasi' },
+    { n: 'Porcelain Veneer Bonding Kit', s: 'MAT-VNR-SENO', st: 0, ms: 3, u: 'box', c: 'Bahan Tambal & Restorasi' },
+    { n: 'Dental Needle 30G Short', s: 'DISP-NDL-SENO', st: 100, ms: 30, u: 'pcs', c: 'Habis Pakai & Sterilisasi' },
+    { n: 'Nitrile Examination Gloves Lavender M', s: 'DISP-GLV-SENO', st: 15, ms: 8, u: 'box', c: 'Habis Pakai & Sterilisasi' },
+    { n: 'Bone Graft Mineral Matrix 0.5cc', s: 'SURG-BONE-SENO', st: 4, ms: 5, u: 'vial', c: 'Instrumen Bedah' },
+    { n: 'Pouch Sterilisasi Autoclave Premium', s: 'STER-PCH-SENO', st: 90, ms: 30, u: 'pcs', c: 'Habis Pakai & Sterilisasi' },
+    { n: 'Intraoral Camera Sheath Barrier', s: 'ACC-CAM-SENO', st: 2, ms: 10, u: 'box', c: 'Peralatan & Aksesoris' },
+  ];
+
+  for (let idx = 0; idx < senopatiInventory.length; idx++) {
+    const d = senopatiInventory[idx];
+    const item = await prisma.inventoryItem.create({
+      data: {
+        branchId: branch3.id,
+        name: d.n,
+        sku: d.s,
+        stock: d.st,
+        minStock: d.ms,
+        unit: d.u,
+        category: d.c,
+      },
+    });
+
+    await prisma.inventoryLog.create({
+      data: {
+        itemId: item.id,
+        userId: manager3.id,
+        type: InventoryLogType.RESTOCK,
+        quantity: d.st + (idx === 0 ? 4 : 0),
+        previousStock: 0,
+        currentStock: d.st + (idx === 0 ? 4 : 0),
+        notes: 'Penerimaan stok klinik Senopati.',
+        createdAt: wibDate(-2, 11, 0),
+      },
+    });
+
+    if (idx === 0) {
+      await prisma.inventoryLog.create({
+        data: {
+          itemId: item.id,
+          userId: staff3.id,
+          type: InventoryLogType.USAGE,
+          quantity: 2,
+          previousStock: d.st + 4,
+          currentStock: d.st + 2,
+          notes: 'Pemasangan behel estetik keramik pasien VIP.',
+          createdAt: wibDate(-1, 15, 0),
+        },
+      });
+      await prisma.inventoryLog.create({
+        data: {
+          itemId: item.id,
+          userId: manager3.id,
+          type: InventoryLogType.DAMAGED,
+          quantity: 2,
+          previousStock: d.st + 2,
+          currentStock: d.st,
+          notes: 'Slot bracket retak saat inspeksi unboxing.',
+          createdAt: wibDate(0, 9, 30),
+        },
+      });
+      await prisma.inventoryLog.create({
+        data: {
+          itemId: item.id,
+          userId: manager3.id,
+          type: InventoryLogType.ADJUSTMENT,
+          quantity: 0,
+          previousStock: d.st,
+          currentStock: d.st,
+          notes: 'Opname fisik inventaris mingguan Senopati.',
+          createdAt: wibDate(0, 11, 30),
+        },
+      });
+    }
   }
 
   // ─── 13. APPROVAL REQUESTS (ALL 3 TYPES x ALL 3 STATUSES = 9 COMBINATIONS) ───
@@ -1565,6 +1971,60 @@ async function main() {
     },
   });
 
+  await prisma.approvalRequest.create({
+    data: {
+      organizationId: org.id,
+      branchId: branch3.id,
+      requestedById: staff3.id,
+      type: ApprovalType.PROCUREMENT,
+      status: ApprovalStatus.PENDING,
+      payload: {
+        title: 'Pengadaan Clear Aligner Starter Kit',
+        itemName: 'Clear Aligner Thermoforming Sheets',
+        category: 'Ortodonti',
+        quantity: 10,
+        estimatedCost: 3500000,
+        urgency: 'URGENT',
+        notes: 'Pasien VIP Senopati membutuhkan cetakan aligner transparan segera.',
+      },
+    },
+  });
+
+  await prisma.approvalRequest.create({
+    data: {
+      organizationId: org.id,
+      branchId: branch3.id,
+      requestedById: staff3.id,
+      type: ApprovalType.MAINTENANCE,
+      status: ApprovalStatus.APPROVED,
+      reviewNote: 'Disetujui. Service berkala dental chair premium cabang Senopati.',
+      payload: {
+        title: 'Perawatan Rutin Kursi Dental Premium Unit 1',
+        equipmentName: 'Dental Unit Senopati Luxury 1',
+        urgency: 'NORMAL',
+        estimatedCost: 500000,
+        description: 'Pembersihan filter kompresor oli dan pelumasan hidrolik berkala.',
+      },
+    },
+  });
+
+  await prisma.approvalRequest.create({
+    data: {
+      organizationId: org.id,
+      branchId: branch3.id,
+      requestedById: staff3.id,
+      type: ApprovalType.OTHER,
+      status: ApprovalStatus.APPROVED,
+      reviewNote: 'Disetujui untuk meningkatkan standar layanan hospitality klinik Senopati.',
+      payload: {
+        title: 'Pelatihan Hospitality & Komunikasi Pasien VIP',
+        urgency: 'NORMAL',
+        estimatedCost: 1500000,
+        description: 'Workshop singkat komunikasi terapeutik dan pelayanan prima perawat gigi.',
+      },
+    },
+  });
+
   // ─── 14. VISITS (INTELLIGENCE MODULE & REVENUE ANALYTICS) ────────────────────
   console.log('Seeding rich historical visits across all payment methods (QRIS, CASH, DEBIT, INSURANCE)...');
 
@@ -1573,18 +2033,26 @@ async function main() {
     { daysAgo: 58, patIdx: '08123456701', doc: doctorAndi, branch: branch1, serv: 'pembersihan-gigi', amt: 350000, meth: 'QRIS', notes: 'Scaling rutin rahang atas dan bawah.' },
     { daysAgo: 54, patIdx: '08123456702', doc: doctorSarah, branch: branch1, serv: 'penambalan-gigi', amt: 550000, meth: 'DEBIT', notes: 'Tambal komposit gigi 36.' },
     { daysAgo: 50, patIdx: '08123456703', doc: doctorBudi, branch: branch2, serv: 'pemutihan-gigi', amt: 1800000, meth: 'QRIS', notes: 'In-office bleaching estetik.' },
+    { daysAgo: 48, patIdx: '08123456707', doc: doctorClara, branch: branch3, serv: 'pemutihan-gigi', amt: 1800000, meth: 'QRIS', notes: 'Whitening paket eksklusif Senopati.' },
     { daysAgo: 46, patIdx: '08123456704', doc: doctorAndi, branch: branch1, serv: 'cabut-gigi', amt: 750000, meth: 'CASH', notes: 'Ekstraksi gigi molar bungsu.' },
+    { daysAgo: 44, patIdx: '08123456706', doc: doctorBudi, branch: branch3, serv: 'implan-gigi', amt: 12000000, meth: 'DEBIT', notes: 'Pemasangan implan titanium dental unit Senopati.' },
     { daysAgo: 42, patIdx: '08123456705', doc: doctorSarah, branch: branch2, serv: 'saluran-akar', amt: 1200000, meth: 'INSURANCE', notes: 'Pembersihan saluran akar sesi 1.' },
     { daysAgo: 38, patIdx: '08123456706', doc: doctorBudi, branch: branch1, serv: 'pembersihan-gigi', amt: 350000, meth: 'QRIS', notes: 'Scaling dan pembersihan plak.' },
+    { daysAgo: 36, patIdx: '08123456703', doc: doctorClara, branch: branch3, serv: 'kawat-gigi', amt: 6500000, meth: 'INSURANCE', notes: 'Pasang bracket keramik estetik.' },
     { daysAgo: 34, patIdx: '08123456707', doc: doctorSarah, branch: branch1, serv: 'pemutihan-gigi', amt: 1800000, meth: 'DEBIT', notes: 'Bleaching gigi 8 tingkat lebih cerah.' },
     { daysAgo: 30, patIdx: '08111111111', doc: doctorAndi, branch: branch2, serv: 'penambalan-gigi', amt: 550000, meth: 'QRIS', notes: 'Tambal estetik insisivus.' },
+    { daysAgo: 28, patIdx: '08123456702', doc: doctorClara, branch: branch3, serv: 'konsultasi', amt: 150000, meth: 'QRIS', notes: 'Konsultasi ortodonti aligner Senopati.' },
     { daysAgo: 26, patIdx: '08222222222', doc: doctorBudi, branch: branch1, serv: 'cabut-gigi', amt: 750000, meth: 'CASH', notes: 'Pencabutan sisa akar gigi.' },
     { daysAgo: 22, patIdx: '08333333333', doc: doctorSarah, branch: branch1, serv: 'pembersihan-gigi', amt: 350000, meth: 'QRIS', notes: 'Pembersihan karang berkala.' },
+    { daysAgo: 20, patIdx: '08123456701', doc: doctorBudi, branch: branch3, serv: 'cabut-gigi', amt: 750000, meth: 'DEBIT', notes: 'Odontektomi gigi bungsu kanan bawah.' },
     { daysAgo: 18, patIdx: '08444444444', doc: doctorClara, branch: branch2, serv: 'kawat-gigi', amt: 6500000, meth: 'INSURANCE', notes: 'Pemasangan behel metal 2 rahang.' },
+    { daysAgo: 16, patIdx: '08123456705', doc: doctorClara, branch: branch3, serv: 'pembersihan-gigi', amt: 350000, meth: 'QRIS', notes: 'Scaling ultrasonic lembut untuk ibu hamil.' },
     { daysAgo: 14, patIdx: '08555555555', doc: doctorAndi, branch: branch1, serv: 'konsultasi', amt: 150000, meth: 'DEBIT', notes: 'Konsultasi panoramik intraoral.' },
+    { daysAgo: 12, patIdx: '08123456707', doc: doctorClara, branch: branch3, serv: 'penambalan-gigi', amt: 550000, meth: 'DEBIT', notes: 'Tambalan komposit estetis gigi depan.' },
     { daysAgo: 10, patIdx: '08666666666', doc: doctorBudi, branch: branch2, serv: 'implan-gigi', amt: 12000000, meth: 'DEBIT', notes: 'Pemasangan fixture implan titanium gigi 46.' },
     { daysAgo: 7, patIdx: '08777777777', doc: doctorSarah, branch: branch1, serv: 'penambalan-gigi', amt: 550000, meth: 'QRIS', notes: 'Tambal komposit kelas II.' },
     { daysAgo: 5, patIdx: '08123456701', doc: doctorAndi, branch: branch1, serv: 'pembersihan-gigi', amt: 350000, meth: 'CASH', notes: 'Scaling profilaksis berkala.' },
+    { daysAgo: 4, patIdx: '08123456704', doc: doctorBudi, branch: branch3, serv: 'implan-gigi', amt: 12000000, meth: 'INSURANCE', notes: 'Restorasi mahkota implan titanium.' },
     { daysAgo: 3, patIdx: '08123456702', doc: doctorSarah, branch: branch2, serv: 'saluran-akar', amt: 1200000, meth: 'INSURANCE', notes: 'Obturasi saluran akar tuntas.' },
     { daysAgo: 2, patIdx: '08123456703', doc: doctorBudi, branch: branch1, serv: 'cabut-gigi', amt: 750000, meth: 'QRIS', notes: 'Ekstraksi gigi geraham bungsu.' },
     { daysAgo: 1, patIdx: '08123456704', doc: doctorSarah, branch: branch1, serv: 'pembersihan-gigi', amt: 350000, meth: 'DEBIT', notes: 'Pembersihan karang dan polishing fluoridasi.' },
@@ -1633,9 +2101,9 @@ async function main() {
   console.log('Demonstration Credentials (Password: demo123456):');
   console.log('  Superadmin: superadmin@demo.com');
   console.log('  Director:   director@demo.com');
-  console.log('  Manager:    manager@demo.com (Kelapa Gading), manager.pluit@demo.com (Pluit)');
-  console.log('  Staff:      staff@demo.com (Kelapa Gading), staff.pluit@demo.com (Pluit)');
-  console.log('  Doctors:    doctor.andi@demo.com, doctor.sarah@demo.com');
+  console.log('  Manager:    manager@demo.com (Kelapa Gading), manager.pluit@demo.com (Pluit), manager.senopati@demo.com (Senopati)');
+  console.log('  Staff:      staff@demo.com (Kelapa Gading), staff.pluit@demo.com (Pluit), staff.senopati@demo.com (Senopati)');
+  console.log('  Doctors:    doctor.andi@demo.com, doctor.sarah@demo.com, doctor.budi@demo.com, doctor.clara@demo.com');
   console.log('  Inactive:   inactive.staff@demo.com');
   console.log('======================================================');
 }
