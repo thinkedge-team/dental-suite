@@ -20,6 +20,7 @@ import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { formatRupiah } from "@/lib/intelligence/analytics";
 import { PatientNotesForm } from "./patient-notes-form";
+import { AnonymizePatientButton } from "./anonymize-patient-button";
 
 const WIB_OFFSET_HOURS = 7;
 
@@ -186,6 +187,14 @@ export default async function PatientDetailPage({
               </div>
             </div>
           </div>
+
+          {(session.user.role === "DIRECTOR" ||
+            session.user.role === "SUPER_ADMIN" ||
+            session.user.role === "MANAGER") && (
+            <div className="shrink-0">
+              <AnonymizePatientButton patientId={patient.id} patientName={patient.name} />
+            </div>
+          )}
         </div>
       </div>
 
